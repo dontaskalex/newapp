@@ -26,19 +26,94 @@ const WORLD_HEIGHT = 900;
 // World center - where everyone spawns near
 const SPAWN_CENTER_X = WORLD_WIDTH / 2;
 const SPAWN_CENTER_Y = WORLD_HEIGHT / 2;
-const SPAWN_RADIUS = 150; // How far from center players can spawn
+const HEX_SPACING = 70; // Distance between blob centers in hex grid
 
-// Random spawn near center
-function getSpawnPosition() {
-    const angle = Math.random() * Math.PI * 2;
-    const distance = Math.random() * SPAWN_RADIUS;
-    return {
-        x: SPAWN_CENTER_X + Math.cos(angle) * distance,
-        y: SPAWN_CENTER_Y + Math.sin(angle) * distance
-    };
+// Generate hexagonal grid positions sorted by distance from center
+function generateHexPositions() {
+    const positions = [];
+    const maxRings = 10; // How many rings of hexagons to generate
+
+    // Center position (ring 0)
+    positions.push({ x: SPAWN_CENTER_X, y: SPAWN_CENTER_Y, ring: 0 });
+
+    // Generate rings of hexagons
+    for (let ring = 1; ring <= maxRings; ring++) {
+        // Each ring has 6 * ring positions
+        for (let i = 0; i < 6; i++) {
+            // Start angle for this side of hexagon
+            const sideAngle = (Math.PI / 3) * i - Math.PI / 2;
+
+            // Walk along this side of the ring
+            for (let j = 0; j < ring; j++) {
+                // Calculate position using axial coordinates converted to cartesian
+                const angle1 = sideAngle;
+                const angle2 = sideAngle + Math.PI / 3;
+
+                // Position along the ring edge
+                const x = SPAWN_CENTER_X +
+                    HEX_SPACING * (ring - j) * Math.cos(angle1) +
+                    HEX_SPACING * j * Math.cos(angle2);
+                const y = SPAWN_CENTER_Y +
+                    HEX_SPACING * (ring - j) * Math.sin(angle1) +
+                    HEX_SPACING * j * Math.sin(angle2);
+
+                positions.push({ x, y, ring });
+            }
+        }
+    }
+
+    return positions;
 }
 
-const spawnPos = getSpawnPosition();
+const hexPositions = generateHexPositions();
+
+// Find the nearest free hex position
+function getSpawnPosition() {
+    // Get all occupied positions from other players
+    const occupiedPositions = new Set();
+    others.forEach((player) => {
+        // Find which hex position this player is closest to
+        const nearestHex = findNearestHexIndex(player.x, player.y);
+        if (nearestHex !== -1) {
+            occupiedPositions.add(nearestHex);
+        }
+    });
+
+    // Find first unoccupied position (they're already sorted by distance)
+    for (let i = 0; i < hexPositions.length; i++) {
+        if (!occupiedPositions.has(i)) {
+            return { x: hexPositions[i].x, y: hexPositions[i].y };
+        }
+    }
+
+    // Fallback if all positions taken (shouldn't happen with 10 rings)
+    return { x: SPAWN_CENTER_X, y: SPAWN_CENTER_Y };
+}
+
+// Find which hex position index a coordinate is closest to
+function findNearestHexIndex(x, y) {
+    let nearestIndex = -1;
+    let nearestDist = Infinity;
+
+    for (let i = 0; i < hexPositions.length; i++) {
+        const dx = hexPositions[i].x - x;
+        const dy = hexPositions[i].y - y;
+        const dist = dx * dx + dy * dy;
+        if (dist < nearestDist) {
+            nearestDist = dist;
+            nearestIndex = i;
+        }
+    }
+
+    // Only return if within reasonable distance of a hex position
+    if (nearestDist < (HEX_SPACING * 0.5) ** 2) {
+        return nearestIndex;
+    }
+    return -1;
+}
+
+// We'll get spawn position after connecting (need to know other players first)
+let spawnPos = { x: SPAWN_CENTER_X, y: SPAWN_CENTER_Y };
 
 // My character state - spawn near world center
 const me = {
@@ -508,7 +583,10 @@ function render() {
     ctx.scale(zoomLevel, zoomLevel);
     ctx.translate(-screenCenterX, -screenCenterY);
 
-    // Draw other players first (behind)
+    // Collect bubble data for drawing on top later
+    const bubblesToDraw = [];
+
+    // Draw all characters first
     others.forEach((player) => {
         const screenPos = worldToScreen(player.x, player.y);
 
@@ -529,13 +607,9 @@ function render() {
                 }
             }
 
-            // Calculate emote opacity
-            let emoteOpacity = 1;
+            // Calculate emote state
             if (player.emote && player.emoteTime) {
                 const elapsed = now - player.emoteTime;
-                if (elapsed > EMOTE_DURATION - 500) {
-                    emoteOpacity = Math.max(0, 1 - (elapsed - (EMOTE_DURATION - 500)) / 500);
-                }
                 if (elapsed > EMOTE_DURATION) {
                     player.emote = null;
                 }
@@ -545,8 +619,10 @@ function render() {
             const activeEmote = player.emote && player.emoteTime && (now - player.emoteTime < EMOTE_DURATION) ? player.emote : null;
 
             drawCharacter(screenPos.x, screenPos.y, false, player.bobOffset || 0, activeEmote);
-            if (player.message && !activeEmote) {
-                drawSpeechBubble(screenPos.x, screenPos.y, player.message, bubbleOpacity);
+
+            // Queue bubble for later if needed (independent of emote)
+            if (player.message) {
+                bubblesToDraw.push({ x: screenPos.x, y: screenPos.y, message: player.message, opacity: bubbleOpacity });
             }
         }
     });
@@ -563,13 +639,9 @@ function render() {
         }
     }
 
-    // Calculate my emote opacity
-    let myEmoteOpacity = 1;
+    // Calculate my emote state
     if (me.emote && me.emoteTime) {
         const elapsed = now - me.emoteTime;
-        if (elapsed > EMOTE_DURATION - 500) {
-            myEmoteOpacity = Math.max(0, 1 - (elapsed - (EMOTE_DURATION - 500)) / 500);
-        }
         if (elapsed > EMOTE_DURATION) {
             me.emote = null;
         }
@@ -579,8 +651,15 @@ function render() {
     const myActiveEmote = me.emote && me.emoteTime && (now - me.emoteTime < EMOTE_DURATION) ? me.emote : null;
 
     drawCharacter(screenCenterX, screenCenterY, true, me.bobOffset, myActiveEmote);
-    if (me.message && !myActiveEmote) {
-        drawSpeechBubble(screenCenterX, screenCenterY, me.message, myBubbleOpacity);
+
+    // Queue my bubble for later if needed (independent of emote)
+    if (me.message) {
+        bubblesToDraw.push({ x: screenCenterX, y: screenCenterY, message: me.message, opacity: myBubbleOpacity });
+    }
+
+    // Now draw all speech bubbles on top
+    for (const bubble of bubblesToDraw) {
+        drawSpeechBubble(bubble.x, bubble.y, bubble.message, bubble.opacity);
     }
 
     ctx.restore();
@@ -716,7 +795,15 @@ async function connectToLobby() {
     // Subscribe and track presence
     await channel.subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
-            // Track my presence
+            // Wait a moment for presence sync to complete
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Now get spawn position based on who else is here
+            const spawnPos = getSpawnPosition();
+            me.x = spawnPos.x;
+            me.y = spawnPos.y;
+
+            // Track my presence at the hex position
             await channel.track({
                 x: me.x,
                 y: me.y,
