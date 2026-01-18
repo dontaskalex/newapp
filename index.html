@@ -3,10 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Page</title>
+    <title>Merge to Zero</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 400px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .score-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .score-display span {
+            color: #4ade80;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .game-wrapper {
+            position: relative;
+        }
+
+        #game-canvas {
+            border-radius: 0 0 20px 20px;
+            background: linear-gradient(180deg, #0f0f23 0%, #1a1a3e 100%);
+            box-shadow: 0 0 40px rgba(74, 222, 128, 0.2);
+        }
+
+        .drop-zone {
+            width: 400px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px 20px 0 0;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .preview-ball {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            transition: left 0.05s ease-out;
+            cursor: pointer;
+        }
+
+        .next-display {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .next-display .label {
+            opacity: 0.7;
+        }
+
+        .next-balls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .next-ball {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .instructions {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            display: none;
+            z-index: 100;
+        }
+
+        .game-over h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #f87171;
+        }
+
+        .game-over .final-score {
+            font-size: 48px;
+            color: #4ade80;
+            margin: 20px 0;
+        }
+
+        .game-over button {
+            background: #4ade80;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #1a1a2e;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .game-over button:hover {
+            transform: scale(1.05);
+        }
+
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #fbbf24;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .combo-display.show {
+            opacity: 1;
+            animation: combo-pop 0.5s ease-out;
+        }
+
+        @keyframes combo-pop {
+            0% { transform: translate(-50%, -50%) scale(0.5); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .danger-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(248, 113, 113, 0.3) 0%, transparent 100%);
+            pointer-events: none;
+            border-radius: 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
-    <p>Welcome to my simple webpage.</p>
+    <div class="game-container">
+        <div class="header">
+            <div class="score-display">Score: <span id="score">0</span></div>
+            <div class="score-display">Best: <span id="best-score">0</span></div>
+        </div>
+
+        <div class="game-wrapper">
+            <div class="drop-zone" id="drop-zone">
+                <div class="preview-ball" id="preview-ball"></div>
+            </div>
+            <canvas id="game-canvas" width="400" height="500"></canvas>
+            <div class="danger-zone"></div>
+            <div class="combo-display" id="combo-display"></div>
+            <div class="game-over" id="game-over">
+                <h2>Game Over!</h2>
+                <div>Final Score</div>
+                <div class="final-score" id="final-score">0</div>
+                <button onclick="restartGame()">Play Again</button>
+            </div>
+        </div>
+
+        <div class="next-display">
+            <span class="label">Next:</span>
+            <div class="next-balls" id="next-balls"></div>
+        </div>
+
+        <div class="instructions">
+            Move mouse to aim • Click to drop • Match opposites to zero!
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
