@@ -262,6 +262,82 @@
             -webkit-user-select: text;
             user-select: text;
         }
+
+        /* Emote button and picker */
+        .emote-btn {
+            width: 48px;
+            height: 48px;
+            border: 2px solid #2d2d2d;
+            border-radius: 50%;
+            background: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .emote-btn:hover {
+            transform: scale(1.05);
+            background: #f5f0e8;
+        }
+
+        .emote-picker {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            background: #fff;
+            border: 2px solid #2d2d2d;
+            border-radius: 25px;
+            padding: 8px 12px;
+            display: none;
+            gap: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .emote-picker.show {
+            display: flex;
+        }
+
+        .emote-option {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emote-option:hover {
+            background: #f5f0e8;
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 600px) {
+            .emote-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+
+            .emote-picker {
+                bottom: 55px;
+                padding: 6px 8px;
+            }
+
+            .emote-option {
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -284,6 +360,14 @@
 
     <div class="hint">press enter to send a message</div>
     <div class="chat-container">
+        <button class="emote-btn" id="emote-btn">😊</button>
+        <div class="emote-picker" id="emote-picker">
+            <button class="emote-option" data-emote="sad">😢</button>
+            <button class="emote-option" data-emote="love">😍</button>
+            <button class="emote-option" data-emote="laugh">😂</button>
+            <button class="emote-option" data-emote="sleepy">😴</button>
+            <button class="emote-option" data-emote="surprised">😮</button>
+        </div>
         <input type="text" class="chat-input" id="chat-input" placeholder="say something..." maxlength="100" autocomplete="off">
         <button class="send-btn" id="send-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

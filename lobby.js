@@ -48,6 +48,18 @@ const me = {
     message: null,
     messageTime: 0,
     bobOffset: Math.random() * Math.PI * 2, // Random start for idle animation
+    emote: null,
+    emoteTime: 0,
+};
+
+// Emote settings
+const EMOTE_DURATION = 4000; // 4 seconds
+const EMOTE_ICONS = {
+    sad: '😢',
+    love: '😍',
+    laugh: '😂',
+    sleepy: '😴',
+    surprised: '😮',
 };
 
 // Other players in the lobby
@@ -60,9 +72,203 @@ const BUBBLE_FADE_TIME = 1000; // 1 second fade
 // Zoom level (1 = normal, 0.5 = zoomed out 2x)
 let zoomLevel = 1;
 
+// Draw face based on current emote
+function drawFace(ctx, time, bobOffset, emote) {
+    ctx.fillStyle = '#f5f0e8';
+    ctx.strokeStyle = '#f5f0e8';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+
+    if (emote === 'sad') {
+        // Sad face - droopy eyes with tears streaming down
+        // Sad droopy eyes (upside down arcs)
+        ctx.strokeStyle = '#f5f0e8';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(-7, -6, 4, 0.3, Math.PI - 0.3);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(7, -6, 4, 0.3, Math.PI - 0.3);
+        ctx.stroke();
+        // Animated tears streaming down
+        const tearOffset = (time * 40) % 25;
+        ctx.fillStyle = '#67e8f9';
+        // Left side tears
+        ctx.beginPath();
+        ctx.ellipse(-7, -2 + tearOffset, 2, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(-9, 8 + (tearOffset + 12) % 25, 1.5, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Right side tears
+        ctx.beginPath();
+        ctx.ellipse(7, -2 + (tearOffset + 8) % 25, 2, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(9, 8 + tearOffset, 1.5, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Wobbly frown
+        const wobble = Math.sin(time * 3) * 0.5;
+        ctx.strokeStyle = '#f5f0e8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 14 + wobble, 5, Math.PI + 0.4, -0.4);
+        ctx.stroke();
+
+    } else if (emote === 'love') {
+        // Love face - heart eyes
+        ctx.fillStyle = '#f472b6';
+        // Left heart
+        ctx.beginPath();
+        ctx.moveTo(-7, -3);
+        ctx.bezierCurveTo(-12, -8, -12, -2, -7, 2);
+        ctx.bezierCurveTo(-2, -2, -2, -8, -7, -3);
+        ctx.fill();
+        // Right heart
+        ctx.beginPath();
+        ctx.moveTo(7, -3);
+        ctx.bezierCurveTo(2, -8, 2, -2, 7, 2);
+        ctx.bezierCurveTo(12, -2, 12, -8, 7, -3);
+        ctx.fill();
+        // Blushing cheeks
+        ctx.fillStyle = 'rgba(255, 100, 100, 0.5)';
+        ctx.beginPath();
+        ctx.ellipse(-14, 2, 6, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(14, 2, 6, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Happy smile
+        ctx.strokeStyle = '#f5f0e8';
+        ctx.beginPath();
+        ctx.arc(0, 2, 6, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+
+    } else if (emote === 'laugh') {
+        // Laughing face - closed happy eyes, big smile
+        // Closed happy eyes (arcs)
+        ctx.strokeStyle = '#f5f0e8';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(-7, -4, 4, Math.PI + 0.5, -0.5);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(7, -4, 4, Math.PI + 0.5, -0.5);
+        ctx.stroke();
+        // Rosy cheeks
+        ctx.fillStyle = 'rgba(255, 150, 150, 0.4)';
+        ctx.beginPath();
+        ctx.ellipse(-14, 2, 5, 3, 0, 0, Math.PI * 2);
+        ctx.ellipse(14, 2, 5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Big open mouth smile
+        ctx.fillStyle = '#f5f0e8';
+        ctx.beginPath();
+        ctx.arc(0, 5, 8, 0, Math.PI);
+        ctx.fill();
+
+    } else if (emote === 'sleepy') {
+        // Sleepy face - closed eyes, zzz
+        // Closed sleepy eyes
+        ctx.strokeStyle = '#f5f0e8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-10, -5);
+        ctx.lineTo(-4, -5);
+        ctx.moveTo(4, -5);
+        ctx.lineTo(10, -5);
+        ctx.stroke();
+        // Small o mouth
+        ctx.fillStyle = '#f5f0e8';
+        ctx.beginPath();
+        ctx.ellipse(0, 5, 4, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Zzz floating with contours - all same size
+        ctx.textAlign = 'left';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.strokeStyle = '#2d2d2d';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        const zzOffset = Math.sin(time * 2) * 2;
+
+        // Draw each Z with stroke outline then fill - same size, staggered position
+        // First Z
+        ctx.strokeText('z', 15, -6 + zzOffset);
+        ctx.fillStyle = '#f5f0e8';
+        ctx.fillText('z', 15, -6 + zzOffset);
+
+        // Second Z
+        ctx.strokeText('z', 22, -13 + zzOffset);
+        ctx.fillText('z', 22, -13 + zzOffset);
+
+        // Third Z
+        ctx.strokeText('z', 29, -20 + zzOffset);
+        ctx.fillText('z', 29, -20 + zzOffset);
+
+    } else if (emote === 'surprised') {
+        // Surprised face - wide eyes, o mouth
+        // Big wide eyes
+        ctx.fillStyle = '#f5f0e8';
+        ctx.beginPath();
+        ctx.arc(-7, -5, 6, 0, Math.PI * 2);
+        ctx.arc(7, -5, 6, 0, Math.PI * 2);
+        ctx.fill();
+        // Small pupils
+        ctx.fillStyle = '#2d2d2d';
+        ctx.beginPath();
+        ctx.arc(-7, -5, 2.5, 0, Math.PI * 2);
+        ctx.arc(7, -5, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        // O mouth
+        ctx.fillStyle = '#f5f0e8';
+        ctx.beginPath();
+        ctx.ellipse(0, 6, 5, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+    } else {
+        // Default neutral face
+        const blinkCycle = (time + bobOffset) % 4;
+        const isBlinking = blinkCycle > 3.8;
+
+        if (isBlinking) {
+            ctx.strokeStyle = '#f5f0e8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-10, -5);
+            ctx.lineTo(-4, -5);
+            ctx.moveTo(4, -5);
+            ctx.lineTo(10, -5);
+            ctx.stroke();
+        } else {
+            ctx.fillStyle = '#f5f0e8';
+            ctx.beginPath();
+            ctx.arc(-7, -5, 4, 0, Math.PI * 2);
+            ctx.arc(7, -5, 4, 0, Math.PI * 2);
+            ctx.fill();
+            // Pupils
+            ctx.fillStyle = '#2d2d2d';
+            const lookX = Math.sin(time * 0.3 + bobOffset) * 1.5;
+            const lookY = Math.cos(time * 0.2 + bobOffset) * 1;
+            ctx.beginPath();
+            ctx.arc(-7 + lookX, -5 + lookY, 2, 0, Math.PI * 2);
+            ctx.arc(7 + lookX, -5 + lookY, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // Rosy cheeks
+        ctx.fillStyle = 'rgba(255, 150, 150, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(-14, 2, 5, 3, 0, 0, Math.PI * 2);
+        ctx.ellipse(14, 2, 5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Small smile
+        ctx.strokeStyle = '#f5f0e8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 2, 6, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+    }
+}
 
 // Character drawing - simple hand-drawn style blob person
-function drawCharacter(x, y, isMe = false, bobOffset = 0) {
+function drawCharacter(x, y, isMe = false, bobOffset = 0, emote = null) {
     const time = Date.now() / 1000;
     const bob = Math.sin(time * 2 + bobOffset) * 3; // Gentle bobbing
 
@@ -97,54 +303,8 @@ function drawCharacter(x, y, isMe = false, bobOffset = 0) {
     ctx.closePath();
     ctx.fill();
 
-    // Eyes - simple dots
-    ctx.fillStyle = '#f5f0e8';
-
-    // Blink occasionally
-    const blinkCycle = (time + bobOffset) % 4;
-    const isBlinking = blinkCycle > 3.8;
-
-    if (isBlinking) {
-        // Closed eyes - lines
-        ctx.strokeStyle = '#f5f0e8';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(-10, -5);
-        ctx.lineTo(-4, -5);
-        ctx.moveTo(4, -5);
-        ctx.lineTo(10, -5);
-        ctx.stroke();
-    } else {
-        // Open eyes
-        ctx.beginPath();
-        ctx.arc(-7, -5, 4, 0, Math.PI * 2);
-        ctx.arc(7, -5, 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pupils - look slightly in random direction
-        ctx.fillStyle = '#2d2d2d';
-        const lookX = Math.sin(time * 0.3 + bobOffset) * 1.5;
-        const lookY = Math.cos(time * 0.2 + bobOffset) * 1;
-        ctx.beginPath();
-        ctx.arc(-7 + lookX, -5 + lookY, 2, 0, Math.PI * 2);
-        ctx.arc(7 + lookX, -5 + lookY, 2, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    // Rosy cheeks
-    ctx.fillStyle = 'rgba(255, 150, 150, 0.3)';
-    ctx.beginPath();
-    ctx.ellipse(-14, 2, 5, 3, 0, 0, Math.PI * 2);
-    ctx.ellipse(14, 2, 5, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Small smile
-    ctx.strokeStyle = '#f5f0e8';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.arc(0, 2, 6, 0.2, Math.PI - 0.2);
-    ctx.stroke();
+    // Draw face based on emote
+    drawFace(ctx, time, bobOffset, emote);
 
     // "You" indicator for own character
     if (isMe) {
@@ -369,8 +529,23 @@ function render() {
                 }
             }
 
-            drawCharacter(screenPos.x, screenPos.y, false, player.bobOffset || 0);
-            if (player.message) {
+            // Calculate emote opacity
+            let emoteOpacity = 1;
+            if (player.emote && player.emoteTime) {
+                const elapsed = now - player.emoteTime;
+                if (elapsed > EMOTE_DURATION - 500) {
+                    emoteOpacity = Math.max(0, 1 - (elapsed - (EMOTE_DURATION - 500)) / 500);
+                }
+                if (elapsed > EMOTE_DURATION) {
+                    player.emote = null;
+                }
+            }
+
+            // Get active emote (if not expired)
+            const activeEmote = player.emote && player.emoteTime && (now - player.emoteTime < EMOTE_DURATION) ? player.emote : null;
+
+            drawCharacter(screenPos.x, screenPos.y, false, player.bobOffset || 0, activeEmote);
+            if (player.message && !activeEmote) {
                 drawSpeechBubble(screenPos.x, screenPos.y, player.message, bubbleOpacity);
             }
         }
@@ -388,8 +563,23 @@ function render() {
         }
     }
 
-    drawCharacter(screenCenterX, screenCenterY, true, me.bobOffset);
-    if (me.message) {
+    // Calculate my emote opacity
+    let myEmoteOpacity = 1;
+    if (me.emote && me.emoteTime) {
+        const elapsed = now - me.emoteTime;
+        if (elapsed > EMOTE_DURATION - 500) {
+            myEmoteOpacity = Math.max(0, 1 - (elapsed - (EMOTE_DURATION - 500)) / 500);
+        }
+        if (elapsed > EMOTE_DURATION) {
+            me.emote = null;
+        }
+    }
+
+    // Get my active emote
+    const myActiveEmote = me.emote && me.emoteTime && (now - me.emoteTime < EMOTE_DURATION) ? me.emote : null;
+
+    drawCharacter(screenCenterX, screenCenterY, true, me.bobOffset, myActiveEmote);
+    if (me.message && !myActiveEmote) {
         drawSpeechBubble(screenCenterX, screenCenterY, me.message, myBubbleOpacity);
     }
 
@@ -412,6 +602,24 @@ function sendMessage(text) {
         payload: {
             id: me.id,
             message: me.message,
+        }
+    });
+}
+
+// Send an emote
+function sendEmote(emote) {
+    if (!EMOTE_ICONS[emote]) return;
+
+    me.emote = emote;
+    me.emoteTime = Date.now();
+
+    // Broadcast to others
+    channel.send({
+        type: 'broadcast',
+        event: 'emote',
+        payload: {
+            id: me.id,
+            emote: emote,
         }
     });
 }
@@ -494,6 +702,17 @@ async function connectToLobby() {
         }
     });
 
+    // Handle broadcast emotes
+    channel.on('broadcast', { event: 'emote' }, ({ payload }) => {
+        if (payload.id !== me.id) {
+            const player = others.get(payload.id);
+            if (player) {
+                player.emote = payload.emote;
+                player.emoteTime = Date.now();
+            }
+        }
+    });
+
     // Subscribe and track presence
     await channel.subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
@@ -528,6 +747,30 @@ sendBtn.addEventListener('click', () => {
     sendMessage(chatInput.value);
     chatInput.value = '';
     chatInput.focus();
+});
+
+// Emote picker handling
+const emoteBtn = document.getElementById('emote-btn');
+const emotePicker = document.getElementById('emote-picker');
+
+emoteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    emotePicker.classList.toggle('show');
+});
+
+// Handle emote selection
+document.querySelectorAll('.emote-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const emote = btn.dataset.emote;
+        sendEmote(emote);
+        emotePicker.classList.remove('show');
+    });
+});
+
+// Close picker when clicking elsewhere
+document.addEventListener('click', () => {
+    emotePicker.classList.remove('show');
 });
 
 // Start everything
