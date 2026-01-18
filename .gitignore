@@ -1,0 +1,8 @@
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Playwright MCP screenshots
+.playwright-mcp/

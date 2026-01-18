@@ -125,6 +125,8 @@ const me = {
     bobOffset: Math.random() * Math.PI * 2, // Random start for idle animation
     emote: null,
     emoteTime: 0,
+    hat: 'none', // Current hat (session only, not saved)
+    bubble: 'default', // Current bubble skin
 };
 
 // Emote settings
@@ -136,6 +138,206 @@ const EMOTE_ICONS = {
     sleepy: '😴',
     surprised: '😮',
 };
+
+// Hat definitions - each hat has unlock time in seconds
+const HATS = {
+    none: { name: 'None', icon: '🚫', unlockTime: 0 },
+    tophat: { name: 'Top Hat', icon: '🎩', unlockTime: 0 },
+    cowboy: { name: 'Cowboy', icon: '🤠', unlockTime: 300 }, // 5 minutes
+    halo: { name: 'Halo', icon: '😇', unlockTime: 900 }, // 15 minutes
+};
+
+// Bubble skin definitions
+const BUBBLES = {
+    default: { name: 'Default', icon: '💬', unlockTime: 0 },
+    chalk: { name: 'Chalk', icon: '✏️', unlockTime: 180 }, // 3 minutes
+    night: { name: 'Night', icon: '🌙', unlockTime: 600 }, // 10 minutes
+    golden: { name: 'Golden', icon: '✨', unlockTime: 1200 }, // 20 minutes
+};
+
+
+// Time tracking
+let totalTimeSpent = parseInt(localStorage.getItem('lobbyTimeSpent') || '0');
+let sessionStartTime = Date.now();
+
+// Save time every 10 seconds
+setInterval(() => {
+    const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+    const newTotal = totalTimeSpent + sessionTime;
+    localStorage.setItem('lobbyTimeSpent', newTotal.toString());
+    updateHatPickerUI();
+    updateBubblePickerUI();
+}, 10000);
+
+// Save time on page unload
+window.addEventListener('beforeunload', () => {
+    const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+    const newTotal = totalTimeSpent + sessionTime;
+    localStorage.setItem('lobbyTimeSpent', newTotal.toString());
+});
+
+// Check if running on localhost (unlock everything for testing)
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Check if a hat is unlocked
+function isHatUnlocked(hatKey) {
+    if (isLocalhost) return true; // Unlock all on localhost
+    const hat = HATS[hatKey];
+    if (!hat) return false;
+    const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+    const currentTotal = totalTimeSpent + sessionTime;
+    return currentTotal >= hat.unlockTime;
+}
+
+// Check if a bubble is unlocked
+function isBubbleUnlocked(bubbleKey) {
+    if (isLocalhost) return true; // Unlock all on localhost
+    const bubble = BUBBLES[bubbleKey];
+    if (!bubble) return false;
+    const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+    const currentTotal = totalTimeSpent + sessionTime;
+    return currentTotal >= bubble.unlockTime;
+}
+
+
+// Get current total time
+function getCurrentTotalTime() {
+    const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+    return totalTimeSpent + sessionTime;
+}
+
+// Format time as minutes
+function formatTime(seconds) {
+    const mins = Math.ceil(seconds / 60);
+    return `${mins} min`;
+}
+
+// Update hat picker UI to show locked/unlocked state
+function updateHatPickerUI() {
+    document.querySelectorAll('.hat-option').forEach(btn => {
+        const hatKey = btn.dataset.hat;
+        const hat = HATS[hatKey];
+        if (!hat) return;
+
+        const unlocked = isHatUnlocked(hatKey);
+        btn.classList.toggle('locked', !unlocked);
+
+        if (!unlocked) {
+            const timeNeeded = hat.unlockTime - getCurrentTotalTime();
+            btn.title = `Unlocks in ${formatTime(timeNeeded)}`;
+        } else {
+            btn.title = hat.name;
+        }
+    });
+}
+
+// Update bubble picker UI to show locked/unlocked state
+function updateBubblePickerUI() {
+    document.querySelectorAll('.bubble-option').forEach(btn => {
+        const bubbleKey = btn.dataset.bubble;
+        const bubble = BUBBLES[bubbleKey];
+        if (!bubble) return;
+
+        const unlocked = isBubbleUnlocked(bubbleKey);
+        btn.classList.toggle('locked', !unlocked);
+
+        if (!unlocked) {
+            const timeNeeded = bubble.unlockTime - getCurrentTotalTime();
+            btn.title = `Unlocks in ${formatTime(timeNeeded)}`;
+        } else {
+            btn.title = bubble.name;
+        }
+    });
+}
+
+
+// Draw hat on character (called from drawCharacter, ctx already translated)
+function drawHat(ctx, time, hat) {
+    if (!hat || hat === 'none') return;
+
+    ctx.save();
+
+    if (hat === 'tophat') {
+        // Classic black top hat
+        ctx.fillStyle = '#1a1a1a';
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        // Brim
+        ctx.beginPath();
+        ctx.ellipse(0, -28, 22, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Cylinder
+        ctx.fillRect(-12, -58, 24, 30);
+        ctx.strokeRect(-12, -58, 24, 30);
+        // Top
+        ctx.beginPath();
+        ctx.ellipse(0, -58, 12, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Red ribbon
+        ctx.fillStyle = '#dc2626';
+        ctx.fillRect(-12, -35, 24, 5);
+
+    } else if (hat === 'cowboy') {
+        // Western cowboy hat
+        ctx.fillStyle = '#92400e';
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 2;
+        // Wide brim
+        ctx.beginPath();
+        ctx.ellipse(0, -26, 28, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Curved brim edges
+        ctx.beginPath();
+        ctx.moveTo(-28, -26);
+        ctx.quadraticCurveTo(-30, -32, -24, -28);
+        ctx.moveTo(28, -26);
+        ctx.quadraticCurveTo(30, -32, 24, -28);
+        ctx.stroke();
+        // Crown
+        ctx.beginPath();
+        ctx.moveTo(-14, -26);
+        ctx.quadraticCurveTo(-16, -42, -8, -45);
+        ctx.lineTo(8, -45);
+        ctx.quadraticCurveTo(16, -42, 14, -26);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        // Indent on top
+        ctx.beginPath();
+        ctx.moveTo(-6, -45);
+        ctx.quadraticCurveTo(0, -40, 6, -45);
+        ctx.stroke();
+        // Band
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(-14, -32, 28, 4);
+
+    } else if (hat === 'halo') {
+        // Floating golden halo
+        const float = Math.sin(time * 2) * 3;
+        const glow = 0.5 + Math.sin(time * 3) * 0.2;
+        // Glow effect
+        ctx.shadowColor = '#fbbf24';
+        ctx.shadowBlur = 15;
+        ctx.strokeStyle = `rgba(251, 191, 36, ${glow})`;
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.ellipse(0, -45 + float, 18, 5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        // Solid halo
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.ellipse(0, -45 + float, 18, 5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+    }
+
+    ctx.restore();
+}
 
 // Other players in the lobby
 const others = new Map();
@@ -343,7 +545,7 @@ function drawFace(ctx, time, bobOffset, emote) {
 }
 
 // Character drawing - simple hand-drawn style blob person
-function drawCharacter(x, y, isMe = false, bobOffset = 0, emote = null) {
+function drawCharacter(x, y, isMe = false, bobOffset = 0, emote = null, hat = null) {
     const time = Date.now() / 1000;
     const bob = Math.sin(time * 2 + bobOffset) * 3; // Gentle bobbing
 
@@ -380,6 +582,9 @@ function drawCharacter(x, y, isMe = false, bobOffset = 0, emote = null) {
 
     // Draw face based on emote
     drawFace(ctx, time, bobOffset, emote);
+
+    // Draw hat on top
+    drawHat(ctx, time, hat);
 
     // "You" indicator for own character
     if (isMe) {
@@ -418,7 +623,7 @@ function wrapText(ctx, text, maxWidth) {
 }
 
 // Draw speech bubble
-function drawSpeechBubble(x, y, message, opacity = 1) {
+function drawSpeechBubble(x, y, message, opacity = 1, bubbleSkin = 'default') {
     if (!message) return;
 
     ctx.save();
@@ -453,10 +658,31 @@ function drawSpeechBubble(x, y, message, opacity = 1) {
     const bubbleX = x - bubbleWidth / 2;
     const bubbleY = y - 50 - bubbleHeight;
 
-    // Bubble background with hand-drawn feel
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#2d2d2d';
-    ctx.lineWidth = 2;
+    // Skin-specific colors
+    let bgColor = '#fff';
+    let strokeColor = '#2d2d2d';
+    let textColor = '#2d2d2d';
+    let lineW = 2;
+
+    if (bubbleSkin === 'chalk') {
+        bgColor = '#faf8f5';
+        strokeColor = '#6b7280';
+        textColor = '#374151';
+        lineW = 3;
+    } else if (bubbleSkin === 'night') {
+        bgColor = '#1f2937';
+        strokeColor = '#4b5563';
+        textColor = '#f3f4f6';
+    } else if (bubbleSkin === 'golden') {
+        bgColor = '#fffbeb';
+        strokeColor = '#d97706';
+        textColor = '#92400e';
+        lineW = 3;
+    }
+
+    ctx.fillStyle = bgColor;
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = lineW;
 
     // Rounded rectangle
     const radius = 18;
@@ -475,7 +701,7 @@ function drawSpeechBubble(x, y, message, opacity = 1) {
     ctx.stroke();
 
     // Little tail pointing down
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = bgColor;
     ctx.beginPath();
     ctx.moveTo(x - 8, bubbleY + bubbleHeight - 1);
     ctx.lineTo(x, bubbleY + bubbleHeight + 10);
@@ -491,11 +717,11 @@ function drawSpeechBubble(x, y, message, opacity = 1) {
     ctx.stroke();
 
     // Cover the line inside the bubble
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = bgColor;
     ctx.fillRect(x - 7, bubbleY + bubbleHeight - 2, 14, 3);
 
     // Text - draw each line
-    ctx.fillStyle = '#2d2d2d';
+    ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -618,11 +844,11 @@ function render() {
             // Get active emote (if not expired)
             const activeEmote = player.emote && player.emoteTime && (now - player.emoteTime < EMOTE_DURATION) ? player.emote : null;
 
-            drawCharacter(screenPos.x, screenPos.y, false, player.bobOffset || 0, activeEmote);
+            drawCharacter(screenPos.x, screenPos.y, false, player.bobOffset || 0, activeEmote, player.hat);
 
             // Queue bubble for later if needed (independent of emote)
             if (player.message) {
-                bubblesToDraw.push({ x: screenPos.x, y: screenPos.y, message: player.message, opacity: bubbleOpacity });
+                bubblesToDraw.push({ x: screenPos.x, y: screenPos.y, message: player.message, opacity: bubbleOpacity, bubble: player.bubble || 'default' });
             }
         }
     });
@@ -650,16 +876,16 @@ function render() {
     // Get my active emote
     const myActiveEmote = me.emote && me.emoteTime && (now - me.emoteTime < EMOTE_DURATION) ? me.emote : null;
 
-    drawCharacter(screenCenterX, screenCenterY, true, me.bobOffset, myActiveEmote);
+    drawCharacter(screenCenterX, screenCenterY, true, me.bobOffset, myActiveEmote, me.hat);
 
     // Queue my bubble for later if needed (independent of emote)
     if (me.message) {
-        bubblesToDraw.push({ x: screenCenterX, y: screenCenterY, message: me.message, opacity: myBubbleOpacity });
+        bubblesToDraw.push({ x: screenCenterX, y: screenCenterY, message: me.message, opacity: myBubbleOpacity, bubble: me.bubble });
     }
 
     // Now draw all speech bubbles on top
     for (const bubble of bubblesToDraw) {
-        drawSpeechBubble(bubble.x, bubble.y, bubble.message, bubble.opacity);
+        drawSpeechBubble(bubble.x, bubble.y, bubble.message, bubble.opacity, bubble.bubble);
     }
 
     ctx.restore();
@@ -741,6 +967,7 @@ async function connectToLobby() {
                     message: p.message || null,
                     messageTime: p.messageTime || 0,
                     bobOffset: p.bobOffset || 0,
+                    hat: p.hat || 'none',
                 });
             }
         });
@@ -759,6 +986,7 @@ async function connectToLobby() {
                 message: null,
                 messageTime: 0,
                 bobOffset: p.bobOffset || 0,
+                hat: p.hat || 'none',
             });
             updateOnlineCount(others.size + 1);
         }
@@ -792,6 +1020,26 @@ async function connectToLobby() {
         }
     });
 
+    // Handle broadcast hat changes
+    channel.on('broadcast', { event: 'hat' }, ({ payload }) => {
+        if (payload.id !== me.id) {
+            const player = others.get(payload.id);
+            if (player) {
+                player.hat = payload.hat;
+            }
+        }
+    });
+
+    // Handle broadcast bubble changes
+    channel.on('broadcast', { event: 'bubble' }, ({ payload }) => {
+        if (payload.id !== me.id) {
+            const player = others.get(payload.id);
+            if (player) {
+                player.bubble = payload.bubble;
+            }
+        }
+    });
+
     // Subscribe and track presence
     await channel.subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
@@ -808,7 +1056,9 @@ async function connectToLobby() {
                 x: me.x,
                 y: me.y,
                 bobOffset: me.bobOffset,
-            });
+                hat: me.hat,
+                bubble: me.bubble,
+                            });
 
             // Hide connecting overlay
             setTimeout(() => {
@@ -858,11 +1108,122 @@ document.querySelectorAll('.emote-option').forEach(btn => {
 // Close picker when clicking elsewhere
 document.addEventListener('click', () => {
     emotePicker.classList.remove('show');
+    hatPicker.classList.remove('show');
 });
+
+// Hat picker handling
+const hatBtn = document.getElementById('hat-btn');
+const hatPicker = document.getElementById('hat-picker');
+
+hatBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    updateHatPickerUI(); // Update lock states when opening
+    hatPicker.classList.toggle('show');
+    emotePicker.classList.remove('show');
+});
+
+// Close emote picker when opening hat picker
+emoteBtn.addEventListener('click', () => {
+    hatPicker.classList.remove('show');
+});
+
+// Handle hat selection
+function setHat(hat) {
+    if (!HATS[hat]) return;
+    if (!isHatUnlocked(hat)) return; // Can't use locked hats
+
+    me.hat = hat;
+
+    // Broadcast to others
+    channel.send({
+        type: 'broadcast',
+        event: 'hat',
+        payload: {
+            id: me.id,
+            hat: hat,
+        }
+    });
+
+    // Update presence
+    channel.track({
+        x: me.x,
+        y: me.y,
+        bobOffset: me.bobOffset,
+        hat: me.hat,
+        bubble: me.bubble,
+            });
+}
+
+document.querySelectorAll('.hat-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const hat = btn.dataset.hat;
+        setHat(hat);
+        hatPicker.classList.remove('show');
+    });
+});
+
+// Bubble picker handling
+const bubbleBtn = document.getElementById('bubble-btn');
+const bubblePicker = document.getElementById('bubble-picker');
+
+if (bubbleBtn && bubblePicker) {
+    bubbleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        updateBubblePickerUI(); // Update lock states when opening
+        bubblePicker.classList.toggle('show');
+        hatPicker.classList.remove('show');
+        emotePicker.classList.remove('show');
+    });
+
+    // Handle bubble selection
+    document.querySelectorAll('.bubble-option').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const bubble = btn.dataset.bubble;
+            setBubble(bubble);
+            bubblePicker.classList.remove('show');
+        });
+    });
+}
+
+// Close bubble picker when clicking elsewhere
+document.addEventListener('click', () => {
+    if (bubblePicker) bubblePicker.classList.remove('show');
+});
+
+// Handle bubble selection
+function setBubble(bubble) {
+    if (!BUBBLES[bubble]) return;
+    if (!isBubbleUnlocked(bubble)) return; // Can't use locked bubbles
+
+    me.bubble = bubble;
+
+    // Broadcast to others
+    channel.send({
+        type: 'broadcast',
+        event: 'bubble',
+        payload: {
+            id: me.id,
+            bubble: bubble,
+        }
+    });
+
+    // Update presence
+    channel.track({
+        x: me.x,
+        y: me.y,
+        bobOffset: me.bobOffset,
+        hat: me.hat,
+        bubble: me.bubble,
+            });
+}
 
 // Start everything
 render();
 connectToLobby();
+updateHatPickerUI(); // Initialize hat lock states
+updateBubblePickerUI(); // Initialize bubble lock states
 
 // Cleanup on page close
 window.addEventListener('beforeunload', () => {
