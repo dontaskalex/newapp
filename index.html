@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merge to Zero</title>
+    <title>The Lobby</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,229 +15,224 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #f5f0e8;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-
-        .game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
         }
 
         .header {
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            background: linear-gradient(to bottom, #f5f0e8, transparent);
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 42px;
+            color: #2d2d2d;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .online-count {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2d2d2d;
+            color: #f5f0e8;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
             display: flex;
-            justify-content: space-between;
-            width: 400px;
-            color: white;
-            font-size: 18px;
-        }
-
-        .score-display {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
-        .score-display span {
-            color: #4ade80;
-            font-weight: bold;
-            font-size: 24px;
-        }
-
-        .game-wrapper {
-            position: relative;
-        }
-
-        #game-canvas {
-            border-radius: 0 0 20px 20px;
-            background: linear-gradient(180deg, #0f0f23 0%, #1a1a3e 100%);
-            box-shadow: 0 0 40px rgba(74, 222, 128, 0.2);
-        }
-
-        .drop-zone {
-            width: 400px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px 20px 0 0;
-            border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
-            display: flex;
-            justify-content: center;
             align-items: center;
-            position: relative;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .preview-ball {
-            position: absolute;
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 16px;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            transition: left 0.05s ease-out;
-            cursor: pointer;
+            animation: pulse 2s infinite;
         }
 
-        .next-display {
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 20px;
-            border-radius: 10px;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .next-display .label {
-            opacity: 0.7;
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: default;
         }
 
-        .next-balls {
+        .chat-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
             display: flex;
             gap: 10px;
-        }
-
-        .next-ball {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
             align-items: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
 
-        .instructions {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            text-align: center;
+        .chat-input {
+            width: 320px;
+            padding: 14px 20px;
+            border: 2px solid #2d2d2d;
+            border-radius: 30px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background: #fff;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        .game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            color: white;
-            display: none;
-            z-index: 100;
+        .chat-input:focus {
+            border-color: #666;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.12);
         }
 
-        .game-over h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            color: #f87171;
+        .chat-input::placeholder {
+            color: #aaa;
         }
 
-        .game-over .final-score {
-            font-size: 48px;
-            color: #4ade80;
-            margin: 20px 0;
-        }
-
-        .game-over button {
-            background: #4ade80;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 10px;
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border: 2px solid #2d2d2d;
+            border-radius: 50%;
+            background: #2d2d2d;
+            color: #f5f0e8;
+            font-size: 20px;
             cursor: pointer;
-            color: #1a1a2e;
-            font-weight: bold;
-            transition: transform 0.1s;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .game-over button:hover {
+        .send-btn:hover {
             transform: scale(1.05);
+            background: #444;
         }
 
-        .combo-display {
-            position: absolute;
-            top: 50%;
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 90px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 48px;
-            font-weight: bold;
-            color: #fbbf24;
-            text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #999;
+            text-align: center;
         }
 
-        .combo-display.show {
-            opacity: 1;
-            animation: combo-pop 0.5s ease-out;
-        }
-
-        @keyframes combo-pop {
-            0% { transform: translate(-50%, -50%) scale(0.5); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .danger-zone {
-            position: absolute;
+        .connecting-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 60px;
-            background: linear-gradient(180deg, rgba(248, 113, 113, 0.3) 0%, transparent 100%);
+            bottom: 0;
+            background: #f5f0e8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s;
+        }
+
+        .connecting-overlay.hidden {
+            opacity: 0;
             pointer-events: none;
-            border-radius: 0;
+        }
+
+        .connecting-overlay h2 {
+            font-family: 'Caveat', cursive;
+            font-size: 36px;
+            color: #2d2d2d;
+            margin-bottom: 20px;
+        }
+
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #ddd;
+            border-top-color: #2d2d2d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notebook paper texture effect */
+        #canvas {
+            background-image:
+                linear-gradient(#e8e0d5 1px, transparent 1px);
+            background-size: 100% 30px;
+            background-position: 0 -1px;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="header">
-            <div class="score-display">Score: <span id="score">0</span></div>
-            <div class="score-display">Best: <span id="best-score">0</span></div>
-        </div>
-
-        <div class="game-wrapper">
-            <div class="drop-zone" id="drop-zone">
-                <div class="preview-ball" id="preview-ball"></div>
-            </div>
-            <canvas id="game-canvas" width="400" height="500"></canvas>
-            <div class="danger-zone"></div>
-            <div class="combo-display" id="combo-display"></div>
-            <div class="game-over" id="game-over">
-                <h2>Game Over!</h2>
-                <div>Final Score</div>
-                <div class="final-score" id="final-score">0</div>
-                <button onclick="restartGame()">Play Again</button>
-            </div>
-        </div>
-
-        <div class="next-display">
-            <span class="label">Next:</span>
-            <div class="next-balls" id="next-balls"></div>
-        </div>
-
-        <div class="instructions">
-            Move mouse to aim • Click to drop • Match opposites to zero!
-        </div>
+    <div class="connecting-overlay" id="connecting">
+        <h2>Entering the lobby...</h2>
+        <div class="loader"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="game.js"></script>
+    <div class="header">
+        <h1>The Lobby</h1>
+        <p>a place to just exist</p>
+    </div>
+
+    <div class="online-count">
+        <div class="online-dot"></div>
+        <span id="online-count">1 here</span>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="hint">press enter to send a message</div>
+    <div class="chat-container">
+        <input type="text" class="chat-input" id="chat-input" placeholder="say something..." maxlength="100" autocomplete="off">
+        <button class="send-btn" id="send-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="lobby.js"></script>
 </body>
 </html>
