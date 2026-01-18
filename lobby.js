@@ -23,15 +23,28 @@ const myId = crypto.randomUUID();
 const WORLD_WIDTH = 1200;
 const WORLD_HEIGHT = 900;
 
-// Camera/viewport offset for panning
-let cameraX = 0;
-let cameraY = 0;
+// World center - where everyone spawns near
+const SPAWN_CENTER_X = WORLD_WIDTH / 2;
+const SPAWN_CENTER_Y = WORLD_HEIGHT / 2;
+const SPAWN_RADIUS = 150; // How far from center players can spawn
 
-// My character state - spawn in world coordinates
+// Random spawn near center
+function getSpawnPosition() {
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * SPAWN_RADIUS;
+    return {
+        x: SPAWN_CENTER_X + Math.cos(angle) * distance,
+        y: SPAWN_CENTER_Y + Math.sin(angle) * distance
+    };
+}
+
+const spawnPos = getSpawnPosition();
+
+// My character state - spawn near world center
 const me = {
     id: myId,
-    x: Math.random() * (WORLD_WIDTH - 200) + 100,
-    y: Math.random() * (WORLD_HEIGHT - 200) + 100,
+    x: spawnPos.x,
+    y: spawnPos.y,
     message: null,
     messageTime: 0,
     bobOffset: Math.random() * Math.PI * 2, // Random start for idle animation
@@ -44,10 +57,9 @@ const others = new Map();
 const BUBBLE_DURATION = 6000; // 6 seconds
 const BUBBLE_FADE_TIME = 1000; // 1 second fade
 
-// Touch/drag state for panning
-let isDragging = false;
-let lastTouchX = 0;
-let lastTouchY = 0;
+// Zoom level (1 = normal, 0.5 = zoomed out 2x)
+let zoomLevel = 1;
+
 
 // Character drawing - simple hand-drawn style blob person
 function drawCharacter(x, y, isMe = false, bobOffset = 0) {
@@ -145,6 +157,31 @@ function drawCharacter(x, y, isMe = false, bobOffset = 0) {
     ctx.restore();
 }
 
+// Wrap text into lines that fit within maxWidth
+// Handles Korean and other languages without spaces
+function wrapText(ctx, text, maxWidth) {
+    const lines = [];
+    let currentLine = '';
+
+    // Process character by character to handle languages without spaces
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const testLine = currentLine + char;
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = char;
+        } else {
+            currentLine = testLine;
+        }
+    }
+    if (currentLine) {
+        lines.push(currentLine);
+    }
+    return lines;
+}
+
 // Draw speech bubble
 function drawSpeechBubble(x, y, message, opacity = 1) {
     if (!message) return;
@@ -152,17 +189,34 @@ function drawSpeechBubble(x, y, message, opacity = 1) {
     ctx.save();
     ctx.globalAlpha = opacity;
 
-    // Measure text
+    // Measure and wrap text
     ctx.font = '14px Inter, sans-serif';
-    const metrics = ctx.measureText(message);
-    const textWidth = Math.min(metrics.width, 200);
+    const maxTextWidth = 180;
+    const maxLines = 3;
+    let lines = wrapText(ctx, message, maxTextWidth);
+
+    // Limit to max lines
+    if (lines.length > maxLines) {
+        lines = lines.slice(0, maxLines);
+        lines[maxLines - 1] = lines[maxLines - 1].slice(0, -3) + '...';
+    }
+
+    const lineHeight = 18;
     const padding = 12;
-    const bubbleWidth = textWidth + padding * 2;
-    const bubbleHeight = 36;
+
+    // Calculate bubble size based on lines
+    let maxLineWidth = 0;
+    for (const line of lines) {
+        const w = ctx.measureText(line).width;
+        if (w > maxLineWidth) maxLineWidth = w;
+    }
+
+    const bubbleWidth = Math.max(maxLineWidth + padding * 2, 50);
+    const bubbleHeight = lines.length * lineHeight + padding * 2 - 4;
 
     // Position bubble above character
     const bubbleX = x - bubbleWidth / 2;
-    const bubbleY = y - 70;
+    const bubbleY = y - 50 - bubbleHeight;
 
     // Bubble background with hand-drawn feel
     ctx.fillStyle = '#fff';
@@ -205,52 +259,79 @@ function drawSpeechBubble(x, y, message, opacity = 1) {
     ctx.fillStyle = '#fff';
     ctx.fillRect(x - 7, bubbleY + bubbleHeight - 2, 14, 3);
 
-    // Text
+    // Text - draw each line
     ctx.fillStyle = '#2d2d2d';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(message, x, bubbleY + bubbleHeight / 2, 200);
+
+    const textStartY = bubbleY + padding + lineHeight / 2 - 2;
+    for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], x, textStartY + i * lineHeight);
+    }
 
     ctx.restore();
 }
 
-// Center camera on player initially
-function centerCameraOnMe() {
-    cameraX = me.x - canvas.width / 2;
-    cameraY = me.y - canvas.height / 2;
-    clampCamera();
-}
-
-// Keep camera within world bounds
-function clampCamera() {
-    const maxX = Math.max(0, WORLD_WIDTH - canvas.width);
-    const maxY = Math.max(0, WORLD_HEIGHT - canvas.height);
-    cameraX = Math.max(0, Math.min(maxX, cameraX));
-    cameraY = Math.max(0, Math.min(maxY, cameraY));
-}
-
-// Convert world coordinates to screen coordinates
-function worldToScreen(x, y) {
+// Convert world coordinates to screen coordinates (centered on me)
+function worldToScreen(worldX, worldY) {
+    const screenCenterX = canvas.width / 2;
+    const screenCenterY = canvas.height / 2;
     return {
-        x: x - cameraX,
-        y: y - cameraY
+        x: screenCenterX + (worldX - me.x),
+        y: screenCenterY + (worldY - me.y)
     };
 }
 
-// Draw world boundary indicator
-function drawWorldBounds() {
-    ctx.save();
-    ctx.translate(-cameraX, -cameraY);
+// Zoom constraints
+const MIN_ZOOM = 0.4;
+const MAX_ZOOM = 1.5;
 
-    // Subtle boundary
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([10, 10]);
-    ctx.strokeRect(10, 10, WORLD_WIDTH - 20, WORLD_HEIGHT - 20);
-    ctx.setLineDash([]);
-
-    ctx.restore();
+// Set zoom level with constraints
+function setZoom(newZoom) {
+    zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
 }
+
+// Pinch zoom tracking
+let initialPinchDistance = null;
+let initialPinchZoom = 1;
+
+function getPinchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Touch handlers for pinch zoom
+canvas.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        e.preventDefault();
+        initialPinchDistance = getPinchDistance(e.touches);
+        initialPinchZoom = zoomLevel;
+    }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && initialPinchDistance !== null) {
+        e.preventDefault();
+        const currentDistance = getPinchDistance(e.touches);
+        const scale = currentDistance / initialPinchDistance;
+        setZoom(initialPinchZoom * scale);
+    }
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) {
+        initialPinchDistance = null;
+    }
+});
+
+// Mouse wheel zoom (desktop)
+canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomSpeed = 0.001;
+    const delta = -e.deltaY * zoomSpeed;
+    setZoom(zoomLevel + delta);
+}, { passive: false });
 
 // Main render loop
 function render() {
@@ -258,17 +339,23 @@ function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const now = Date.now();
+    const screenCenterX = canvas.width / 2;
+    const screenCenterY = canvas.height / 2;
 
-    // Draw world bounds
-    drawWorldBounds();
+    // Apply zoom transformation
+    ctx.save();
+    ctx.translate(screenCenterX, screenCenterY);
+    ctx.scale(zoomLevel, zoomLevel);
+    ctx.translate(-screenCenterX, -screenCenterY);
 
     // Draw other players first (behind)
     others.forEach((player) => {
         const screenPos = worldToScreen(player.x, player.y);
 
-        // Only draw if on screen (with some margin for bubbles)
-        if (screenPos.x > -100 && screenPos.x < canvas.width + 100 &&
-            screenPos.y > -100 && screenPos.y < canvas.height + 100) {
+        // Expanded visibility check for zoomed out view
+        const margin = 200 / zoomLevel;
+        if (screenPos.x > -margin && screenPos.x < canvas.width + margin &&
+            screenPos.y > -margin && screenPos.y < canvas.height + margin) {
 
             // Calculate bubble opacity
             let bubbleOpacity = 1;
@@ -289,9 +376,7 @@ function render() {
         }
     });
 
-    // Draw me (in front)
-    const myScreenPos = worldToScreen(me.x, me.y);
-
+    // Draw me (always in center)
     let myBubbleOpacity = 1;
     if (me.message && me.messageTime) {
         const elapsed = now - me.messageTime;
@@ -303,10 +388,12 @@ function render() {
         }
     }
 
-    drawCharacter(myScreenPos.x, myScreenPos.y, true, me.bobOffset);
+    drawCharacter(screenCenterX, screenCenterY, true, me.bobOffset);
     if (me.message) {
-        drawSpeechBubble(myScreenPos.x, myScreenPos.y, me.message, myBubbleOpacity);
+        drawSpeechBubble(screenCenterX, screenCenterY, me.message, myBubbleOpacity);
     }
+
+    ctx.restore();
 
     requestAnimationFrame(render);
 }
@@ -443,73 +530,7 @@ sendBtn.addEventListener('click', () => {
     chatInput.focus();
 });
 
-// Touch/mouse pan controls
-canvas.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) {
-        isDragging = true;
-        lastTouchX = e.touches[0].clientX;
-        lastTouchY = e.touches[0].clientY;
-    }
-}, { passive: true });
-
-canvas.addEventListener('touchmove', (e) => {
-    if (isDragging && e.touches.length === 1) {
-        const deltaX = lastTouchX - e.touches[0].clientX;
-        const deltaY = lastTouchY - e.touches[0].clientY;
-
-        cameraX += deltaX;
-        cameraY += deltaY;
-        clampCamera();
-
-        lastTouchX = e.touches[0].clientX;
-        lastTouchY = e.touches[0].clientY;
-    }
-}, { passive: true });
-
-canvas.addEventListener('touchend', () => {
-    isDragging = false;
-}, { passive: true });
-
-// Mouse drag for desktop
-canvas.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    lastTouchX = e.clientX;
-    lastTouchY = e.clientY;
-    canvas.style.cursor = 'grabbing';
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-        const deltaX = lastTouchX - e.clientX;
-        const deltaY = lastTouchY - e.clientY;
-
-        cameraX += deltaX;
-        cameraY += deltaY;
-        clampCamera();
-
-        lastTouchX = e.clientX;
-        lastTouchY = e.clientY;
-    }
-});
-
-canvas.addEventListener('mouseup', () => {
-    isDragging = false;
-    canvas.style.cursor = 'default';
-});
-
-canvas.addEventListener('mouseleave', () => {
-    isDragging = false;
-    canvas.style.cursor = 'default';
-});
-
-// Center camera on resize
-window.addEventListener('resize', () => {
-    resizeCanvas();
-    clampCamera();
-});
-
 // Start everything
-centerCameraOnMe();
 render();
 connectToLobby();
 
