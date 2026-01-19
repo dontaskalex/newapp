@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Roller | hafnr</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #e5e5e5;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        .back-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #999;
+        }
+
+        h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Dice Display Area */
+        .dice-area {
+            background: #141414;
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 24px;
+            min-height: 200px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dice {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border: 2px solid #333;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .dice.rolling {
+            animation: roll 0.1s infinite;
+        }
+
+        .dice.landed {
+            animation: land 0.3s ease-out;
+            border-color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+        }
+
+        @keyframes roll {
+            0% { transform: rotate(-5deg) scale(1.05); }
+            25% { transform: rotate(5deg) scale(0.95); }
+            50% { transform: rotate(-3deg) scale(1.02); }
+            75% { transform: rotate(3deg) scale(0.98); }
+            100% { transform: rotate(-5deg) scale(1.05); }
+        }
+
+        @keyframes land {
+            0% { transform: scale(1.2); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        .dice-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .dice-type {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .empty-state {
+            color: #444;
+            font-size: 14px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        /* Total Display */
+        .total-display {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .total-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .total-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 48px;
+            font-weight: 700;
+            color: #4ade80;
+        }
+
+        /* Roll Button */
+        .roll-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(145deg, #4ade80, #22c55e);
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-bottom: 32px;
+        }
+
+        .roll-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.3);
+        }
+
+        .roll-btn:active {
+            transform: translateY(0);
+        }
+
+        .roll-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Dice Config */
+        .config-section {
+            background: #141414;
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .config-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .add-dice-btn {
+            background: #222;
+            border: 1px solid #333;
+            color: #e5e5e5;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .add-dice-btn:hover {
+            background: #2a2a2a;
+            border-color: #444;
+        }
+
+        .dice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dice-config-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        .dice-config-item .dice-icon {
+            width: 44px;
+            height: 44px;
+            background: #222;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #888;
+        }
+
+        .dice-config-item .dice-settings {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dice-config-item label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .dice-config-item select,
+        .dice-config-item input[type="number"] {
+            background: #222;
+            border: 1px solid #333;
+            color: #e5e5e5;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Space Mono', monospace;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .dice-config-item select:focus,
+        .dice-config-item input[type="number"]:focus {
+            border-color: #4ade80;
+        }
+
+        .dice-config-item input[type="number"] {
+            width: 70px;
+        }
+
+        .remove-dice-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .remove-dice-btn:hover {
+            background: #2a2a2a;
+            color: #ff4444;
+        }
+
+        /* Presets */
+        .presets {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: #222;
+            border: 1px solid #333;
+            color: #888;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .preset-btn:hover {
+            background: #2a2a2a;
+            border-color: #444;
+            color: #e5e5e5;
+        }
+
+        /* History */
+        .history-section {
+            margin-top: 32px;
+        }
+
+        .history-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: #1a1a1a;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .history-item .roll-total {
+            color: #4ade80;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 24px 16px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .dice {
+                width: 65px;
+                height: 65px;
+            }
+
+            .dice-value {
+                font-size: 22px;
+            }
+
+            .dice-config-item {
+                flex-wrap: wrap;
+            }
+
+            .dice-config-item .dice-settings {
+                width: 100%;
+                margin-top: 8px;
+            }
+
+            .total-value {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">← back to hafnr</a>
+            <h1>Dice Roller</h1>
+            <p class="tagline">Roll custom dice with satisfying animations</p>
+        </header>
+
+        <div class="dice-area" id="diceArea">
+            <div class="empty-state">Add some dice below and roll!</div>
+        </div>
+
+        <div class="total-display">
+            <div class="total-label">Total</div>
+            <div class="total-value" id="totalValue">-</div>
+        </div>
+
+        <button class="roll-btn" id="rollBtn" disabled>Roll Dice</button>
+
+        <section class="config-section">
+            <div class="config-header">
+                <span class="config-title">Configure Dice</span>
+                <button class="add-dice-btn" id="addDiceBtn">+ Add Die</button>
+            </div>
+
+            <div class="dice-list" id="diceList"></div>
+
+            <div class="presets">
+                <button class="preset-btn" data-preset="1d6">1d6</button>
+                <button class="preset-btn" data-preset="2d6">2d6</button>
+                <button class="preset-btn" data-preset="1d20">1d20</button>
+                <button class="preset-btn" data-preset="1d4+1d6+1d8">1d4+1d6+1d8</button>
+                <button class="preset-btn" data-preset="4d6">4d6</button>
+                <button class="preset-btn" data-preset="1d100">1d100</button>
+            </div>
+        </section>
+
+        <section class="history-section">
+            <div class="history-title">Recent rolls</div>
+            <div class="history-list" id="historyList">
+                <span style="color: #444; font-size: 13px;">No rolls yet</span>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const diceArea = document.getElementById('diceArea');
+        const totalValue = document.getElementById('totalValue');
+        const rollBtn = document.getElementById('rollBtn');
+        const addDiceBtn = document.getElementById('addDiceBtn');
+        const diceList = document.getElementById('diceList');
+        const historyList = document.getElementById('historyList');
+
+        let diceConfigs = [];
+        let rollHistory = [];
+        let isRolling = false;
+
+        const commonDice = [4, 6, 8, 10, 12, 20, 100];
+
+        function createDiceConfigItem(id, sides = 6) {
+            const item = document.createElement('div');
+            item.className = 'dice-config-item';
+            item.dataset.id = id;
+
+            item.innerHTML = `
+                <div class="dice-icon">d${sides}</div>
+                <div class="dice-settings">
+                    <label>Sides:</label>
+                    <input type="number" class="sides-input" value="${sides}" min="1" max="100">
+                </div>
+                <button class="remove-dice-btn">×</button>
+            `;
+
+            const sidesInput = item.querySelector('.sides-input');
+            const diceIcon = item.querySelector('.dice-icon');
+            const removeBtn = item.querySelector('.remove-dice-btn');
+
+            sidesInput.addEventListener('change', () => {
+                let value = parseInt(sidesInput.value) || 6;
+                value = Math.max(1, Math.min(100, value));
+                sidesInput.value = value;
+                diceIcon.textContent = `d${value}`;
+                updateDiceConfig(id, value);
+            });
+
+            removeBtn.addEventListener('click', () => {
+                removeDice(id);
+            });
+
+            return item;
+        }
+
+        function addDice(sides = 6) {
+            const id = Date.now() + Math.random();
+            diceConfigs.push({ id, sides });
+            diceList.appendChild(createDiceConfigItem(id, sides));
+            updateUI();
+        }
+
+        function removeDice(id) {
+            diceConfigs = diceConfigs.filter(d => d.id !== id);
+            const item = diceList.querySelector(`[data-id="${id}"]`);
+            if (item) item.remove();
+            updateUI();
+        }
+
+        function updateDiceConfig(id, sides) {
+            const config = diceConfigs.find(d => d.id === id);
+            if (config) config.sides = sides;
+        }
+
+        function updateUI() {
+            rollBtn.disabled = diceConfigs.length === 0;
+
+            if (diceConfigs.length === 0) {
+                diceArea.innerHTML = '<div class="empty-state">Add some dice below and roll!</div>';
+                totalValue.textContent = '-';
+            }
+        }
+
+        function renderDice(results = null) {
+            if (diceConfigs.length === 0) {
+                diceArea.innerHTML = '<div class="empty-state">Add some dice below and roll!</div>';
+                return;
+            }
+
+            diceArea.innerHTML = '';
+
+            diceConfigs.forEach((config, index) => {
+                const dice = document.createElement('div');
+                dice.className = 'dice';
+
+                const value = results ? results[index] : '?';
+                dice.innerHTML = `
+                    <div class="dice-value">${value}</div>
+                    <div class="dice-type">d${config.sides}</div>
+                `;
+
+                diceArea.appendChild(dice);
+            });
+        }
+
+        async function rollDice() {
+            if (isRolling || diceConfigs.length === 0) return;
+
+            isRolling = true;
+            rollBtn.disabled = true;
+
+            renderDice();
+            const diceElements = diceArea.querySelectorAll('.dice');
+
+            // Start rolling animation
+            diceElements.forEach(dice => dice.classList.add('rolling'));
+
+            // Randomize values during roll
+            const rollDuration = 1000;
+            const intervalTime = 50;
+            let elapsed = 0;
+
+            const rollInterval = setInterval(() => {
+                elapsed += intervalTime;
+
+                diceElements.forEach((dice, index) => {
+                    const valueEl = dice.querySelector('.dice-value');
+                    const sides = diceConfigs[index].sides;
+                    valueEl.textContent = Math.floor(Math.random() * sides) + 1;
+                });
+
+                if (elapsed >= rollDuration) {
+                    clearInterval(rollInterval);
+                    finishRoll(diceElements);
+                }
+            }, intervalTime);
+        }
+
+        function finishRoll(diceElements) {
+            // Generate final results
+            const results = diceConfigs.map(config =>
+                Math.floor(Math.random() * config.sides) + 1
+            );
+
+            // Stop rolling and show final values with staggered landing
+            diceElements.forEach((dice, index) => {
+                setTimeout(() => {
+                    dice.classList.remove('rolling');
+                    dice.classList.add('landed');
+
+                    const valueEl = dice.querySelector('.dice-value');
+                    valueEl.textContent = results[index];
+
+                    // Remove landed class after animation
+                    setTimeout(() => dice.classList.remove('landed'), 300);
+                }, index * 100);
+            });
+
+            // Update total after all dice land
+            setTimeout(() => {
+                const total = results.reduce((sum, val) => sum + val, 0);
+                totalValue.textContent = total;
+
+                // Add to history
+                addToHistory(results, total);
+
+                isRolling = false;
+                rollBtn.disabled = false;
+            }, diceElements.length * 100 + 100);
+        }
+
+        function addToHistory(results, total) {
+            const notation = diceConfigs.map((c, i) => `${results[i]}(d${c.sides})`).join(' + ');
+            rollHistory.unshift({ notation, total });
+
+            if (rollHistory.length > 10) rollHistory.pop();
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (rollHistory.length === 0) {
+                historyList.innerHTML = '<span style="color: #444; font-size: 13px;">No rolls yet</span>';
+                return;
+            }
+
+            historyList.innerHTML = rollHistory.map(roll => `
+                <div class="history-item">
+                    <span class="roll-total">${roll.total}</span>
+                </div>
+            `).join('');
+        }
+
+        function parsePreset(preset) {
+            // Parse notation like "2d6" or "1d4+1d6+1d8"
+            const parts = preset.split('+');
+            const configs = [];
+
+            parts.forEach(part => {
+                const match = part.match(/(\d+)d(\d+)/);
+                if (match) {
+                    const count = parseInt(match[1]);
+                    const sides = parseInt(match[2]);
+                    for (let i = 0; i < count; i++) {
+                        configs.push(sides);
+                    }
+                }
+            });
+
+            return configs;
+        }
+
+        // Event listeners
+        rollBtn.addEventListener('click', rollDice);
+        addDiceBtn.addEventListener('click', () => addDice(6));
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const preset = btn.dataset.preset;
+                const configs = parsePreset(preset);
+
+                // Clear existing dice
+                diceConfigs = [];
+                diceList.innerHTML = '';
+
+                // Add preset dice
+                configs.forEach(sides => addDice(sides));
+            });
+        });
+
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !e.target.matches('input')) {
+                e.preventDefault();
+                rollDice();
+            }
+        });
+
+        // Initialize
+        updateUI();
+    </script>
+</body>
+</html>
