@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Ant Colony - hafnr</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #1a1510;
+            --surface: #211c14;
+            --border: #3a3020;
+            --text: #e4e4e7;
+            --text-muted: #a09080;
+            --ant-color: #1a1a1a;
+            --pheromone-food: rgba(80, 200, 120, 0.3);
+            --pheromone-home: rgba(100, 150, 255, 0.2);
+        }
+
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            min-height: 100dvh;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            color: var(--text);
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            cursor: crosshair;
+            z-index: 1;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            backdrop-filter: blur(8px);
+            transition: all 0.15s ease;
+        }
+
+        .back-link:hover {
+            color: var(--text);
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .info-panel {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            max-width: 220px;
+        }
+
+        .info-panel h3 {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .instructions {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.5;
+        }
+
+        .food-selector {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 8px;
+            z-index: 100;
+        }
+
+        .food-btn {
+            width: 44px;
+            height: 44px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .food-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .food-btn.active {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .food-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-right: 4px;
+            align-self: center;
+        }
+
+        .food-btn .size-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 8px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 600px) {
+            .info-panel {
+                display: none;
+            }
+
+            .ui-overlay {
+                top: 12px;
+                left: 12px;
+            }
+
+            .food-selector {
+                bottom: 12px;
+            }
+
+            .food-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div class="ui-overlay">
+        <a href="/" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            back
+        </a>
+        <div class="info-panel">
+            <h3>Ant Colony</h3>
+            <div class="stat-row">
+                <span>Colony level</span>
+                <span class="stat-value" id="colony-level">1</span>
+            </div>
+            <div class="stat-row">
+                <span>Ants</span>
+                <span class="stat-value" id="ant-count">0</span>
+            </div>
+            <div class="stat-row">
+                <span>Food collected</span>
+                <span class="stat-value" id="food-collected">0</span>
+            </div>
+            <div class="stat-row">
+                <span>Food on ground</span>
+                <span class="stat-value" id="food-available">0</span>
+            </div>
+            <div class="instructions">
+                Click or drag to drop food.<br>
+                Watch the ants discover it and work together to carry it home.
+            </div>
+        </div>
+    </div>
+
+    <div class="food-selector">
+        <span class="food-label">Drop food:</span>
+        <button class="food-btn active" data-food="crumb" title="Crumb (tiny)">
+            <span>·</span>
+        </button>
+        <button class="food-btn" data-food="morsel" title="Morsel (small)">
+            <span>•</span>
+        </button>
+        <button class="food-btn" data-food="chunk" title="Chunk (medium)">
+            <span>●</span>
+        </button>
+        <button class="food-btn" data-food="feast" title="Feast (large)">
+            <span>⬤</span>
+        </button>
+    </div>
+
+    <script>
+        // ===========================================
+        // ANT COLONY SIMULATION
+        // Based on real ant behavior research
+        // ===========================================
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // High DPI support
+        let dpr = window.devicePixelRatio || 1;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+
+        // ===========================================
+        // CONFIGURATION
+        // ===========================================
+
+        const CONFIG = {
+            // Colony
+            nestX: 0,
+            nestY: 0,
+            nestRadius: 30,
+            initialAnts: 60,
+            maxAnts: 200,
+
+            // Ant properties
+            antSpeed: 0.8,              // Base speed in pixels per frame
+            antSize: 5,                 // Body length
+            carryCapacity: 10,          // Max weight one ant can carry (1x = crumb)
+            dragThreshold: 3,           // Weight threshold to switch to dragging
+            turnRate: 0.15,             // How sharply ants can turn (radians)
+            wanderStrength: 0.3,        // Random turning when exploring
+
+            // Pheromones
+            pheromoneGridSize: 8,       // Grid cell size in pixels
+            pheromoneDecay: 0.997,      // Decay multiplier per frame (~2min half-life at 60fps)
+            pheromoneDeposit: 1.0,      // Base deposit amount
+            pheromoneMax: 255,          // Max pheromone value
+            pheromoneFollowStrength: 0.4,
+
+            // Food
+            foodTypes: {
+                crumb:  { weight: 1, radius: 2, color: '#c4a060', value: 1 },
+                morsel: { weight: 3, radius: 4, color: '#b08040', value: 3 },
+                chunk:  { weight: 8, radius: 7, color: '#a06030', value: 8 },
+                feast:  { weight: 25, radius: 12, color: '#904020', value: 25 }
+            },
+
+            // Recruitment
+            recruitmentRadius: 40,      // Radius around nest entrance for recruitment
+            recruitmentChance: 0.02,    // Chance per frame for idle ant to be recruited
+        };
+
+        // Position nest in center-ish area
+        CONFIG.nestX = width * 0.5;
+        CONFIG.nestY = height * 0.6;
+
+        // ===========================================
+        // PHEROMONE GRID
+        // Two layers: food trail and home trail
+        // ===========================================
+
+        let pheromoneGrid = {
+            food: null,   // Trails to food
+            home: null,   // Trails back to nest
+            cols: 0,
+            rows: 0
+        };
+
+        function initPheromoneGrid() {
+            const cellSize = CONFIG.pheromoneGridSize;
+            pheromoneGrid.cols = Math.ceil(width / cellSize);
+            pheromoneGrid.rows = Math.ceil(height / cellSize);
+            const size = pheromoneGrid.cols * pheromoneGrid.rows;
+            pheromoneGrid.food = new Float32Array(size);
+            pheromoneGrid.home = new Float32Array(size);
+        }
+
+        function getPheromoneIndex(x, y) {
+            const col = Math.floor(x / CONFIG.pheromoneGridSize);
+            const row = Math.floor(y / CONFIG.pheromoneGridSize);
+            if (col < 0 || col >= pheromoneGrid.cols || row < 0 || row >= pheromoneGrid.rows) {
+                return -1;
+            }
+            return row * pheromoneGrid.cols + col;
+        }
+
+        function depositPheromone(x, y, type, amount) {
+            const idx = getPheromoneIndex(x, y);
+            if (idx === -1) return;
+            const grid = type === 'food' ? pheromoneGrid.food : pheromoneGrid.home;
+            grid[idx] = Math.min(grid[idx] + amount, CONFIG.pheromoneMax);
+        }
+
+        function getPheromone(x, y, type) {
+            const idx = getPheromoneIndex(x, y);
+            if (idx === -1) return 0;
+            const grid = type === 'food' ? pheromoneGrid.food : pheromoneGrid.home;
+            return grid[idx];
+        }
+
+        function samplePheromoneDirection(x, y, currentAngle, type) {
+            // Sample pheromone in three directions: left, center, right
+            const sampleDist = 12;
+            const sampleAngle = 0.5; // ~30 degrees
+
+            const leftAngle = currentAngle - sampleAngle;
+            const rightAngle = currentAngle + sampleAngle;
+
+            const center = getPheromone(
+                x + Math.cos(currentAngle) * sampleDist,
+                y + Math.sin(currentAngle) * sampleDist,
+                type
+            );
+            const left = getPheromone(
+                x + Math.cos(leftAngle) * sampleDist,
+                y + Math.sin(leftAngle) * sampleDist,
+                type
+            );
+            const right = getPheromone(
+                x + Math.cos(rightAngle) * sampleDist,
+                y + Math.sin(rightAngle) * sampleDist,
+                type
+            );
+
+            // Return turn direction based on strongest pheromone
+            if (center >= left && center >= right) {
+                return 0; // Go straight
+            } else if (left > right) {
+                return -sampleAngle * CONFIG.pheromoneFollowStrength;
+            } else {
+                return sampleAngle * CONFIG.pheromoneFollowStrength;
+            }
+        }
+
+        function decayPheromones() {
+            const decay = CONFIG.pheromoneDecay;
+            for (let i = 0; i < pheromoneGrid.food.length; i++) {
+                pheromoneGrid.food[i] *= decay;
+                pheromoneGrid.home[i] *= decay;
+                // Clear very small values to prevent buildup
+                if (pheromoneGrid.food[i] < 0.01) pheromoneGrid.food[i] = 0;
+                if (pheromoneGrid.home[i] < 0.01) pheromoneGrid.home[i] = 0;
+            }
+        }
+
+        // ===========================================
+        // FOOD ITEMS
+        // ===========================================
+
+        let foodItems = [];
+        let foodCollected = 0;
+
+        class FoodItem {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                const config = CONFIG.foodTypes[type];
+                this.weight = config.weight;
+                this.radius = config.radius;
+                this.color = config.color;
+                this.value = config.value;
+                this.originalWeight = config.weight;
+                this.carriers = [];  // Ants currently carrying this
+                this.beingBrokenDown = false;
+                this.breakdownProgress = 0;
+            }
+
+            canBeCarriedBy(numAnts) {
+                // Each ant can carry up to carryCapacity weight
+                return this.weight <= numAnts * CONFIG.carryCapacity;
+            }
+
+            getRequiredAnts() {
+                return Math.ceil(this.weight / CONFIG.carryCapacity);
+            }
+
+            addCarrier(ant) {
+                if (!this.carriers.includes(ant)) {
+                    this.carriers.push(ant);
+                }
+            }
+
+            removeCarrier(ant) {
+                const idx = this.carriers.indexOf(ant);
+                if (idx !== -1) {
+                    this.carriers.splice(idx, 1);
+                }
+            }
+
+            // Break off a piece if too heavy for current ants
+            breakOffPiece() {
+                if (this.weight <= 1) return null;
+
+                const pieceWeight = Math.min(CONFIG.carryCapacity, Math.floor(this.weight / 2));
+                this.weight -= pieceWeight;
+                this.value = Math.ceil(this.value * (this.weight / this.originalWeight));
+                this.radius = Math.max(2, this.radius * Math.sqrt(this.weight / this.originalWeight));
+
+                // Create new smaller piece
+                const angle = Math.random() * Math.PI * 2;
+                const dist = this.radius + 3;
+                const piece = new FoodItem(
+                    this.x + Math.cos(angle) * dist,
+                    this.y + Math.sin(angle) * dist,
+                    'crumb'
+                );
+                piece.weight = pieceWeight;
+                piece.value = pieceWeight;
+                piece.radius = Math.max(2, 2 * Math.sqrt(pieceWeight));
+                piece.color = this.color;
+
+                return piece;
+            }
+        }
+
+        function addFood(x, y, type) {
+            foodItems.push(new FoodItem(x, y, type));
+        }
+
+        // ===========================================
+        // ANTS
+        // ===========================================
+
+        let ants = [];
+
+        class Ant {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = CONFIG.antSpeed * (0.9 + Math.random() * 0.2);
+
+                // State machine
+                this.state = 'exploring';  // exploring, returning, carrying, breaking
+                this.targetFood = null;
+                this.carriedFood = null;
+
+                // Behavior parameters (individual variation)
+                this.wanderBias = (Math.random() - 0.5) * 0.1;
+                this.isScout = Math.random() < 0.15;  // 15% are scouts - more exploratory
+
+                // Trail laying
+                this.depositTimer = 0;
+                this.foundFoodRecently = false;
+
+                // Animation
+                this.legPhase = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                this.legPhase += 0.3;
+
+                switch (this.state) {
+                    case 'exploring':
+                        this.explore();
+                        break;
+                    case 'returning':
+                        this.returnToNest();
+                        break;
+                    case 'carrying':
+                        this.carryFood();
+                        break;
+                    case 'breaking':
+                        this.breakDownFood();
+                        break;
+                }
+
+                // Keep ants on screen
+                this.bounceOffWalls();
+            }
+
+            explore() {
+                // Scouts wander more randomly, workers follow pheromones
+                if (this.isScout || Math.random() < 0.3) {
+                    // Random correlated walk (systematic meandering)
+                    this.angle += (Math.random() - 0.5) * CONFIG.wanderStrength + this.wanderBias;
+                } else {
+                    // Follow food pheromones
+                    const turn = samplePheromoneDirection(this.x, this.y, this.angle, 'food');
+                    this.angle += turn + (Math.random() - 0.5) * CONFIG.wanderStrength * 0.5;
+                }
+
+                // Deposit home pheromone (so returning ants can find way back)
+                this.depositTimer++;
+                if (this.depositTimer > 5) {
+                    // Deposit more near nest
+                    const distToNest = this.distanceToNest();
+                    const amount = CONFIG.pheromoneDeposit * Math.max(0.2, 1 - distToNest / 300);
+                    depositPheromone(this.x, this.y, 'home', amount);
+                    this.depositTimer = 0;
+                }
+
+                // Move
+                this.move();
+
+                // Check for food
+                this.checkForFood();
+
+                // Return to nest periodically (stochastic reset)
+                if (Math.random() < 0.0005) {
+                    this.state = 'returning';
+                    this.foundFoodRecently = false;
+                }
+            }
+
+            checkForFood() {
+                for (const food of foodItems) {
+                    const dist = Math.hypot(this.x - food.x, this.y - food.y);
+                    if (dist < food.radius + 5) {
+                        // Found food!
+                        if (food.canBeCarriedBy(1) && food.carriers.length === 0) {
+                            // Small enough to carry alone
+                            this.pickUpFood(food);
+                        } else if (food.carriers.length < food.getRequiredAnts()) {
+                            // Join other carriers
+                            this.joinCarrying(food);
+                        } else {
+                            // Food needs to be broken down or has enough carriers
+                            // Deposit strong food pheromone to recruit more
+                            depositPheromone(this.x, this.y, 'food', CONFIG.pheromoneDeposit * 5);
+                            this.state = 'returning';
+                            this.foundFoodRecently = true;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            pickUpFood(food) {
+                this.carriedFood = food;
+                this.targetFood = food;
+                food.addCarrier(this);
+                this.state = 'carrying';
+                this.angle = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
+            }
+
+            joinCarrying(food) {
+                this.targetFood = food;
+                food.addCarrier(this);
+                this.state = 'carrying';
+            }
+
+            carryFood() {
+                const food = this.targetFood;
+                if (!food || !foodItems.includes(food)) {
+                    // Food was delivered or disappeared
+                    this.carriedFood = null;
+                    this.targetFood = null;
+                    this.state = 'exploring';
+                    return;
+                }
+
+                // Check if enough ants to carry
+                if (!food.canBeCarriedBy(food.carriers.length)) {
+                    // Need more ants or need to break it down
+                    if (food.carriers.length >= 3 && food.weight > CONFIG.carryCapacity) {
+                        // Start breaking it down
+                        this.state = 'breaking';
+                        food.beingBrokenDown = true;
+                    } else {
+                        // Wait for more ants, deposit pheromone
+                        depositPheromone(food.x, food.y, 'food', CONFIG.pheromoneDeposit * 3);
+                        // Circle around the food
+                        const angleToFood = Math.atan2(food.y - this.y, food.x - this.x);
+                        this.angle = angleToFood + Math.PI / 2;
+                        this.x += Math.cos(this.angle) * this.speed * 0.3;
+                        this.y += Math.sin(this.angle) * this.speed * 0.3;
+                    }
+                    return;
+                }
+
+                // Move food toward nest
+                const angleToNest = Math.atan2(CONFIG.nestY - food.y, CONFIG.nestX - food.x);
+
+                // Speed depends on weight and number of carriers
+                const speedFactor = Math.min(1, food.carriers.length * CONFIG.carryCapacity / food.weight);
+                const moveSpeed = this.speed * 0.5 * speedFactor;
+
+                food.x += Math.cos(angleToNest) * moveSpeed;
+                food.y += Math.sin(angleToNest) * moveSpeed;
+
+                // Position ant near food
+                const offsetAngle = angleToNest + Math.PI + (food.carriers.indexOf(this) * 0.5);
+                this.x = food.x + Math.cos(offsetAngle) * (food.radius + 2);
+                this.y = food.y + Math.sin(offsetAngle) * (food.radius + 2);
+                this.angle = angleToNest;
+
+                // Deposit food pheromone trail
+                this.depositTimer++;
+                if (this.depositTimer > 3) {
+                    // Deposit more near the food (22x more according to research)
+                    const distToNest = Math.hypot(CONFIG.nestX - food.x, CONFIG.nestY - food.y);
+                    const nearFoodBonus = Math.max(1, 10 - distToNest / 50);
+                    depositPheromone(this.x, this.y, 'food', CONFIG.pheromoneDeposit * nearFoodBonus);
+                    this.depositTimer = 0;
+                }
+
+                // Check if reached nest
+                const distToNest = Math.hypot(CONFIG.nestX - food.x, CONFIG.nestY - food.y);
+                if (distToNest < CONFIG.nestRadius) {
+                    // Delivered!
+                    foodCollected += food.value;
+
+                    // Remove food and release carriers
+                    for (const carrier of food.carriers) {
+                        carrier.carriedFood = null;
+                        carrier.targetFood = null;
+                        carrier.state = 'exploring';
+                        carrier.foundFoodRecently = true;
+                    }
+
+                    const idx = foodItems.indexOf(food);
+                    if (idx !== -1) {
+                        foodItems.splice(idx, 1);
+                    }
+                }
+            }
+
+            breakDownFood() {
+                const food = this.targetFood;
+                if (!food || !foodItems.includes(food)) {
+                    this.state = 'exploring';
+                    return;
+                }
+
+                // Animate around the food (cutting behavior)
+                food.breakdownProgress += 0.01 * food.carriers.length;
+
+                const offsetAngle = food.breakdownProgress * 2 + food.carriers.indexOf(this) * (Math.PI * 2 / food.carriers.length);
+                this.x = food.x + Math.cos(offsetAngle) * (food.radius + 2);
+                this.y = food.y + Math.sin(offsetAngle) * (food.radius + 2);
+                this.angle = offsetAngle + Math.PI;
+
+                // Deposit pheromone to attract more help
+                depositPheromone(food.x, food.y, 'food', CONFIG.pheromoneDeposit * 2);
+
+                // Break off piece when ready
+                if (food.breakdownProgress >= 1) {
+                    const piece = food.breakOffPiece();
+                    if (piece) {
+                        foodItems.push(piece);
+                    }
+                    food.breakdownProgress = 0;
+                    food.beingBrokenDown = false;
+
+                    // Check if food is now small enough
+                    if (food.canBeCarriedBy(food.carriers.length)) {
+                        for (const carrier of food.carriers) {
+                            carrier.state = 'carrying';
+                        }
+                    }
+                }
+            }
+
+            returnToNest() {
+                // Follow home pheromones back to nest
+                const angleToNest = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
+
+                // Blend direct path with pheromone following
+                const pheromoneTurn = samplePheromoneDirection(this.x, this.y, this.angle, 'home');
+                const directTurn = this.angleDiff(angleToNest, this.angle) * 0.1;
+
+                this.angle += directTurn + pheromoneTurn * 0.5 + (Math.random() - 0.5) * 0.1;
+
+                // Deposit food pheromone if found food recently
+                if (this.foundFoodRecently) {
+                    this.depositTimer++;
+                    if (this.depositTimer > 3) {
+                        depositPheromone(this.x, this.y, 'food', CONFIG.pheromoneDeposit * 2);
+                        this.depositTimer = 0;
+                    }
+                }
+
+                this.move();
+
+                // Check if reached nest
+                if (this.distanceToNest() < CONFIG.nestRadius) {
+                    this.state = 'exploring';
+                    this.foundFoodRecently = false;
+                    // Turn around
+                    this.angle += Math.PI + (Math.random() - 0.5) * 1;
+                }
+            }
+
+            move() {
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+            }
+
+            bounceOffWalls() {
+                const margin = 10;
+                if (this.x < margin) {
+                    this.x = margin;
+                    this.angle = Math.PI - this.angle;
+                }
+                if (this.x > width - margin) {
+                    this.x = width - margin;
+                    this.angle = Math.PI - this.angle;
+                }
+                if (this.y < margin) {
+                    this.y = margin;
+                    this.angle = -this.angle;
+                }
+                if (this.y > height - margin) {
+                    this.y = height - margin;
+                    this.angle = -this.angle;
+                }
+            }
+
+            distanceToNest() {
+                return Math.hypot(this.x - CONFIG.nestX, this.y - CONFIG.nestY);
+            }
+
+            angleDiff(target, current) {
+                let diff = target - current;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                return diff;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                const size = CONFIG.antSize;
+                const legWave = Math.sin(this.legPhase) * 0.4;
+
+                // Ant body color - dark brown/black
+                const bodyColor = '#1a0a05';
+                const legColor = '#2a1510';
+
+                // Draw legs first (behind body)
+                ctx.strokeStyle = legColor;
+                ctx.lineWidth = size * 0.12;
+                ctx.lineCap = 'round';
+
+                // 6 legs - 3 on each side, attached to thorax
+                const legPositions = [-0.2, 0, 0.2]; // Along thorax
+                for (let i = 0; i < 3; i++) {
+                    const attachX = legPositions[i] * size;
+                    const phase = (i === 1) ? -legWave : legWave;
+
+                    // Left leg (top in this orientation)
+                    ctx.beginPath();
+                    ctx.moveTo(attachX, -size * 0.15);
+                    const leftKneeX = attachX - size * 0.3;
+                    const leftKneeY = -size * 0.5 - phase * size * 0.2;
+                    const leftFootX = attachX - size * 0.15;
+                    const leftFootY = -size * 0.8 - phase * size * 0.15;
+                    ctx.quadraticCurveTo(leftKneeX, leftKneeY, leftFootX, leftFootY);
+                    ctx.stroke();
+
+                    // Right leg (bottom)
+                    ctx.beginPath();
+                    ctx.moveTo(attachX, size * 0.15);
+                    const rightKneeX = attachX - size * 0.3;
+                    const rightKneeY = size * 0.5 + phase * size * 0.2;
+                    const rightFootX = attachX - size * 0.15;
+                    const rightFootY = size * 0.8 + phase * size * 0.15;
+                    ctx.quadraticCurveTo(rightKneeX, rightKneeY, rightFootX, rightFootY);
+                    ctx.stroke();
+                }
+
+                // GASTER (large rear abdomen) - the big back part
+                ctx.fillStyle = bodyColor;
+                ctx.beginPath();
+                ctx.ellipse(-size * 0.7, 0, size * 0.55, size * 0.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // PETIOLE (narrow waist) - distinctive ant feature!
+                ctx.beginPath();
+                ctx.ellipse(-size * 0.2, 0, size * 0.1, size * 0.08, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // THORAX (middle section)
+                ctx.beginPath();
+                ctx.ellipse(size * 0.15, 0, size * 0.3, size * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // HEAD (front)
+                ctx.beginPath();
+                ctx.ellipse(size * 0.55, 0, size * 0.22, size * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // ANTENNAE - elbowed like real ants
+                ctx.strokeStyle = legColor;
+                ctx.lineWidth = size * 0.08;
+                const antennaWave = Math.sin(this.legPhase * 0.7) * 0.15;
+
+                // Left antenna (elbowed)
+                ctx.beginPath();
+                ctx.moveTo(size * 0.7, -size * 0.12);
+                ctx.lineTo(size * 0.9, -size * 0.25); // scape (first segment)
+                ctx.lineTo(size * 1.1, -size * 0.2 + antennaWave * size); // funiculus
+                ctx.stroke();
+
+                // Right antenna
+                ctx.beginPath();
+                ctx.moveTo(size * 0.7, size * 0.12);
+                ctx.lineTo(size * 0.9, size * 0.25);
+                ctx.lineTo(size * 1.1, size * 0.2 - antennaWave * size);
+                ctx.stroke();
+
+                // MANDIBLES
+                ctx.lineWidth = size * 0.1;
+                ctx.beginPath();
+                ctx.moveTo(size * 0.72, -size * 0.08);
+                ctx.lineTo(size * 0.88, -size * 0.12);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(size * 0.72, size * 0.08);
+                ctx.lineTo(size * 0.88, size * 0.12);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        // Initialize ants
+        function initAnts() {
+            ants = [];
+            for (let i = 0; i < CONFIG.initialAnts; i++) {
+                // Start near nest
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * CONFIG.nestRadius * 0.8;
+                ants.push(new Ant(
+                    CONFIG.nestX + Math.cos(angle) * dist,
+                    CONFIG.nestY + Math.sin(angle) * dist
+                ));
+            }
+        }
+
+        // ===========================================
+        // RENDERING
+        // ===========================================
+
+        function drawGround() {
+            // Sandy/dirt background
+            ctx.fillStyle = '#1a1510';
+            ctx.fillRect(0, 0, width, height);
+
+            // Subtle texture
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.01)';
+            for (let i = 0; i < 200; i++) {
+                const x = (i * 73) % width;
+                const y = (i * 97) % height;
+                ctx.beginPath();
+                ctx.arc(x, y, 1 + Math.random(), 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawPheromones() {
+            const cellSize = CONFIG.pheromoneGridSize;
+
+            for (let row = 0; row < pheromoneGrid.rows; row++) {
+                for (let col = 0; col < pheromoneGrid.cols; col++) {
+                    const idx = row * pheromoneGrid.cols + col;
+                    const foodPh = pheromoneGrid.food[idx];
+                    const homePh = pheromoneGrid.home[idx];
+
+                    if (foodPh > 0.5 || homePh > 0.5) {
+                        const x = col * cellSize;
+                        const y = row * cellSize;
+
+                        // Food pheromone (greenish)
+                        if (foodPh > 0.5) {
+                            const alpha = Math.min(0.4, foodPh / CONFIG.pheromoneMax * 0.5);
+                            ctx.fillStyle = `rgba(80, 180, 100, ${alpha})`;
+                            ctx.fillRect(x, y, cellSize, cellSize);
+                        }
+
+                        // Home pheromone (bluish) - fainter
+                        if (homePh > 0.5) {
+                            const alpha = Math.min(0.15, homePh / CONFIG.pheromoneMax * 0.2);
+                            ctx.fillStyle = `rgba(100, 150, 255, ${alpha})`;
+                            ctx.fillRect(x, y, cellSize, cellSize);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Colony growth tracking
+        let colonyLevel = 1;
+        let nextLevelThreshold = 20;
+
+        function getColonySize() {
+            // Colony grows based on food collected
+            const baseRadius = CONFIG.nestRadius;
+            const growth = Math.min(3, 1 + foodCollected / 50); // Max 3x size
+            return baseRadius * growth;
+        }
+
+        function updateColonyGrowth() {
+            // Check if we should level up
+            if (foodCollected >= nextLevelThreshold && colonyLevel < 5) {
+                colonyLevel++;
+                nextLevelThreshold = nextLevelThreshold * 2.5;
+
+                // Spawn more ants when leveling up
+                const newAnts = 10 + colonyLevel * 5;
+                for (let i = 0; i < newAnts; i++) {
+                    if (ants.length < CONFIG.maxAnts) {
+                        const angle = Math.random() * Math.PI * 2;
+                        ants.push(new Ant(
+                            CONFIG.nestX + Math.cos(angle) * CONFIG.nestRadius * 0.5,
+                            CONFIG.nestY + Math.sin(angle) * CONFIG.nestRadius * 0.5
+                        ));
+                    }
+                }
+            }
+        }
+
+        function drawNest() {
+            const currentRadius = getColonySize();
+
+            // Dirt mound - multiple layers for 3D effect
+            // Outer scattered dirt
+            ctx.fillStyle = '#2a1f15';
+            for (let i = 0; i < 8 + colonyLevel * 3; i++) {
+                const angle = (i / (8 + colonyLevel * 3)) * Math.PI * 2 + Math.sin(i * 1.5) * 0.3;
+                const dist = currentRadius * (0.9 + Math.sin(i * 2.7) * 0.3);
+                const blobSize = currentRadius * (0.15 + Math.random() * 0.1);
+                ctx.beginPath();
+                ctx.ellipse(
+                    CONFIG.nestX + Math.cos(angle) * dist,
+                    CONFIG.nestY + Math.sin(angle) * dist * 0.6,
+                    blobSize,
+                    blobSize * 0.6,
+                    0, 0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+
+            // Main mound gradient
+            const gradient = ctx.createRadialGradient(
+                CONFIG.nestX, CONFIG.nestY - currentRadius * 0.2, 0,
+                CONFIG.nestX, CONFIG.nestY, currentRadius * 1.3
+            );
+            gradient.addColorStop(0, '#3d2d1f');
+            gradient.addColorStop(0.3, '#2a1f15');
+            gradient.addColorStop(0.7, '#1e1610');
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 1.2, currentRadius * 0.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mound texture - small dirt particles
+            ctx.fillStyle = '#3a2a1a';
+            for (let i = 0; i < 15 + colonyLevel * 5; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * currentRadius * 0.9;
+                const size = 1.5 + Math.random() * 2;
+                ctx.beginPath();
+                ctx.arc(
+                    CONFIG.nestX + Math.cos(angle) * dist,
+                    CONFIG.nestY + Math.sin(angle) * dist * 0.6,
+                    size, 0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+
+            // Central raised area
+            const innerGradient = ctx.createRadialGradient(
+                CONFIG.nestX, CONFIG.nestY - currentRadius * 0.1, 0,
+                CONFIG.nestX, CONFIG.nestY, currentRadius * 0.6
+            );
+            innerGradient.addColorStop(0, '#4a3a28');
+            innerGradient.addColorStop(0.5, '#3a2a1a');
+            innerGradient.addColorStop(1, '#2a1f15');
+
+            ctx.fillStyle = innerGradient;
+            ctx.beginPath();
+            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 0.5, currentRadius * 0.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nest entrance hole (dark)
+            const entranceGradient = ctx.createRadialGradient(
+                CONFIG.nestX, CONFIG.nestY, 0,
+                CONFIG.nestX, CONFIG.nestY, currentRadius * 0.25
+            );
+            entranceGradient.addColorStop(0, '#000000');
+            entranceGradient.addColorStop(0.7, '#0a0503');
+            entranceGradient.addColorStop(1, '#1a0f0a');
+
+            ctx.fillStyle = entranceGradient;
+            ctx.beginPath();
+            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 0.25, currentRadius * 0.18, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Entrance rim highlight
+            ctx.strokeStyle = '#4a3820';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 0.28, currentRadius * 0.2, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Colony level indicator (small dots around entrance)
+            ctx.fillStyle = '#5a4a30';
+            for (let i = 0; i < colonyLevel; i++) {
+                const angle = (i / colonyLevel) * Math.PI * 2 - Math.PI / 2;
+                ctx.beginPath();
+                ctx.arc(
+                    CONFIG.nestX + Math.cos(angle) * currentRadius * 0.4,
+                    CONFIG.nestY + Math.sin(angle) * currentRadius * 0.28,
+                    3, 0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+        }
+
+        function drawFood() {
+            for (const food of foodItems) {
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.ellipse(food.x + 2, food.y + 2, food.radius, food.radius * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Food item
+                ctx.fillStyle = food.color;
+                ctx.beginPath();
+                ctx.arc(food.x, food.y, food.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Highlight
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.beginPath();
+                ctx.arc(food.x - food.radius * 0.3, food.y - food.radius * 0.3, food.radius * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Breaking indicator
+                if (food.beingBrokenDown) {
+                    ctx.strokeStyle = 'rgba(255, 200, 100, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(food.x, food.y, food.radius + 4, 0, Math.PI * 2 * food.breakdownProgress);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawAnts() {
+            for (const ant of ants) {
+                ant.draw();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('colony-level').textContent = colonyLevel;
+            document.getElementById('ant-count').textContent = ants.length;
+            document.getElementById('food-collected').textContent = foodCollected;
+            document.getElementById('food-available').textContent = foodItems.length;
+        }
+
+        // ===========================================
+        // INPUT HANDLING
+        // ===========================================
+
+        let selectedFoodType = 'crumb';
+        let isPlacing = false;
+        let lastPlaceTime = 0;
+        let showHint = true;
+
+        // Food selector buttons
+        document.querySelectorAll('.food-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.food-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedFoodType = btn.dataset.food;
+            });
+            btn.addEventListener('mousedown', (e) => e.stopPropagation());
+            btn.addEventListener('touchstart', (e) => e.stopPropagation());
+        });
+
+        // Prevent food selector from triggering canvas events
+        document.querySelector('.food-selector').addEventListener('mousedown', (e) => e.stopPropagation());
+        document.querySelector('.food-selector').addEventListener('touchstart', (e) => e.stopPropagation());
+
+        function placeFood(x, y) {
+            const now = Date.now();
+            // Throttle placement
+            const minInterval = selectedFoodType === 'crumb' ? 50 : 100;
+            if (now - lastPlaceTime < minInterval) return;
+            lastPlaceTime = now;
+
+            // Don't place too close to nest
+            const distToNest = Math.hypot(x - CONFIG.nestX, y - CONFIG.nestY);
+            if (distToNest < CONFIG.nestRadius * 2) return;
+
+            addFood(x, y, selectedFoodType);
+            showHint = false; // Hide hint after first food drop
+        }
+
+        canvas.addEventListener('click', (e) => {
+            placeFood(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isPlacing = true;
+            placeFood(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isPlacing) {
+                placeFood(e.clientX, e.clientY);
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isPlacing = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isPlacing = false;
+        });
+
+        // Touch support
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isPlacing = true;
+            const touch = e.touches[0];
+            placeFood(touch.clientX, touch.clientY);
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (isPlacing) {
+                const touch = e.touches[0];
+                placeFood(touch.clientX, touch.clientY);
+            }
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isPlacing = false;
+        });
+
+        // ===========================================
+        // MAIN LOOP
+        // ===========================================
+
+        function update() {
+            // Update all ants
+            for (const ant of ants) {
+                ant.update();
+            }
+
+            // Decay pheromones
+            decayPheromones();
+
+            // Update colony growth (check for level ups)
+            updateColonyGrowth();
+
+            // Spawn new ants occasionally if food is being collected
+            if (ants.length < CONFIG.maxAnts && foodCollected > 0 && Math.random() < 0.003) {
+                const angle = Math.random() * Math.PI * 2;
+                const currentRadius = getColonySize();
+                ants.push(new Ant(
+                    CONFIG.nestX + Math.cos(angle) * currentRadius * 0.5,
+                    CONFIG.nestY + Math.sin(angle) * currentRadius * 0.5
+                ));
+            }
+        }
+
+        function drawHint() {
+            if (!showHint) return;
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '16px "IBM Plex Sans", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Click anywhere to drop food', width / 2, height * 0.25);
+
+            // Arrow pointing down
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(width / 2, height * 0.28);
+            ctx.lineTo(width / 2, height * 0.35);
+            ctx.moveTo(width / 2 - 8, height * 0.33);
+            ctx.lineTo(width / 2, height * 0.35);
+            ctx.lineTo(width / 2 + 8, height * 0.33);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function render() {
+            drawGround();
+            drawPheromones();
+            drawNest();
+            drawFood();
+            drawAnts();
+            drawHint();
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            updateUI();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Resize function
+        function resize() {
+            dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.scale(dpr, dpr);
+            initPheromoneGrid();
+            CONFIG.nestX = width * 0.5;
+            CONFIG.nestY = height * 0.65;
+        }
+
+        // Initialize
+        resize();
+        initAnts();
+
+        // Start the simulation
+        gameLoop();
+
+        // Handle window resize
+        window.addEventListener('resize', resize);
+    </script>
+</body>
+</html>
