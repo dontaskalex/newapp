@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Wheel | hafnr</title>
+    <meta name="description" content="A premium decision wheel with physics-based spinning, weighted probabilities, and elegant design.">
+
+    <!-- OG Tags for social sharing -->
+    <meta property="og:title" content="Decision Wheel | hafnr">
+    <meta property="og:description" content="Spin the wheel and let fate decide. Premium decision-making with style.">
+    <meta property="og:type" content="website">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Core palette - matching hafnr */
+            --bg: #09090b;
+            --bg-deep: #050507;
+            --surface: #111113;
+            --surface-elevated: #161618;
+            --border: #1e1e21;
+            --border-hover: #2a2a2e;
+            --border-active: #3a3a3f;
+
+            /* Text */
+            --text: #e4e4e7;
+            --text-muted: #71717a;
+            --text-dim: #52525b;
+
+            /* Accent - Emerald/Teal for this tool */
+            --accent: #10b981;
+            --accent-light: #34d399;
+            --accent-dark: #059669;
+            --accent-glow: rgba(16, 185, 129, 0.15);
+            --accent-glow-strong: rgba(16, 185, 129, 0.3);
+
+            /* Secondary accent - Gold for special moments */
+            --gold: #d4af37;
+            --gold-light: #f4e4a6;
+            --gold-glow: rgba(212, 175, 55, 0.2);
+
+            /* Danger */
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.15);
+
+            /* Wheel segment colors - sophisticated palette */
+            --segment-1: #10b981;
+            --segment-2: #3b82f6;
+            --segment-3: #8b5cf6;
+            --segment-4: #ec4899;
+            --segment-5: #f59e0b;
+            --segment-6: #06b6d4;
+            --segment-7: #84cc16;
+            --segment-8: #f43f5e;
+
+            /* Fonts */
+            --font-ui: 'IBM Plex Sans', -apple-system, sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --font-display: 'Playfair Display', Georgia, serif;
+
+            /* Sizing */
+            --wheel-size: min(380px, 85vw);
+            --container-max: 520px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-ui);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px 48px;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Subtle background texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ambient glow */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--container-max);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-bottom: 16px;
+            transition: color 0.15s ease;
+        }
+
+        .back-link:hover {
+            color: var(--text-muted);
+        }
+
+        .back-link svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 6vw, 36px);
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .tagline {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        /* Wheel Container */
+        .wheel-wrapper {
+            position: relative;
+            width: var(--wheel-size);
+            height: var(--wheel-size);
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--surface);
+            box-shadow:
+                0 0 0 3px var(--border),
+                0 0 60px rgba(0, 0, 0, 0.5),
+                inset 0 0 40px rgba(0, 0, 0, 0.3);
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .wheel-container:active {
+            cursor: grabbing;
+        }
+
+        .wheel-container.spinning {
+            cursor: not-allowed;
+        }
+
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 0.05s linear;
+        }
+
+        .wheel-container.spinning #wheel {
+            transition: none;
+        }
+
+        /* Center hub */
+        .wheel-hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, var(--surface-elevated) 0%, var(--bg) 100%);
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .wheel-hub-inner {
+            width: 36px;
+            height: 36px;
+            background: var(--bg);
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wheel-hub-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent-glow-strong);
+        }
+
+        /* Pointer/Arrow */
+        .wheel-pointer {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+        }
+
+        .wheel-pointer svg {
+            width: 32px;
+            height: 40px;
+        }
+
+        /* Result display */
+        .result-container {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .result-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-family: var(--font-mono);
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: 700;
+            color: var(--accent-light);
+            text-align: center;
+            text-shadow: 0 0 30px var(--accent-glow-strong);
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .result-text.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .result-hint {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .result-hint.visible {
+            opacity: 1;
+        }
+
+        /* Spin instruction */
+        .spin-instruction {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .spin-instruction kbd {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 4px 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-dim);
+        }
+
+        .spin-instruction.hidden {
+            opacity: 0;
+        }
+
+        /* Options Panel */
+        .options-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title .count {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding-right: 4px;
+        }
+
+        .options-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .options-list::-webkit-scrollbar-track {
+            background: var(--bg);
+            border-radius: 2px;
+        }
+
+        .options-list::-webkit-scrollbar-thumb {
+            background: var(--border-hover);
+            border-radius: 2px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .option-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .option-item.excluded {
+            opacity: 0.4;
+            background: transparent;
+        }
+
+        .option-item.excluded .option-name {
+            text-decoration: line-through;
+        }
+
+        .option-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .option-name {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: text;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+        }
+
+        .option-name:hover {
+            background: var(--surface);
+            border-color: var(--border);
+        }
+
+        .option-name:focus {
+            outline: none;
+            background: var(--surface);
+            border-color: var(--accent);
+            white-space: normal;
+            overflow: visible;
+        }
+
+        .option-weight {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .weight-btn {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.15s ease;
+        }
+
+        .weight-btn:hover {
+            border-color: var(--border-hover);
+            color: var(--text);
+        }
+
+        .weight-btn:active {
+            transform: scale(0.95);
+        }
+
+        .weight-value {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-dim);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .option-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .option-action-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .option-action-btn:hover {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        .option-action-btn.exclude:hover {
+            color: var(--gold);
+        }
+
+        .option-action-btn.delete:hover {
+            color: var(--danger);
+        }
+
+        .option-action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Add option */
+        .add-option {
+            display: flex;
+            gap: 8px;
+        }
+
+        .add-option input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font-ui);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .add-option input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .add-option input:focus {
+            border-color: var(--accent);
+        }
+
+        .add-option button {
+            padding: 10px 18px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .add-option button:hover {
+            background: var(--accent-light);
+        }
+
+        .add-option button:active {
+            transform: scale(0.98);
+        }
+
+        /* Actions bar */
+        .actions-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-family: var(--font-ui);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--border-hover);
+            color: var(--text);
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 20px;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Keyboard hints */
+        .keyboard-hints {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--text-dim);
+            opacity: 0.6;
+        }
+
+        .keyboard-hints kbd {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 2px 6px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            margin-right: 6px;
+        }
+
+        @media (max-width: 600px) {
+            .keyboard-hints {
+                display: none;
+            }
+        }
+
+        /* Sound toggle */
+        .sound-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: all 0.15s ease;
+            z-index: 100;
+        }
+
+        .sound-toggle:hover {
+            border-color: var(--border-hover);
+            color: var(--text);
+        }
+
+        .sound-toggle.muted {
+            color: var(--text-dim);
+            opacity: 0.5;
+        }
+
+        .sound-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Confetti canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+            50% { box-shadow: 0 0 40px var(--accent-glow-strong); }
+        }
+
+        .wheel-container.highlight {
+            animation: glow 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to hafnr
+        </a>
+
+        <header>
+            <h1>Decision Wheel</h1>
+            <p class="tagline">Let fate decide</p>
+        </header>
+
+        <div class="wheel-wrapper">
+            <div class="wheel-pointer">
+                <svg viewBox="0 0 32 40" fill="none">
+                    <path d="M16 40L4 8C4 3.58172 7.58172 0 12 0H20C24.4183 0 28 3.58172 28 8L16 40Z" fill="var(--accent)"/>
+                    <path d="M16 36L6 10C6 6.13401 9.13401 3 13 3H19C22.866 3 26 6.13401 26 10L16 36Z" fill="var(--bg)"/>
+                    <circle cx="16" cy="10" r="4" fill="var(--accent)"/>
+                </svg>
+            </div>
+            <div class="wheel-container" id="wheel-container">
+                <canvas id="wheel"></canvas>
+                <div class="wheel-hub">
+                    <div class="wheel-hub-inner">
+                        <div class="wheel-hub-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-container">
+            <span class="result-label">Result</span>
+            <div class="result-text" id="result-text">—</div>
+            <div class="result-hint" id="result-hint"></div>
+        </div>
+
+        <p class="spin-instruction" id="spin-instruction">
+            Drag to spin or press <kbd>Space</kbd>
+        </p>
+
+        <div class="options-panel">
+            <div class="panel-header">
+                <span class="panel-title">
+                    Options
+                    <span class="count" id="option-count">0</span>
+                </span>
+            </div>
+            <div class="options-list" id="options-list"></div>
+            <div class="add-option">
+                <input type="text" id="new-option-input" placeholder="Add an option..." maxlength="50">
+                <button id="add-option-btn">Add</button>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+            <button class="action-btn" id="share-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+                Share
+            </button>
+            <button class="action-btn" id="reset-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                </svg>
+                Reset
+            </button>
+        </div>
+    </div>
+
+    <button class="sound-toggle" id="sound-toggle" title="Toggle sound">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sound-on">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sound-off" style="display:none">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+    </button>
+
+    <div class="keyboard-hints">
+        <div><kbd>Space</kbd> Spin</div>
+        <div><kbd>N</kbd> New option</div>
+        <div><kbd>R</kbd> Reset excluded</div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ==================== STATE ====================
+        const state = {
+            options: [],
+            rotation: 0,
+            isSpinning: false,
+            isDragging: false,
+            lastAngle: 0,
+            velocity: 0,
+            soundEnabled: true,
+            history: []
+        };
+
+        const SEGMENT_COLORS = [
+            '#10b981', '#3b82f6', '#8b5cf6', '#ec4899',
+            '#f59e0b', '#06b6d4', '#84cc16', '#f43f5e'
+        ];
+
+        const DEFAULT_OPTIONS = [
+            { name: 'Pizza', weight: 1 },
+            { name: 'Sushi', weight: 1 },
+            { name: 'Tacos', weight: 1 },
+            { name: 'Burger', weight: 1 },
+            { name: 'Salad', weight: 1 }
+        ];
+
+        // ==================== AUDIO ====================
+        const AudioManager = {
+            ctx: null,
+
+            init() {
+                if (this.ctx) return;
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            },
+
+            playTick() {
+                if (!state.soundEnabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.frequency.value = 800 + Math.random() * 200;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+                gain.gain.exponentialDecayTo && gain.gain.exponentialDecayTo(0.001, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+                osc.start(this.ctx.currentTime);
+                osc.stop(this.ctx.currentTime + 0.04);
+            },
+
+            playWin() {
+                if (!state.soundEnabled || !this.ctx) return;
+                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    const startTime = this.ctx.currentTime + i * 0.1;
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(0.1, startTime + 0.05);
+                    gain.gain.linearRampToValueAtTime(0, startTime + 0.3);
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.3);
+                });
+            }
+        };
+
+        // ==================== WHEEL RENDERING ====================
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const container = document.getElementById('wheel-container');
+            const size = container.offsetWidth;
+            canvas.width = size * 2;
+            canvas.height = size * 2;
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+            ctx.scale(2, 2);
+            drawWheel();
+        }
+
+        function getActiveOptions() {
+            return state.options.filter(o => !o.excluded);
+        }
+
+        function getTotalWeight() {
+            return getActiveOptions().reduce((sum, o) => sum + o.weight, 0);
+        }
+
+        function drawWheel() {
+            const size = canvas.width / 2;
+            const center = size / 2;
+            const radius = center - 4;
+
+            ctx.clearRect(0, 0, size, size);
+
+            const activeOptions = getActiveOptions();
+            if (activeOptions.length === 0) {
+                // Draw empty state
+                ctx.beginPath();
+                ctx.arc(center, center, radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#111113';
+                ctx.fill();
+                ctx.strokeStyle = '#1e1e21';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#52525b';
+                ctx.font = '14px IBM Plex Sans';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Add options to spin', center, center);
+                return;
+            }
+
+            const totalWeight = getTotalWeight();
+            let currentAngle = state.rotation * Math.PI / 180;
+
+            activeOptions.forEach((option, index) => {
+                const sliceAngle = (option.weight / totalWeight) * Math.PI * 2;
+                const color = SEGMENT_COLORS[index % SEGMENT_COLORS.length];
+
+                // Draw slice
+                ctx.beginPath();
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+
+                // Gradient fill
+                const gradient = ctx.createRadialGradient(center, center, 0, center, center, radius);
+                gradient.addColorStop(0, adjustColor(color, 20));
+                gradient.addColorStop(1, adjustColor(color, -20));
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Slice border
+                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Draw text
+                const textAngle = currentAngle + sliceAngle / 2;
+                const textRadius = radius * 0.65;
+                const textX = center + Math.cos(textAngle) * textRadius;
+                const textY = center + Math.sin(textAngle) * textRadius;
+
+                ctx.save();
+                ctx.translate(textX, textY);
+                ctx.rotate(textAngle + Math.PI / 2);
+
+                // Text styling
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.font = 'bold 13px IBM Plex Sans';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Truncate text if needed
+                let text = option.name;
+                if (ctx.measureText(text).width > radius * 0.5) {
+                    while (ctx.measureText(text + '...').width > radius * 0.5 && text.length > 0) {
+                        text = text.slice(0, -1);
+                    }
+                    text += '...';
+                }
+
+                ctx.fillText(text, 0, 1);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(text, 0, 0);
+
+                ctx.restore();
+
+                currentAngle += sliceAngle;
+            });
+
+            // Outer ring
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function adjustColor(hex, amount) {
+            const num = parseInt(hex.slice(1), 16);
+            const r = Math.min(255, Math.max(0, (num >> 16) + amount));
+            const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
+            const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
+            return `rgb(${r},${g},${b})`;
+        }
+
+        // ==================== PHYSICS & SPINNING ====================
+        let lastTickAngle = 0;
+        let animationId = null;
+
+        function spin(initialVelocity = null) {
+            if (state.isSpinning || getActiveOptions().length < 2) return;
+
+            AudioManager.init();
+            state.isSpinning = true;
+            document.getElementById('wheel-container').classList.add('spinning');
+            document.getElementById('result-text').classList.remove('visible');
+            document.getElementById('result-hint').classList.remove('visible');
+            document.getElementById('spin-instruction').classList.add('hidden');
+
+            // Calculate velocity - fast initial spin
+            let velocity = initialVelocity ? initialVelocity * 1.5 : (35 + Math.random() * 15);
+            const minVelocity = 0.08;
+
+            lastTickAngle = state.rotation;
+
+            function animate() {
+                // Dynamic friction - fast start, gradual slowdown, bit of tension at end
+                let friction;
+                if (velocity > 20) {
+                    friction = 0.98; // Blazing fast phase - decays quicker
+                } else if (velocity > 5) {
+                    friction = 0.985; // Medium phase
+                } else if (velocity > 1.5) {
+                    friction = 0.99; // Slowing down
+                } else {
+                    friction = 0.994; // Final stretch - bit of suspense
+                }
+
+                velocity *= friction;
+                state.rotation += velocity;
+
+                // Tick sound on segment change
+                const totalWeight = getTotalWeight();
+                const activeOptions = getActiveOptions();
+                const degreesPerTick = 360 / activeOptions.length;
+
+                if (Math.abs(state.rotation - lastTickAngle) >= degreesPerTick / activeOptions.length) {
+                    AudioManager.playTick();
+                    lastTickAngle = state.rotation;
+                }
+
+                drawWheel();
+
+                if (velocity > minVelocity) {
+                    animationId = requestAnimationFrame(animate);
+                } else {
+                    finishSpin();
+                }
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function finishSpin() {
+            state.isSpinning = false;
+            document.getElementById('wheel-container').classList.remove('spinning');
+            document.getElementById('wheel-container').classList.add('highlight');
+            setTimeout(() => {
+                document.getElementById('wheel-container').classList.remove('highlight');
+            }, 500);
+
+            // Determine winner
+            // The pointer is at the top (-90° or 270° in canvas coords)
+            // The wheel draws slices starting from state.rotation (in degrees, converted to radians)
+            // We need to find which slice is at the -90° position (top)
+            const pointerAngle = -90; // Top of the wheel in degrees
+            // Normalize rotation to 0-360 range
+            let wheelRotation = state.rotation % 360;
+            if (wheelRotation < 0) wheelRotation += 360;
+
+            // The angle under the pointer relative to the wheel's starting position
+            // pointerAngle - wheelRotation gives us where the pointer is relative to slice start
+            let angleUnderPointer = (pointerAngle - wheelRotation) % 360;
+            if (angleUnderPointer < 0) angleUnderPointer += 360;
+
+            const totalWeight = getTotalWeight();
+            const activeOptions = getActiveOptions();
+
+            let accumulatedAngle = 0;
+            let winner = activeOptions[0];
+
+            for (const option of activeOptions) {
+                const sliceAngle = (option.weight / totalWeight) * 360;
+                if (angleUnderPointer >= accumulatedAngle && angleUnderPointer < accumulatedAngle + sliceAngle) {
+                    winner = option;
+                    break;
+                }
+                accumulatedAngle += sliceAngle;
+            }
+
+            // Display result
+            const resultText = document.getElementById('result-text');
+            resultText.textContent = winner.name;
+            resultText.classList.add('visible');
+
+            // Add to history
+            state.history.push({ name: winner.name, timestamp: Date.now() });
+
+            // Check for streaks
+            const resultHint = document.getElementById('result-hint');
+            const recentWins = state.history.slice(-5).filter(h => h.name === winner.name).length;
+            if (recentWins >= 3) {
+                resultHint.textContent = `${winner.name} is on a ${recentWins}-win streak!`;
+                resultHint.classList.add('visible');
+            }
+
+            AudioManager.playWin();
+            triggerConfetti();
+
+            document.getElementById('spin-instruction').classList.remove('hidden');
+            saveState();
+        }
+
+        // ==================== DRAG HANDLING ====================
+        const wheelContainer = document.getElementById('wheel-container');
+        let dragStartAngle = 0;
+        let dragStartRotation = 0;
+        let lastDragAngle = 0;
+        let dragVelocity = 0;
+        let lastDragTime = 0;
+
+        function getAngleFromCenter(e) {
+            const rect = wheelContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
+        }
+
+        function handleDragStart(e) {
+            if (state.isSpinning || getActiveOptions().length < 2) return;
+            e.preventDefault();
+            AudioManager.init();
+
+            state.isDragging = true;
+            dragStartAngle = getAngleFromCenter(e);
+            dragStartRotation = state.rotation;
+            lastDragAngle = dragStartAngle;
+            lastDragTime = performance.now();
+            dragVelocity = 0;
+        }
+
+        function handleDragMove(e) {
+            if (!state.isDragging) return;
+            e.preventDefault();
+
+            const currentAngle = getAngleFromCenter(e);
+            const deltaAngle = currentAngle - lastDragAngle;
+            const now = performance.now();
+            const deltaTime = now - lastDragTime;
+
+            // Handle angle wrapping
+            let adjustedDelta = deltaAngle;
+            if (deltaAngle > 180) adjustedDelta -= 360;
+            if (deltaAngle < -180) adjustedDelta += 360;
+
+            state.rotation += adjustedDelta;
+            dragVelocity = adjustedDelta / Math.max(deltaTime, 1) * 16;
+
+            lastDragAngle = currentAngle;
+            lastDragTime = now;
+
+            drawWheel();
+        }
+
+        function handleDragEnd(e) {
+            if (!state.isDragging) return;
+            state.isDragging = false;
+
+            // If velocity is high enough, spin
+            if (Math.abs(dragVelocity) > 2) {
+                spin(Math.abs(dragVelocity) * 1.5);
+            }
+        }
+
+        wheelContainer.addEventListener('mousedown', handleDragStart);
+        wheelContainer.addEventListener('touchstart', handleDragStart, { passive: false });
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('touchmove', handleDragMove, { passive: false });
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchend', handleDragEnd);
+
+        // ==================== OPTIONS MANAGEMENT ====================
+        function renderOptions() {
+            const list = document.getElementById('options-list');
+            list.innerHTML = '';
+
+            state.options.forEach((option, index) => {
+                const item = document.createElement('div');
+                item.className = 'option-item' + (option.excluded ? ' excluded' : '');
+                item.innerHTML = `
+                    <div class="option-color" style="background: ${SEGMENT_COLORS[index % SEGMENT_COLORS.length]}"></div>
+                    <span class="option-name" contenteditable="true" data-index="${index}">${escapeHtml(option.name)}</span>
+                    <div class="option-weight">
+                        <button class="weight-btn" data-action="decrease" data-index="${index}">−</button>
+                        <span class="weight-value">${option.weight}x</span>
+                        <button class="weight-btn" data-action="increase" data-index="${index}">+</button>
+                    </div>
+                    <div class="option-actions">
+                        <button class="option-action-btn exclude" data-action="exclude" data-index="${index}" title="${option.excluded ? 'Include' : 'Exclude for now'}">
+                            ${option.excluded ?
+                                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' :
+                                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+                            }
+                        </button>
+                        <button class="option-action-btn delete" data-action="delete" data-index="${index}" title="Remove">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+
+            // Add event listeners for editable names
+            document.querySelectorAll('.option-name[contenteditable]').forEach(el => {
+                el.addEventListener('blur', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    const newName = e.target.textContent.trim();
+                    if (newName && newName !== state.options[index].name) {
+                        state.options[index].name = newName.slice(0, 50); // Max 50 chars
+                        drawWheel();
+                        saveState();
+                    } else if (!newName) {
+                        e.target.textContent = state.options[index].name; // Restore if empty
+                    }
+                });
+
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.target.blur();
+                    }
+                    if (e.key === 'Escape') {
+                        e.target.textContent = state.options[e.target.dataset.index].name;
+                        e.target.blur();
+                    }
+                });
+            });
+
+            document.getElementById('option-count').textContent = getActiveOptions().length;
+            drawWheel();
+            saveState();
+        }
+
+        function addOption(name) {
+            if (!name.trim() || state.options.length >= 20) return;
+            state.options.push({ name: name.trim(), weight: 1, excluded: false });
+            renderOptions();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event delegation for option actions
+        document.getElementById('options-list').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const index = parseInt(btn.dataset.index);
+            const option = state.options[index];
+
+            switch (action) {
+                case 'increase':
+                    if (option.weight < 5) option.weight++;
+                    break;
+                case 'decrease':
+                    if (option.weight > 1) option.weight--;
+                    break;
+                case 'exclude':
+                    option.excluded = !option.excluded;
+                    showToast(option.excluded ? `"${option.name}" excluded` : `"${option.name}" included`);
+                    break;
+                case 'delete':
+                    state.options.splice(index, 1);
+                    break;
+            }
+
+            renderOptions();
+        });
+
+        // Add option input
+        const newOptionInput = document.getElementById('new-option-input');
+        const addOptionBtn = document.getElementById('add-option-btn');
+
+        addOptionBtn.addEventListener('click', () => {
+            addOption(newOptionInput.value);
+            newOptionInput.value = '';
+            newOptionInput.focus();
+        });
+
+        newOptionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addOption(newOptionInput.value);
+                newOptionInput.value = '';
+            }
+        });
+
+        // ==================== SHARING ====================
+        document.getElementById('share-btn').addEventListener('click', () => {
+            const data = {
+                o: state.options.map(o => ({ n: o.name, w: o.weight }))
+            };
+            const encoded = btoa(JSON.stringify(data));
+            const url = `${window.location.origin}${window.location.pathname}?w=${encoded}`;
+
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(() => {
+                showToast('Could not copy link');
+            });
+        });
+
+        // ==================== RESET ====================
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            state.options = [];
+            state.rotation = 0;
+            state.history = [];
+            localStorage.removeItem('wheel-options');
+            document.getElementById('result-text').textContent = '—';
+            document.getElementById('result-text').classList.remove('visible');
+            document.getElementById('result-hint').classList.remove('visible');
+            renderOptions();
+            showToast('Wheel cleared');
+        });
+
+        // ==================== KEYBOARD SHORTCUTS ====================
+        document.addEventListener('keydown', (e) => {
+            // Ignore if typing in input
+            if (e.target.tagName === 'INPUT') return;
+
+            switch (e.code) {
+                case 'Space':
+                    e.preventDefault();
+                    if (!state.isSpinning) spin();
+                    break;
+                case 'KeyN':
+                    newOptionInput.focus();
+                    break;
+                case 'KeyR':
+                    state.options.forEach(o => o.excluded = false);
+                    renderOptions();
+                    showToast('All options restored');
+                    break;
+            }
+        });
+
+        // ==================== SOUND TOGGLE ====================
+        const soundToggle = document.getElementById('sound-toggle');
+        soundToggle.addEventListener('click', () => {
+            state.soundEnabled = !state.soundEnabled;
+            soundToggle.classList.toggle('muted', !state.soundEnabled);
+            soundToggle.querySelector('.sound-on').style.display = state.soundEnabled ? 'block' : 'none';
+            soundToggle.querySelector('.sound-off').style.display = state.soundEnabled ? 'none' : 'block';
+            localStorage.setItem('wheel-sound', state.soundEnabled);
+        });
+
+        // ==================== CONFETTI ====================
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = SEGMENT_COLORS;
+
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15 - 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+
+            let frame = 0;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3;
+                    p.rotation += p.rotationSpeed;
+                    p.vx *= 0.99;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = Math.max(0, 1 - frame / 60);
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                frame++;
+                if (frame < 60) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        // ==================== TOAST ====================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 2500);
+        }
+
+        // ==================== PERSISTENCE ====================
+        function saveState() {
+            localStorage.setItem('wheel-options', JSON.stringify(state.options));
+        }
+
+        function loadState() {
+            // Check URL params first
+            const params = new URLSearchParams(window.location.search);
+            const wheelData = params.get('w');
+
+            if (wheelData) {
+                try {
+                    const data = JSON.parse(atob(wheelData));
+                    state.options = data.o.map(o => ({ name: o.n, weight: o.w, excluded: false }));
+                    // Clear URL params
+                    window.history.replaceState({}, '', window.location.pathname);
+                    return;
+                } catch (e) {
+                    console.error('Failed to parse wheel data from URL');
+                }
+            }
+
+            // Load from localStorage
+            const saved = localStorage.getItem('wheel-options');
+            if (saved) {
+                try {
+                    state.options = JSON.parse(saved);
+                } catch (e) {
+                    state.options = [...DEFAULT_OPTIONS];
+                }
+            } else {
+                state.options = [...DEFAULT_OPTIONS];
+            }
+
+            // Load sound preference
+            const soundPref = localStorage.getItem('wheel-sound');
+            if (soundPref !== null) {
+                state.soundEnabled = soundPref === 'true';
+                soundToggle.classList.toggle('muted', !state.soundEnabled);
+                soundToggle.querySelector('.sound-on').style.display = state.soundEnabled ? 'block' : 'none';
+                soundToggle.querySelector('.sound-off').style.display = state.soundEnabled ? 'none' : 'block';
+            }
+        }
+
+        // ==================== INIT ====================
+        window.addEventListener('resize', resizeCanvas);
+        loadState();
+        resizeCanvas();
+        renderOptions();
+    </script>
+</body>
+</html>
