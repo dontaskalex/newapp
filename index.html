@@ -6,7 +6,7 @@
     <title>hafnr</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,131 +14,204 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #09090b;
+            --surface: #111113;
+            --border: #1e1e21;
+            --border-hover: #2a2a2e;
+            --text: #e4e4e7;
+            --text-muted: #71717a;
+            --text-dim: #52525b;
+        }
+
         body {
-            background: #0a0a0a;
+            background: var(--bg);
             min-height: 100vh;
-            font-family: 'Inter', sans-serif;
-            color: #e5e5e5;
-            padding: 40px 20px;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            color: var(--text);
+            padding: 24px 16px;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
         header {
-            margin-bottom: 60px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
         }
 
         h1 {
             font-family: 'Space Mono', monospace;
-            font-size: 48px;
+            font-size: 22px;
             font-weight: 700;
-            letter-spacing: -2px;
-            margin-bottom: 12px;
+            letter-spacing: -0.5px;
         }
 
         .tagline {
-            color: #666;
-            font-size: 16px;
+            color: var(--text-dim);
+            font-size: 13px;
         }
 
         .projects {
             display: grid;
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
 
         .project-card {
-            background: #141414;
-            border: 1px solid #222;
-            border-radius: 16px;
-            padding: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
             text-decoration: none;
             color: inherit;
-            transition: all 0.2s;
-            display: block;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .project-card:hover {
-            border-color: #444;
-            background: #1a1a1a;
-            transform: translateY(-2px);
+            border-color: var(--border-hover);
+            background: #141416;
+        }
+
+        .project-card:active {
+            transform: scale(0.995);
         }
 
         .project-header {
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 12px;
+            gap: 10px;
         }
 
         .project-icon {
-            width: 44px;
-            height: 44px;
-            background: #222;
-            border-radius: 12px;
+            width: 32px;
+            height: 32px;
+            background: var(--border);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 14px;
+            flex-shrink: 0;
         }
 
         .project-title {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .project-description {
-            color: #888;
-            font-size: 14px;
-            line-height: 1.6;
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .project-tag {
-            display: inline-block;
-            margin-top: 16px;
-            padding: 6px 12px;
-            background: #1f1f1f;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #666;
+            padding: 3px 6px;
+            background: var(--border);
+            border-radius: 4px;
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            align-self: flex-start;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #444;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-        }
-
-        footer {
-            margin-top: 80px;
-            padding-top: 30px;
-            border-top: 1px solid #1a1a1a;
-            text-align: center;
-            color: #444;
-            font-size: 13px;
-        }
-
-        @media (max-width: 600px) {
+        /* Tablet - 2 columns */
+        @media (min-width: 520px) {
             body {
-                padding: 30px 16px;
+                padding: 32px 24px;
+            }
+
+            header {
+                margin-bottom: 28px;
             }
 
             h1 {
-                font-size: 36px;
+                font-size: 24px;
+            }
+
+            .projects {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
 
             .project-card {
-                padding: 22px;
+                padding: 16px;
+            }
+
+            .project-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 15px;
             }
 
             .project-title {
-                font-size: 18px;
+                font-size: 14px;
+            }
+
+            .project-description {
+                font-size: 12px;
+            }
+        }
+
+        /* Desktop - 3 columns */
+        @media (min-width: 768px) {
+            body {
+                padding: 48px 32px;
+            }
+
+            header {
+                margin-bottom: 32px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .tagline {
+                font-size: 14px;
+            }
+
+            .projects {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+
+            .project-card {
+                padding: 18px;
+                border-radius: 12px;
+            }
+
+            .project-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            .project-title {
+                font-size: 15px;
+            }
+
+            .project-description {
+                font-size: 12px;
+                -webkit-line-clamp: 3;
+            }
+
+            .project-tag {
+                font-size: 10px;
             }
         }
     </style>
@@ -147,7 +220,7 @@
     <div class="container">
         <header>
             <h1>hafnr</h1>
-            <p class="tagline">small experiments and side projects</p>
+            <p class="tagline">experiments</p>
         </header>
 
         <section class="projects">
@@ -156,11 +229,8 @@
                     <div class="project-icon">🏠</div>
                     <h2 class="project-title">The Lobby</h2>
                 </div>
-                <p class="project-description">
-                    A cozy real-time hangout space where you can just exist with others.
-                    Chat, express yourself with emotes, and customize your character with hats and speech bubbles.
-                </p>
-                <span class="project-tag">multiplayer</span>
+                <p class="project-description">Real-time hangout space with chat, emotes, and character customization</p>
+                <span class="project-tag">social</span>
             </a>
 
             <a href="/speed-reader" class="project-card">
@@ -168,10 +238,8 @@
                     <div class="project-icon">⚡</div>
                     <h2 class="project-title">Speed Reader</h2>
                 </div>
-                <p class="project-description">
-                    RSVP-style speed reading with focus highlighting. Read faster by eliminating eye movement—words appear one at a time, centered on the optimal recognition point.
-                </p>
-                <span class="project-tag">productivity</span>
+                <p class="project-description">RSVP-style reading with focus highlighting for faster comprehension</p>
+                <span class="project-tag">tools</span>
             </a>
 
             <a href="/dice" class="project-card">
@@ -179,30 +247,28 @@
                     <div class="project-icon">🎲</div>
                     <h2 class="project-title">Dice Roller</h2>
                 </div>
-                <p class="project-description">
-                    Roll custom dice with satisfying animations. Configure any combination of dice from d1 to d100—perfect for tabletop games.
-                </p>
+                <p class="project-description">Custom dice rolls with animations, perfect for tabletop games</p>
                 <span class="project-tag">tools</span>
             </a>
 
-            <!-- Add more projects here as you create them -->
-            <!--
-            <a href="/project-name" class="project-card">
+            <a href="/pomodoro" class="project-card">
                 <div class="project-header">
-                    <div class="project-icon">🎮</div>
-                    <h2 class="project-title">Project Name</h2>
+                    <div class="project-icon">🍅</div>
+                    <h2 class="project-title">Pomodoro</h2>
                 </div>
-                <p class="project-description">
-                    Description of the project goes here.
-                </p>
-                <span class="project-tag">tag</span>
+                <p class="project-description">Calm focus timer with session tracking and automatic breaks</p>
+                <span class="project-tag">focus</span>
             </a>
-            -->
-        </section>
 
-        <footer>
-            <p>built with curiosity</p>
-        </footer>
+            <a href="/hostile-takeover" class="project-card">
+                <div class="project-header">
+                    <div class="project-icon">🕵️</div>
+                    <h2 class="project-title">Hostile Takeover</h2>
+                </div>
+                <p class="project-description">Find the secret bad guys! A party game for 5-10 friends, one phone</p>
+                <span class="project-tag">party</span>
+            </a>
+        </section>
     </div>
 </body>
 </html>

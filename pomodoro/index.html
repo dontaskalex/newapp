@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro | hafnr</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0c0c0e;
+            --bg-surface: #131316;
+            --bg-elevated: #1a1a1f;
+            --border: #252529;
+            --text-primary: #e8e6e3;
+            --text-secondary: #8a8a8a;
+            --text-muted: #4a4a4a;
+            --amber: #e09f3e;
+            --amber-glow: rgba(224, 159, 62, 0.15);
+            --amber-soft: #f5d89a;
+            --green-soft: #7ec98a;
+            --green-glow: rgba(126, 201, 138, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-deep);
+            min-height: 100vh;
+            font-family: 'DM Mono', monospace;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle radial glow in background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--amber-glow) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.8s ease;
+        }
+
+        body.break-mode::before {
+            background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+        }
+
+        /* Grain texture */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.02;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 24px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--text-secondary);
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 48px;
+            background: var(--bg-surface);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .mode-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .mode-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .mode-tab.active {
+            background: var(--bg-elevated);
+            color: var(--amber);
+        }
+
+        body.break-mode .mode-tab.active {
+            color: var(--green-soft);
+        }
+
+        /* Timer Circle */
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        .timer-circle {
+            position: relative;
+            width: 280px;
+            height: 280px;
+        }
+
+        .timer-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .timer-track {
+            fill: none;
+            stroke: var(--bg-elevated);
+            stroke-width: 4;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke: var(--amber);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+            filter: drop-shadow(0 0 8px var(--amber-glow));
+        }
+
+        body.break-mode .timer-progress {
+            stroke: var(--green-soft);
+            filter: drop-shadow(0 0 8px var(--green-glow));
+        }
+
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .timer-time {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 64px;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .timer-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .control-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            border-color: var(--text-muted);
+            color: var(--text-primary);
+            transform: scale(1.05);
+        }
+
+        .control-btn.primary {
+            width: 72px;
+            height: 72px;
+            background: var(--amber);
+            border-color: var(--amber);
+            color: var(--bg-deep);
+        }
+
+        .control-btn.primary:hover {
+            background: var(--amber-soft);
+            border-color: var(--amber-soft);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--amber-glow);
+        }
+
+        body.break-mode .control-btn.primary {
+            background: var(--green-soft);
+            border-color: var(--green-soft);
+        }
+
+        body.break-mode .control-btn.primary:hover {
+            box-shadow: 0 0 30px var(--green-glow);
+        }
+
+        .control-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .control-btn.primary svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Sessions Counter */
+        .sessions {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .sessions-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .sessions-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .session-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .session-dot.completed {
+            background: var(--amber);
+            border-color: var(--amber);
+            box-shadow: 0 0 10px var(--amber-glow);
+        }
+
+        .session-dot.current {
+            border-color: var(--amber);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        /* Settings */
+        .settings {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+        }
+
+        .settings-title {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .settings-row:first-of-type {
+            padding-top: 0;
+        }
+
+        .setting-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .setting-value {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .setting-input {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 400;
+            width: 48px;
+            text-align: center;
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 4px;
+            outline: none;
+            transition: all 0.2s;
+            -moz-appearance: textfield;
+        }
+
+        .setting-input::-webkit-outer-spin-button,
+        .setting-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .setting-input:focus {
+            border-color: var(--amber);
+        }
+
+        .setting-input:hover {
+            border-color: var(--text-muted);
+        }
+
+        .setting-unit {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Sound toggle */
+        .sound-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .sound-toggle input {
+            display: none;
+        }
+
+        .sound-toggle-track {
+            width: 36px;
+            height: 20px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .sound-toggle-track::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .sound-toggle input:checked + .sound-toggle-track {
+            background: var(--amber);
+            border-color: var(--amber);
+        }
+
+        .sound-toggle input:checked + .sound-toggle-track::after {
+            left: 18px;
+            background: var(--bg-deep);
+        }
+
+        /* Keyboard hint */
+        .hint {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .hint kbd {
+            display: inline-block;
+            padding: 3px 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            margin: 0 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                justify-content: flex-start;
+                padding: 24px 16px 40px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            header {
+                margin-bottom: 32px;
+            }
+
+            .timer-circle {
+                width: 240px;
+                height: 240px;
+            }
+
+            .timer-time {
+                font-size: 52px;
+            }
+
+            .mode-tabs {
+                margin-bottom: 32px;
+            }
+
+            .mode-tab {
+                padding: 8px 14px;
+                font-size: 11px;
+            }
+
+            .timer-container {
+                margin-bottom: 32px;
+            }
+
+            .controls {
+                margin-bottom: 32px;
+            }
+
+            .sessions {
+                margin-bottom: 28px;
+            }
+
+            .settings {
+                padding: 16px 20px;
+            }
+
+            .hint {
+                margin-top: 24px;
+                padding-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">← back to hafnr</a>
+            <h1>Pomodoro</h1>
+            <p class="tagline">Focus. Rest. Repeat.</p>
+        </header>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="work">Focus</button>
+            <button class="mode-tab" data-mode="break">Break</button>
+            <button class="mode-tab" data-mode="longBreak">Long Break</button>
+        </div>
+
+        <div class="timer-container">
+            <div class="timer-circle">
+                <svg class="timer-svg" viewBox="0 0 280 280">
+                    <circle class="timer-track" cx="140" cy="140" r="130"/>
+                    <circle class="timer-progress" cx="140" cy="140" r="130"
+                            stroke-dasharray="816.81" stroke-dashoffset="0"/>
+                </svg>
+                <div class="timer-display">
+                    <div class="timer-time" id="timerDisplay">25:00</div>
+                    <div class="timer-label" id="timerLabel">focus time</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" id="resetBtn" title="Reset">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                </svg>
+            </button>
+            <button class="control-btn primary" id="playPauseBtn" title="Start">
+                <svg viewBox="0 0 24 24" fill="currentColor" id="playIcon">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                <svg viewBox="0 0 24 24" fill="currentColor" id="pauseIcon" style="display: none;">
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="skipBtn" title="Skip">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 4 15 12 5 20 5 4"/>
+                    <rect x="15" y="4" width="4" height="16"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sessions">
+            <div class="sessions-label">Sessions today</div>
+            <div class="sessions-dots" id="sessionDots">
+                <div class="session-dot current"></div>
+                <div class="session-dot"></div>
+                <div class="session-dot"></div>
+                <div class="session-dot"></div>
+            </div>
+        </div>
+
+        <div class="settings">
+            <div class="settings-title">Settings</div>
+
+            <div class="settings-row">
+                <span class="setting-label">Focus duration</span>
+                <div class="setting-value">
+                    <input type="number" class="setting-input" id="workDuration" value="25" min="1" max="60" data-setting="work">
+                    <span class="setting-unit">min</span>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <span class="setting-label">Break duration</span>
+                <div class="setting-value">
+                    <input type="number" class="setting-input" id="breakDuration" value="5" min="1" max="60" data-setting="break">
+                    <span class="setting-unit">min</span>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <span class="setting-label">Long break</span>
+                <div class="setting-value">
+                    <input type="number" class="setting-input" id="longBreakDuration" value="15" min="1" max="60" data-setting="longBreak">
+                    <span class="setting-unit">min</span>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <span class="setting-label">Sound</span>
+                <label class="sound-toggle">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="sound-toggle-track"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="hint">
+            <kbd>Space</kbd> Start/Pause
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerLabel = document.getElementById('timerLabel');
+        const timerProgress = document.querySelector('.timer-progress');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const resetBtn = document.getElementById('resetBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const sessionDots = document.getElementById('sessionDots');
+        const soundToggle = document.getElementById('soundToggle');
+        const modeTabs = document.querySelectorAll('.mode-tab');
+
+        // Settings elements
+        const workDurationEl = document.getElementById('workDuration');
+        const breakDurationEl = document.getElementById('breakDuration');
+        const longBreakDurationEl = document.getElementById('longBreakDuration');
+
+        // State
+        let settings = {
+            work: 25,
+            break: 5,
+            longBreak: 15
+        };
+
+        let currentMode = 'work';
+        let timeRemaining = settings.work * 60;
+        let totalTime = settings.work * 60;
+        let isRunning = false;
+        let intervalId = null;
+        let completedSessions = 0;
+        let soundEnabled = true;
+
+        // Circle circumference
+        const circumference = 2 * Math.PI * 130;
+        timerProgress.style.strokeDasharray = circumference;
+
+        // Audio context for notification sound
+        let audioContext = null;
+
+        function playNotificationSound() {
+            if (!soundEnabled) return;
+
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            // Cute sparkly chime - three ascending notes
+            const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 - major chord
+            const t = audioContext.currentTime;
+
+            notes.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                // Soft sine wave for gentle sound
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, t);
+
+                // Quick attack, soft decay for "ding" effect
+                gain.gain.setValueAtTime(0, t + i * 0.12);
+                gain.gain.linearRampToValueAtTime(0.15, t + i * 0.12 + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.4);
+
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                osc.start(t + i * 0.12);
+                osc.stop(t + i * 0.12 + 0.5);
+            });
+
+            // Add a soft high shimmer on top
+            setTimeout(() => {
+                const shimmer = audioContext.createOscillator();
+                const shimmerGain = audioContext.createGain();
+
+                shimmer.type = 'sine';
+                shimmer.frequency.setValueAtTime(1318.51, audioContext.currentTime); // E6
+
+                shimmerGain.gain.setValueAtTime(0.08, audioContext.currentTime);
+                shimmerGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+
+                shimmer.connect(shimmerGain);
+                shimmerGain.connect(audioContext.destination);
+
+                shimmer.start(audioContext.currentTime);
+                shimmer.stop(audioContext.currentTime + 0.35);
+            }, 350);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(timeRemaining);
+
+            // Update progress circle
+            const progress = timeRemaining / totalTime;
+            const offset = circumference * (1 - progress);
+            timerProgress.style.strokeDashoffset = offset;
+
+            // Update page title
+            const modeText = currentMode === 'work' ? 'Focus' : 'Break';
+            document.title = `${formatTime(timeRemaining)} - ${modeText} | Pomodoro`;
+        }
+
+        function updateSessionDots() {
+            const dots = sessionDots.querySelectorAll('.session-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.remove('completed', 'current');
+                if (index < completedSessions) {
+                    dot.classList.add('completed');
+                } else if (index === completedSessions && currentMode === 'work') {
+                    dot.classList.add('current');
+                }
+            });
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            timeRemaining = settings[mode] * 60;
+            totalTime = settings[mode] * 60;
+
+            // Update UI
+            modeTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === mode);
+            });
+
+            // Update body class for color theme
+            document.body.classList.toggle('break-mode', mode !== 'work');
+
+            // Update label
+            const labels = {
+                work: 'focus time',
+                break: 'short break',
+                longBreak: 'long break'
+            };
+            timerLabel.textContent = labels[mode];
+
+            // Stop timer if running
+            if (isRunning) {
+                pause();
+            }
+
+            updateDisplay();
+            updateSessionDots();
+        }
+
+        function start() {
+            if (isRunning) return;
+            isRunning = true;
+
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+
+            intervalId = setInterval(() => {
+                timeRemaining--;
+
+                if (timeRemaining <= 0) {
+                    timerComplete();
+                } else {
+                    updateDisplay();
+                }
+            }, 1000);
+        }
+
+        function pause() {
+            isRunning = false;
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function reset() {
+            pause();
+            timeRemaining = settings[currentMode] * 60;
+            totalTime = settings[currentMode] * 60;
+            updateDisplay();
+        }
+
+        function skip() {
+            pause();
+            timerComplete();
+        }
+
+        function timerComplete() {
+            pause();
+            playNotificationSound();
+
+            if (currentMode === 'work') {
+                completedSessions++;
+                updateSessionDots();
+
+                // After 4 sessions, take a long break
+                if (completedSessions % 4 === 0) {
+                    setMode('longBreak');
+                } else {
+                    setMode('break');
+                }
+            } else {
+                setMode('work');
+            }
+
+            // Auto-start the next session
+            start();
+        }
+
+        function togglePlayPause() {
+            if (isRunning) {
+                pause();
+            } else {
+                start();
+            }
+        }
+
+        function updateSettingFromInput(setting, value) {
+            const min = 1;
+            const max = 60;
+
+            // Clamp value between min and max
+            let newValue = parseInt(value) || min;
+            newValue = Math.max(min, Math.min(max, newValue));
+
+            settings[setting] = newValue;
+
+            // Update input to show clamped value
+            const inputEl = document.querySelector(`[data-setting="${setting}"]`);
+            if (inputEl && parseInt(inputEl.value) !== newValue) {
+                inputEl.value = newValue;
+            }
+
+            // If current mode matches the setting, update the timer
+            if (setting === currentMode && !isRunning) {
+                timeRemaining = settings[currentMode] * 60;
+                totalTime = settings[currentMode] * 60;
+                updateDisplay();
+            }
+        }
+
+        // Event listeners
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        resetBtn.addEventListener('click', reset);
+        skipBtn.addEventListener('click', skip);
+
+        modeTabs.forEach(tab => {
+            tab.addEventListener('click', () => setMode(tab.dataset.mode));
+        });
+
+        document.querySelectorAll('.setting-input').forEach(input => {
+            input.addEventListener('change', () => {
+                updateSettingFromInput(input.dataset.setting, input.value);
+            });
+            input.addEventListener('blur', () => {
+                updateSettingFromInput(input.dataset.setting, input.value);
+            });
+        });
+
+        soundToggle.addEventListener('change', () => {
+            soundEnabled = soundToggle.checked;
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+                e.preventDefault();
+                togglePlayPause();
+            }
+        });
+
+        // Initialize
+        updateDisplay();
+        updateSessionDots();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hostile Takeover | hafnr</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Azeret+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #050507;
+            --bg-deep: #0a0a0d;
+            --bg-surface: #101014;
+            --bg-elevated: #18181d;
+            --bg-card: #1f1f26;
+            --border: #2a2a35;
+            --border-glow: #3d3d4d;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --text-dim: #404050;
+
+            /* Good Guys - cool steel blue */
+            --loyalist: #60a5fa;
+            --loyalist-bright: #93c5fd;
+            --loyalist-dim: #2563eb;
+            --loyalist-glow: rgba(96, 165, 250, 0.25);
+            --loyalist-bg: rgba(96, 165, 250, 0.08);
+
+            /* Bad Guys - blood red */
+            --saboteur: #ef4444;
+            --saboteur-bright: #f87171;
+            --saboteur-dim: #b91c1c;
+            --saboteur-glow: rgba(239, 68, 68, 0.25);
+            --saboteur-bg: rgba(239, 68, 68, 0.08);
+
+            /* Growth - emerald */
+            --growth: #34d399;
+            --growth-bright: #6ee7b7;
+            --growth-dim: #059669;
+            --growth-glow: rgba(52, 211, 153, 0.3);
+            --growth-bg: rgba(52, 211, 153, 0.1);
+
+            /* Austerity - amber fire */
+            --austerity: #f59e0b;
+            --austerity-bright: #fbbf24;
+            --austerity-dim: #b45309;
+            --austerity-glow: rgba(245, 158, 11, 0.3);
+            --austerity-bg: rgba(245, 158, 11, 0.1);
+
+            /* Gold - The Mole */
+            --gold: #eab308;
+            --gold-bright: #facc15;
+            --gold-dim: #a16207;
+            --gold-glow: rgba(234, 179, 8, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: var(--bg-void);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Atmospheric background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% 0%, rgba(96, 165, 250, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(239, 68, 68, 0.02) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 60% at 0% 80%, rgba(234, 179, 8, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Subtle scanline effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.03) 2px,
+                rgba(0, 0, 0, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Screen container */
+        .screen {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            height: 100%;
+            padding: 16px;
+            position: relative;
+            z-index: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .screen.active {
+            display: flex;
+            animation: screenFadeIn 0.4s ease-out;
+        }
+
+        @keyframes screenFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 12px 0 20px;
+            flex-shrink: 0;
+        }
+
+        .back-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: fit-content;
+        }
+
+        .back-link:hover {
+            color: var(--text-secondary);
+            border-color: var(--border);
+            background: var(--bg-elevated);
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .tagline {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-top: 12px;
+        }
+
+        /* Content area */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Cards */
+        .card {
+            background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+        }
+
+        .card-title {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '//';
+            color: var(--text-dim);
+        }
+
+        /* Player setup */
+        .player-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .player-input {
+            flex: 1;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .player-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .player-input:focus {
+            border-color: var(--loyalist-dim);
+            box-shadow: 0 0 0 3px var(--loyalist-glow), inset 0 0 20px rgba(96, 165, 250, 0.03);
+        }
+
+        .btn-add-player {
+            width: 52px;
+            height: 52px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (hover: hover) {
+            .btn-add-player:hover {
+                border-color: var(--loyalist);
+                color: var(--loyalist);
+                box-shadow: 0 0 20px var(--loyalist-glow);
+                transform: scale(1.02);
+            }
+        }
+
+        .btn-add-player:active {
+            border-color: var(--loyalist);
+            color: var(--loyalist);
+            transform: scale(0.98);
+        }
+
+        .player-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            min-height: 40px;
+        }
+
+        .player-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            animation: tagAppear 0.3s ease-out;
+        }
+
+        @keyframes tagAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .player-tag-remove {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0;
+            font-size: 16px;
+            line-height: 1;
+            transition: all 0.2s ease;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        @media (hover: hover) {
+            .player-tag-remove:hover {
+                color: var(--saboteur);
+                background: var(--saboteur-bg);
+            }
+        }
+
+        .player-tag-remove:active {
+            color: var(--saboteur);
+            background: var(--saboteur-bg);
+        }
+
+        .player-count {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .player-count span {
+            color: var(--loyalist);
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-family: 'Azeret Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        @media (hover: hover) {
+            .btn:hover::before {
+                left: 100%;
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--loyalist-dim) 0%, var(--loyalist) 100%);
+            color: var(--bg-void);
+            border: none;
+            font-weight: 600;
+        }
+
+        @media (hover: hover) {
+            .btn-primary:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 32px var(--loyalist-glow), 0 0 0 1px var(--loyalist);
+            }
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: var(--bg-elevated);
+            color: var(--text-dim);
+        }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        @media (hover: hover) {
+            .btn-secondary:hover {
+                border-color: var(--border-glow);
+                color: var(--text-primary);
+                background: var(--bg-card);
+            }
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--saboteur-dim) 0%, var(--saboteur) 100%);
+            color: white;
+            border: none;
+        }
+
+        @media (hover: hover) {
+            .btn-danger:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 32px var(--saboteur-glow), 0 0 0 1px var(--saboteur);
+            }
+        }
+
+        .btn-danger:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .btn-growth {
+            background: linear-gradient(135deg, var(--growth-dim) 0%, var(--growth) 100%);
+            color: var(--bg-void);
+            border: none;
+        }
+
+        @media (hover: hover) {
+            .btn-growth:hover:not(:disabled) {
+                box-shadow: 0 8px 32px var(--growth-glow);
+            }
+        }
+
+        .btn-austerity {
+            background: linear-gradient(135deg, var(--austerity-dim) 0%, var(--austerity) 100%);
+            color: var(--bg-void);
+            border: none;
+        }
+
+        @media (hover: hover) {
+            .btn-austerity:hover:not(:disabled) {
+                box-shadow: 0 8px 32px var(--austerity-glow);
+            }
+        }
+
+        /* Role reveal screen */
+        .role-reveal {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .role-player-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            color: var(--text-secondary);
+        }
+
+        .role-card {
+            width: 100%;
+            max-width: 260px;
+            aspect-ratio: 2.5/4;
+            background: var(--bg-surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .role-card.hidden {
+            background:
+                linear-gradient(135deg, var(--bg-elevated) 25%, transparent 25%),
+                linear-gradient(225deg, var(--bg-elevated) 25%, transparent 25%),
+                linear-gradient(315deg, var(--bg-elevated) 25%, transparent 25%),
+                linear-gradient(45deg, var(--bg-elevated) 25%, transparent 25%),
+                var(--bg-surface);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 0, 10px -10px, 0 10px;
+        }
+
+        .role-card.hidden:hover {
+            transform: scale(1.02);
+            border-color: var(--border-glow);
+        }
+
+        .role-card.hidden:active {
+            transform: scale(0.98);
+        }
+
+        .role-card.hidden .role-content {
+            display: none;
+        }
+
+        .role-card.hidden .role-hidden-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .role-hidden-text {
+            display: none;
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .role-hidden-icon {
+            font-size: 48px;
+            opacity: 0.5;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+        }
+
+        .role-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .role-icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+            animation: roleReveal 0.6s ease-out;
+        }
+
+        @keyframes roleReveal {
+            from {
+                transform: scale(0) rotate(-20deg);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .role-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            animation: slideUp 0.4s ease-out 0.1s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .role-team {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            animation: slideUp 0.4s ease-out 0.2s both;
+        }
+
+        .role-card.loyalist {
+            border-color: var(--loyalist);
+            box-shadow:
+                0 0 60px var(--loyalist-glow),
+                inset 0 0 60px var(--loyalist-glow),
+                0 0 120px var(--loyalist-glow);
+            background: radial-gradient(ellipse at center, var(--loyalist-bg) 0%, var(--bg-surface) 70%);
+        }
+
+        .role-card.loyalist .role-title {
+            color: var(--loyalist-bright);
+        }
+
+        .role-card.loyalist .role-team {
+            background: var(--loyalist-bg);
+            color: var(--loyalist);
+            border: 1px solid var(--loyalist-dim);
+        }
+
+        .role-card.saboteur {
+            border-color: var(--saboteur);
+            box-shadow:
+                0 0 60px var(--saboteur-glow),
+                inset 0 0 60px var(--saboteur-glow),
+                0 0 120px var(--saboteur-glow);
+            background: radial-gradient(ellipse at center, var(--saboteur-bg) 0%, var(--bg-surface) 70%);
+        }
+
+        .role-card.saboteur .role-title {
+            color: var(--saboteur-bright);
+        }
+
+        .role-card.saboteur .role-team {
+            background: var(--saboteur-bg);
+            color: var(--saboteur);
+            border: 1px solid var(--saboteur-dim);
+        }
+
+        .role-card.mole {
+            border-color: var(--gold);
+            box-shadow:
+                0 0 60px var(--gold-glow),
+                inset 0 0 60px var(--gold-glow),
+                0 0 120px var(--gold-glow);
+            background: radial-gradient(ellipse at center, rgba(234, 179, 8, 0.1) 0%, var(--bg-surface) 70%);
+        }
+
+        .role-card.mole .role-title {
+            color: var(--gold-bright);
+        }
+
+        .role-card.mole .role-team {
+            background: rgba(234, 179, 8, 0.1);
+            color: var(--gold);
+            border: 1px solid var(--gold-dim);
+        }
+
+        .role-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            max-width: 200px;
+            line-height: 1.5;
+            animation: slideUp 0.4s ease-out 0.3s both;
+        }
+
+        .role-allies {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-muted);
+            animation: slideUp 0.4s ease-out 0.4s both;
+        }
+
+        .role-allies strong {
+            color: var(--saboteur);
+            font-weight: 600;
+        }
+
+        .role-instruction {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 24px;
+            letter-spacing: 0.05em;
+        }
+
+        /* Game board */
+        .game-board {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 16px;
+        }
+
+        .policy-tracks {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .policy-track {
+            background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .policy-track::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+        }
+
+        .policy-track.growth::before {
+            background: linear-gradient(90deg, transparent, var(--growth-dim), transparent);
+        }
+
+        .policy-track.austerity::before {
+            background: linear-gradient(90deg, transparent, var(--austerity-dim), transparent);
+        }
+
+        .policy-track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .policy-track-label {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .policy-track.growth .policy-track-label {
+            color: var(--growth);
+        }
+
+        .policy-track.austerity .policy-track-label {
+            color: var(--austerity);
+        }
+
+        .policy-track-count {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .policy-track.growth .policy-track-count {
+            color: var(--growth);
+        }
+
+        .policy-track.austerity .policy-track-count {
+            color: var(--austerity);
+        }
+
+        .policy-slots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .policy-slot {
+            flex: 1;
+            aspect-ratio: 1;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .policy-slot.filled {
+            animation: slotFill 0.4s ease-out;
+        }
+
+        @keyframes slotFill {
+            0% { transform: scale(1.2); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .policy-slot.filled.growth {
+            background: var(--growth-bg);
+            border-color: var(--growth-dim);
+            box-shadow: 0 0 20px var(--growth-glow);
+        }
+
+        .policy-slot.filled.austerity {
+            background: var(--austerity-bg);
+            border-color: var(--austerity-dim);
+            box-shadow: 0 0 20px var(--austerity-glow);
+        }
+
+        .policy-slot.power {
+            border-style: dashed;
+            border-color: var(--austerity-dim);
+        }
+
+        .policy-slot .power-icon {
+            position: absolute;
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        /* Election tracker */
+        .election-tracker {
+            background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .election-tracker-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .election-tracker-label {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .election-dots {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .election-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-deep);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Azeret Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            transition: all 0.3s ease;
+        }
+
+        .election-dot.active {
+            border-color: var(--saboteur);
+            color: var(--saboteur);
+            background: var(--saboteur-bg);
+            box-shadow: 0 0 20px var(--saboteur-glow);
+            animation: dotPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { box-shadow: 0 0 20px var(--saboteur-glow); }
+            50% { box-shadow: 0 0 30px var(--saboteur-glow), 0 0 40px var(--saboteur-glow); }
+        }
+
+        /* Current government */
+        .government {
+            background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .government-header {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .government-positions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .government-position {
+            flex: 1;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .government-position:first-child {
+            border-color: var(--gold-dim);
+        }
+
+        .position-title {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .government-position:first-child .position-title {
+            color: var(--gold);
+        }
+
+        .position-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .position-name.empty {
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        /* Player grid */
+        .players-section {
+            background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+            gap: 8px;
+        }
+
+        .player-chip {
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        @media (hover: hover) {
+            .player-chip:hover:not(.eliminated):not(.disabled) {
+                border-color: var(--border-glow);
+                transform: translateY(-2px);
+                background: var(--bg-elevated);
+            }
+        }
+
+        .player-chip.selected {
+            border-color: var(--loyalist);
+            background: var(--loyalist-bg);
+            box-shadow: 0 0 20px var(--loyalist-glow);
+        }
+
+        .player-chip.ceo {
+            border-color: var(--gold);
+            background: rgba(234, 179, 8, 0.05);
+        }
+
+        .player-chip.ceo::before {
+            content: '👔';
+            position: absolute;
+            top: -10px;
+            right: -4px;
+            font-size: 14px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .player-chip.eliminated {
+            opacity: 0.3;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+        .player-chip.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .player-chip.prev-gov {
+            border-style: dashed;
+            opacity: 0.7;
+        }
+
+        /* Voting */
+        .vote-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .vote-prompt {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .vote-government {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            animation: slideUp 0.4s ease-out 0.1s both;
+        }
+
+        .vote-government strong {
+            color: var(--gold);
+        }
+
+        .vote-buttons {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 320px;
+            animation: slideUp 0.4s ease-out 0.2s both;
+        }
+
+        .vote-btn {
+            flex: 1;
+            padding: 28px 16px;
+            border-radius: 16px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vote-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .vote-btn:active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .vote-btn.yes {
+            background: var(--growth-bg);
+            border-color: var(--growth-dim);
+            color: var(--growth);
+        }
+
+        @media (hover: hover) {
+            .vote-btn.yes:hover {
+                background: var(--growth);
+                color: var(--bg-void);
+                transform: scale(1.05) translateY(-4px);
+                box-shadow: 0 12px 40px var(--growth-glow);
+            }
+        }
+
+        .vote-btn.yes:active {
+            background: var(--growth);
+            color: var(--bg-void);
+            transform: scale(0.98);
+        }
+
+        .vote-btn.no {
+            background: var(--saboteur-bg);
+            border-color: var(--saboteur-dim);
+            color: var(--saboteur);
+        }
+
+        @media (hover: hover) {
+            .vote-btn.no:hover {
+                background: var(--saboteur);
+                color: white;
+                transform: scale(1.05) translateY(-4px);
+                box-shadow: 0 12px 40px var(--saboteur-glow);
+            }
+        }
+
+        .vote-btn.no:active {
+            background: var(--saboteur);
+            color: white;
+            transform: scale(0.98);
+        }
+
+        .vote-hidden {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 32px;
+            animation: slideUp 0.4s ease-out 0.3s both;
+        }
+
+        /* Policy phase */
+        .policy-phase {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .policy-prompt {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .policy-instruction {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .policy-cards {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .policy-card {
+            width: 90px;
+            height: 130px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid;
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .policy-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+        }
+
+        .policy-card.growth {
+            background: radial-gradient(ellipse at top, var(--growth-bg) 0%, var(--bg-surface) 100%);
+            border-color: var(--growth-dim);
+            color: var(--growth);
+        }
+
+        @media (hover: hover) {
+            .policy-card.growth:hover:not(.selected) {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 20px 40px var(--growth-glow);
+                border-color: var(--growth);
+            }
+        }
+
+        .policy-card.austerity {
+            background: radial-gradient(ellipse at top, var(--austerity-bg) 0%, var(--bg-surface) 100%);
+            border-color: var(--austerity-dim);
+            color: var(--austerity);
+        }
+
+        @media (hover: hover) {
+            .policy-card.austerity:hover:not(.selected) {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 20px 40px var(--austerity-glow);
+                border-color: var(--austerity);
+            }
+        }
+
+        .policy-card-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .policy-card.selected {
+            transform: translateY(-16px) scale(1.08);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+        }
+
+        .policy-card.selected.growth {
+            border-color: var(--growth-bright);
+            box-shadow: 0 24px 48px var(--growth-glow), 0 0 0 4px var(--growth-glow);
+        }
+
+        .policy-card.selected.austerity {
+            border-color: var(--austerity-bright);
+            box-shadow: 0 24px 48px var(--austerity-glow), 0 0 0 4px var(--austerity-glow);
+        }
+
+        .policy-card.discarded {
+            opacity: 0.2;
+            transform: scale(0.85) rotate(-5deg);
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        .result-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .result-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: resultBounce 0.6s ease-out;
+        }
+
+        @keyframes resultBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .result-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            animation: slideUp 0.4s ease-out 0.2s both;
+        }
+
+        .result-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            max-width: 280px;
+            animation: slideUp 0.4s ease-out 0.3s both;
+        }
+
+        .result-votes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 24px;
+            animation: slideUp 0.4s ease-out 0.4s both;
+        }
+
+        .result-vote {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid var(--border);
+            font-family: 'Azeret Mono', monospace;
+        }
+
+        .result-vote.yes {
+            background: var(--growth-bg);
+            border-color: var(--growth-dim);
+            color: var(--growth);
+        }
+
+        .result-vote.no {
+            background: var(--saboteur-bg);
+            border-color: var(--saboteur-dim);
+            color: var(--saboteur);
+        }
+
+        /* Executive power */
+        .power-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .power-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            animation: powerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes powerPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 20px var(--austerity-glow)); }
+        }
+
+        .power-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--austerity);
+        }
+
+        .power-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            max-width: 280px;
+        }
+
+        .power-target-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 28px;
+        }
+
+        .power-target {
+            padding: 18px 14px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 14px;
+        }
+
+        @media (hover: hover) {
+            .power-target:hover:not(.disabled) {
+                border-color: var(--austerity);
+                background: var(--austerity-bg);
+                transform: translateY(-2px);
+            }
+        }
+
+        .power-target.selected {
+            border-color: var(--austerity);
+            background: var(--austerity);
+            color: var(--bg-void);
+            box-shadow: 0 8px 24px var(--austerity-glow);
+        }
+
+        .power-target.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Investigation result */
+        .investigation-result {
+            padding: 28px;
+            background: var(--bg-surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 28px;
+            animation: resultReveal 0.5s ease-out;
+        }
+
+        @keyframes resultReveal {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .investigation-result.loyalist {
+            border-color: var(--loyalist);
+            background: var(--loyalist-bg);
+            box-shadow: 0 0 40px var(--loyalist-glow);
+        }
+
+        .investigation-result.saboteur {
+            border-color: var(--saboteur);
+            background: var(--saboteur-bg);
+            box-shadow: 0 0 40px var(--saboteur-glow);
+        }
+
+        .investigation-player {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .investigation-team {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .investigation-result.loyalist .investigation-team {
+            color: var(--loyalist);
+        }
+
+        .investigation-result.saboteur .investigation-team {
+            color: var(--saboteur);
+        }
+
+        /* Game over */
+        .game-over {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .game-over-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: trophyBounce 0.8s ease-out;
+        }
+
+        @keyframes trophyBounce {
+            0% { transform: scale(0) rotate(-20deg); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            70% { transform: scale(0.9) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .game-over-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .game-over.loyalist-win .game-over-title {
+            color: var(--loyalist-bright);
+            text-shadow: 0 0 40px var(--loyalist-glow);
+        }
+
+        .game-over.saboteur-win .game-over-title {
+            color: var(--saboteur-bright);
+            text-shadow: 0 0 40px var(--saboteur-glow);
+        }
+
+        .game-over-reason {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 300px;
+        }
+
+        .game-over-roles {
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 32px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+        }
+
+        .game-over-role {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: background 0.2s ease;
+        }
+
+        .game-over-role:nth-child(odd) {
+            background: var(--bg-elevated);
+        }
+
+        .game-over-role-team {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .game-over-role-team.loyalist {
+            color: var(--loyalist);
+            background: var(--loyalist-bg);
+        }
+
+        .game-over-role-team.saboteur {
+            color: var(--saboteur);
+            background: var(--saboteur-bg);
+        }
+
+        .game-over-role-team.mole {
+            color: var(--gold);
+            background: rgba(234, 179, 8, 0.1);
+        }
+
+        /* Rules section */
+        .rules-section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .rules-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 16px 20px;
+            transition: background 0.2s ease;
+        }
+
+        .rules-toggle:hover {
+            background: var(--bg-elevated);
+        }
+
+        .rules-toggle-text {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .rules-toggle-icon {
+            color: var(--text-dim);
+            transition: transform 0.3s ease;
+            font-size: 12px;
+        }
+
+        .rules-content {
+            display: none;
+            padding: 0 20px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .rules-content.open {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .rules-content h4 {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 10px;
+            color: var(--loyalist);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 20px 0 10px;
+        }
+
+        .rules-content h4:first-child {
+            margin-top: 20px;
+        }
+
+        .rules-content p, .rules-content li {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .rules-content ul {
+            padding-left: 16px;
+            margin: 8px 0;
+        }
+
+        .rules-content li {
+            margin: 6px 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px 16px;
+            font-size: 10px;
+            color: var(--text-dim);
+            line-height: 1.7;
+            flex-shrink: 0;
+            border-top: 1px solid var(--border);
+            margin-top: 16px;
+        }
+
+        .footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: var(--text-secondary);
+        }
+
+        /* Responsive - Tablet and Desktop */
+        @media (min-width: 480px) {
+            .screen {
+                padding: 24px;
+            }
+
+            .logo {
+                font-size: 38px;
+            }
+
+            .policy-card {
+                width: 100px;
+                height: 145px;
+            }
+
+            .policy-card-icon {
+                font-size: 40px;
+            }
+
+            .role-card {
+                max-width: 280px;
+            }
+
+            .vote-btn {
+                padding: 32px 20px;
+                font-size: 32px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .screen {
+                padding: 32px;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .logo {
+                font-size: 44px;
+            }
+
+            .tagline {
+                font-size: 10px;
+            }
+
+            .policy-tracks {
+                flex-direction: row;
+                gap: 16px;
+            }
+
+            .policy-track {
+                flex: 1;
+            }
+
+            .policy-slot {
+                font-size: 22px;
+            }
+
+            .players-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+
+            .policy-card {
+                width: 110px;
+                height: 160px;
+            }
+
+            .policy-cards {
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .screen {
+                max-width: 700px;
+            }
+
+            .game-board {
+                gap: 16px;
+            }
+
+            .government-positions {
+                gap: 16px;
+            }
+
+            .government-position {
+                padding: 18px 16px;
+            }
+        }
+
+        /* Animations for screen transitions */
+        .screen.active .header {
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .screen.active .content {
+            animation: slideUp 0.4s ease-out 0.1s both;
+        }
+
+        .screen.active .btn {
+            animation: slideUp 0.4s ease-out 0.2s both;
+        }
+    </style>
+</head>
+<body>
+    <!-- Setup Screen -->
+    <div class="screen active" id="setupScreen">
+        <div class="header">
+            <a href="/" class="back-link">← hafnr</a>
+            <h1 class="logo">Hostile Takeover</h1>
+            <p class="tagline">A game of lies and secrets</p>
+        </div>
+
+        <div class="content">
+            <div class="card">
+                <div class="card-title">Players (5-10 people)</div>
+                <div class="player-input-row">
+                    <input type="text" class="player-input" id="playerNameInput" placeholder="Enter name..." maxlength="20">
+                    <button class="btn-add-player" id="addPlayerBtn">+</button>
+                </div>
+                <div class="player-list" id="playerList"></div>
+                <div class="player-count">Players: <span id="playerCount">0</span>/10</div>
+            </div>
+
+            <button class="btn btn-primary" id="startGameBtn" disabled>Start Game</button>
+
+            <div class="rules-section">
+                <div class="rules-toggle" id="rulesToggle">
+                    <span class="rules-toggle-text">How to Play</span>
+                    <span class="rules-toggle-icon">▼</span>
+                </div>
+                <div class="rules-content" id="rulesContent">
+                    <h4>The Teams</h4>
+                    <p>Players are split into two secret teams: <strong style="color: var(--loyalist)">Good Guys</strong> (want to help the company) and <strong style="color: var(--saboteur)">Bad Guys</strong> (want to destroy it). One Bad Guy is <strong style="color: var(--gold)">The Mole</strong> — the secret boss.</p>
+
+                    <h4>How to Win</h4>
+                    <ul>
+                        <li><strong style="color: var(--loyalist)">Good Guys win:</strong> Pass 5 green cards OR find and fire The Mole</li>
+                        <li><strong style="color: var(--saboteur)">Bad Guys win:</strong> Pass 6 orange cards OR get The Mole chosen as Partner (after 3 orange cards)</li>
+                    </ul>
+
+                    <h4>Each Turn</h4>
+                    <ul>
+                        <li>The <strong>Boss</strong> picks a <strong>Partner</strong></li>
+                        <li>Everyone votes Yes or No (pass phone secretly)</li>
+                        <li>If Yes wins: Boss sees 3 cards, picks 2 to give to Partner who plays 1</li>
+                        <li>If No wins: Next player becomes Boss. Three No's in a row = random card played!</li>
+                    </ul>
+
+                    <h4>Special Powers</h4>
+                    <p>When orange cards pass, the Boss gets powers: peek at someone's team, pick the next Boss, or kick someone out of the game.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Based on <a href="https://www.secrethitler.com" target="_blank">Secret Hitler</a> by Goat, Wolf & Cabbage.<br>
+            Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a>
+        </div>
+    </div>
+
+    <!-- Role Reveal Screen -->
+    <div class="screen" id="roleScreen">
+        <div class="header">
+            <h1 class="logo">Your Secret Role</h1>
+            <p class="tagline">Pass the phone to each player</p>
+        </div>
+
+        <div class="role-reveal">
+            <div class="role-player-name" id="rolePlayerName">Player Name</div>
+
+            <div class="role-card hidden" id="roleCard">
+                <div class="role-hidden-text">
+                    <div class="role-hidden-icon">🔒</div>
+                    <span>Tap to Reveal</span>
+                </div>
+                <div class="role-content">
+                    <div class="role-icon" id="roleIcon">💼</div>
+                    <div class="role-title" id="roleTitle">Good Guy</div>
+                    <div class="role-team" id="roleTeam">Team Good</div>
+                    <div class="role-info" id="roleInfo">You want to help the company. Try to pass green cards.</div>
+                    <div class="role-allies" id="roleAllies"></div>
+                </div>
+            </div>
+
+            <div class="role-instruction">Tap to show/hide • Remember your role!</div>
+        </div>
+
+        <button class="btn btn-primary" id="nextRoleBtn">Next Player</button>
+    </div>
+
+    <!-- Game Board Screen -->
+    <div class="screen" id="gameScreen">
+        <div class="header" style="padding-bottom: 12px;">
+            <h1 class="logo" style="font-size: 24px;">Game Board</h1>
+        </div>
+
+        <div class="game-board">
+            <div class="policy-tracks">
+                <div class="policy-track growth">
+                    <div class="policy-track-header">
+                        <span class="policy-track-label">📈 Good Cards</span>
+                        <span class="policy-track-count" id="growthCount">0/5</span>
+                    </div>
+                    <div class="policy-slots" id="growthSlots">
+                        <div class="policy-slot"></div>
+                        <div class="policy-slot"></div>
+                        <div class="policy-slot"></div>
+                        <div class="policy-slot"></div>
+                        <div class="policy-slot"></div>
+                    </div>
+                </div>
+
+                <div class="policy-track austerity">
+                    <div class="policy-track-header">
+                        <span class="policy-track-label">📉 Bad Cards</span>
+                        <span class="policy-track-count" id="austerityCount">0/6</span>
+                    </div>
+                    <div class="policy-slots" id="austeritySlots">
+                        <div class="policy-slot"></div>
+                        <div class="policy-slot"></div>
+                        <div class="policy-slot power"><span class="power-icon">🔍</span></div>
+                        <div class="policy-slot power"><span class="power-icon">🗳️</span></div>
+                        <div class="policy-slot power"><span class="power-icon">🔥</span></div>
+                        <div class="policy-slot power"><span class="power-icon">🔥</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="election-tracker">
+                <div class="election-tracker-header">
+                    <span class="election-tracker-label">Failed Votes</span>
+                </div>
+                <div class="election-dots" id="electionDots">
+                    <div class="election-dot">1</div>
+                    <div class="election-dot">2</div>
+                    <div class="election-dot">3</div>
+                </div>
+            </div>
+
+            <div class="government">
+                <div class="government-header">This Round</div>
+                <div class="government-positions">
+                    <div class="government-position">
+                        <div class="position-title">Boss</div>
+                        <div class="position-name" id="currentCEO">—</div>
+                    </div>
+                    <div class="government-position">
+                        <div class="position-title">Partner</div>
+                        <div class="position-name" id="currentCFO">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="players-section">
+                <div class="card-title">Players</div>
+                <div class="players-grid" id="playersGrid"></div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="startElectionBtn">Start Round</button>
+    </div>
+
+    <!-- Nomination Screen -->
+    <div class="screen" id="nominationScreen">
+        <div class="header">
+            <h1 class="logo">Pick a Partner</h1>
+            <p class="tagline" id="ceoNominationText">Boss picks a Partner</p>
+        </div>
+
+        <div class="content">
+            <div class="card">
+                <div class="card-title">Who do you want as Partner?</div>
+                <div class="players-grid" id="cfoGrid"></div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="confirmCFOBtn" disabled>Confirm Choice</button>
+    </div>
+
+    <!-- Voting Screen -->
+    <div class="screen" id="voteScreen">
+        <div class="header">
+            <h1 class="logo">Vote Now</h1>
+        </div>
+
+        <div class="vote-section">
+            <div class="vote-prompt" id="voterName">Voter Name</div>
+            <div class="vote-government">
+                Boss: <strong id="voteCEO">—</strong> &nbsp;+&nbsp; Partner: <strong id="voteCFO">—</strong>
+            </div>
+
+            <div class="vote-buttons">
+                <button class="vote-btn yes" id="voteYes">Yes!</button>
+                <button class="vote-btn no" id="voteNo">No!</button>
+            </div>
+
+            <div class="vote-hidden">Pass phone to next person after voting</div>
+        </div>
+    </div>
+
+    <!-- Vote Result Screen -->
+    <div class="screen" id="voteResultScreen">
+        <div class="header">
+            <h1 class="logo">Vote Results</h1>
+        </div>
+
+        <div class="result-section">
+            <div class="result-icon" id="voteResultIcon">✓</div>
+            <div class="result-title" id="voteResultTitle">Vote Passed!</div>
+            <div class="result-message" id="voteResultMessage">Everyone agreed! Time to play cards.</div>
+            <div class="result-votes" id="voteResults"></div>
+        </div>
+
+        <button class="btn btn-primary" id="continueFromVoteBtn">Continue</button>
+    </div>
+
+    <!-- CEO Policy Screen -->
+    <div class="screen" id="ceoPolicyScreen">
+        <div class="header">
+            <h1 class="logo">Boss Turn</h1>
+            <p class="tagline">Give phone to <span id="ceoPolicyName">Boss</span></p>
+        </div>
+
+        <div class="policy-phase">
+            <div class="policy-prompt">Pick 2 Cards to Give</div>
+            <div class="policy-instruction">You got 3 cards. Pick 2 to give to your Partner.</div>
+
+            <div class="policy-cards" id="ceoPolicyCards"></div>
+        </div>
+
+        <button class="btn btn-primary" id="ceoDiscardBtn" disabled>Give These Cards</button>
+    </div>
+
+    <!-- CFO Policy Screen -->
+    <div class="screen" id="cfoPolicyScreen">
+        <div class="header">
+            <h1 class="logo">Partner Turn</h1>
+            <p class="tagline">Give phone to <span id="cfoPolicyName">Partner</span></p>
+        </div>
+
+        <div class="policy-phase">
+            <div class="policy-prompt">Pick a Card to Play</div>
+            <div class="policy-instruction">The Boss gave you 2 cards. Pick 1 to play.</div>
+
+            <div class="policy-cards" id="cfoPolicyCards"></div>
+        </div>
+
+        <button class="btn btn-primary" id="cfoEnactBtn" disabled>Play This Card</button>
+    </div>
+
+    <!-- Policy Enacted Screen -->
+    <div class="screen" id="policyEnactedScreen">
+        <div class="header">
+            <h1 class="logo">Card Played!</h1>
+        </div>
+
+        <div class="result-section">
+            <div class="result-icon" id="policyIcon">📈</div>
+            <div class="result-title" id="policyTitle">Good Card!</div>
+            <div class="result-message" id="policyMessage">The company is doing better!</div>
+        </div>
+
+        <button class="btn btn-primary" id="continueFromPolicyBtn">Continue</button>
+    </div>
+
+    <!-- Executive Power Screens -->
+    <div class="screen" id="investigateScreen">
+        <div class="header">
+            <h1 class="logo">Special Power!</h1>
+        </div>
+
+        <div class="power-section">
+            <div class="power-icon">🔍</div>
+            <div class="power-title">Peek at Someone</div>
+            <div class="power-description">You can secretly look at one player's team. Pick someone!</div>
+
+            <div class="power-target-grid" id="investigateGrid"></div>
+        </div>
+
+        <button class="btn btn-austerity" id="investigateBtn" disabled>Peek</button>
+    </div>
+
+    <div class="screen" id="investigateResultScreen">
+        <div class="header">
+            <h1 class="logo">Secret Info</h1>
+            <p class="tagline">Only you can see this!</p>
+        </div>
+
+        <div class="power-section">
+            <div class="investigation-result" id="investigationResult">
+                <div class="investigation-player" id="investigatedPlayer">Player Name</div>
+                <div class="investigation-team" id="investigatedTeam">is a Good Guy</div>
+            </div>
+            <div class="policy-instruction">You can lie about what you saw!</div>
+        </div>
+
+        <button class="btn btn-primary" id="continueFromInvestigateBtn">Continue</button>
+    </div>
+
+    <div class="screen" id="specialElectionScreen">
+        <div class="header">
+            <h1 class="logo">Special Power!</h1>
+        </div>
+
+        <div class="power-section">
+            <div class="power-icon">🗳️</div>
+            <div class="power-title">Pick Next Boss</div>
+            <div class="power-description">You get to choose who will be the Boss next round!</div>
+
+            <div class="power-target-grid" id="specialElectionGrid"></div>
+        </div>
+
+        <button class="btn btn-austerity" id="specialElectionBtn" disabled>Choose as Boss</button>
+    </div>
+
+    <div class="screen" id="fireScreen">
+        <div class="header">
+            <h1 class="logo">Special Power!</h1>
+        </div>
+
+        <div class="power-section">
+            <div class="power-icon">🔥</div>
+            <div class="power-title">Kick Someone Out</div>
+            <div class="power-description">You must remove one player from the game. Choose carefully!</div>
+
+            <div class="power-target-grid" id="fireGrid"></div>
+        </div>
+
+        <button class="btn btn-danger" id="fireBtn" disabled>Kick Out</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="screen" id="gameOverScreen">
+        <div class="header">
+            <h1 class="logo">Game Over!</h1>
+        </div>
+
+        <div class="game-over" id="gameOverContent">
+            <div class="game-over-icon" id="gameOverIcon">🏆</div>
+            <div class="game-over-title" id="gameOverTitle">Good Guys Win!</div>
+            <div class="game-over-reason" id="gameOverReason">The company is saved!</div>
+
+            <div class="game-over-roles" id="gameOverRoles"></div>
+        </div>
+
+        <button class="btn btn-primary" id="newGameBtn">Play Again</button>
+    </div>
+
+    <script>
+        // Game State
+        const state = {
+            players: [],
+            roles: {}, // playerName -> role
+            eliminated: new Set(),
+            growthPolicies: 0,
+            austerityPolicies: 0,
+            electionTracker: 0,
+            ceoIndex: 0,
+            currentCEO: null,
+            currentCFO: null,
+            previousCEO: null,
+            previousCFO: null,
+            votes: {},
+            policyDeck: [],
+            discardPile: [], // Track discarded policies
+            currentPolicies: [],
+            selectedCFO: null,
+            selectedPolicy: null,
+            selectedTarget: null,
+            specialElectionCEO: null,
+            investigated: new Set(),
+            currentVoterIndex: 0,
+            roleRevealIndex: 0,
+            phase: 'setup' // setup, roles, game, nomination, voting, voteResult, ceoPolicy, cfoPolicy, power, gameOver
+        };
+
+        // Role distribution based on player count
+        const roleDistribution = {
+            5: { loyalists: 3, saboteurs: 1, mole: 1 },
+            6: { loyalists: 4, saboteurs: 1, mole: 1 },
+            7: { loyalists: 4, saboteurs: 2, mole: 1 },
+            8: { loyalists: 5, saboteurs: 2, mole: 1 },
+            9: { loyalists: 5, saboteurs: 3, mole: 1 },
+            10: { loyalists: 6, saboteurs: 3, mole: 1 }
+        };
+
+        // Executive powers based on austerity policies (player count dependent)
+        function getPower(austerityCount, playerCount) {
+            if (playerCount <= 6) {
+                // 5-6 players: no power, no power, peek, fire, fire, fire
+                if (austerityCount === 3) return 'investigate';
+                if (austerityCount >= 4) return 'fire';
+            } else if (playerCount <= 8) {
+                // 7-8 players: no power, investigate, special, fire, fire, fire
+                if (austerityCount === 2) return 'investigate';
+                if (austerityCount === 3) return 'specialElection';
+                if (austerityCount >= 4) return 'fire';
+            } else {
+                // 9-10 players: investigate, investigate, special, fire, fire, fire
+                if (austerityCount === 1 || austerityCount === 2) return 'investigate';
+                if (austerityCount === 3) return 'specialElection';
+                if (austerityCount >= 4) return 'fire';
+            }
+            return null;
+        }
+
+        // DOM Elements
+        const screens = {
+            setup: document.getElementById('setupScreen'),
+            role: document.getElementById('roleScreen'),
+            game: document.getElementById('gameScreen'),
+            nomination: document.getElementById('nominationScreen'),
+            vote: document.getElementById('voteScreen'),
+            voteResult: document.getElementById('voteResultScreen'),
+            ceoPolicy: document.getElementById('ceoPolicyScreen'),
+            cfoPolicy: document.getElementById('cfoPolicyScreen'),
+            policyEnacted: document.getElementById('policyEnactedScreen'),
+            investigate: document.getElementById('investigateScreen'),
+            investigateResult: document.getElementById('investigateResultScreen'),
+            specialElection: document.getElementById('specialElectionScreen'),
+            fire: document.getElementById('fireScreen'),
+            gameOver: document.getElementById('gameOverScreen')
+        };
+
+        // Show screen helper
+        function showScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            screens[screenName].classList.add('active');
+            screens[screenName].scrollTop = 0;
+        }
+
+        // Setup Screen Logic
+        const playerNameInput = document.getElementById('playerNameInput');
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        const playerList = document.getElementById('playerList');
+        const playerCount = document.getElementById('playerCount');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const rulesToggle = document.getElementById('rulesToggle');
+        const rulesContent = document.getElementById('rulesContent');
+
+        function addPlayer() {
+            const name = playerNameInput.value.trim();
+            if (name && state.players.length < 10 && !state.players.includes(name)) {
+                state.players.push(name);
+                renderPlayerList();
+                playerNameInput.value = '';
+                playerNameInput.focus();
+            }
+        }
+
+        function removePlayer(name) {
+            state.players = state.players.filter(p => p !== name);
+            renderPlayerList();
+        }
+
+        function renderPlayerList() {
+            playerList.innerHTML = state.players.map(name => `
+                <div class="player-tag">
+                    <span>${name}</span>
+                    <button class="player-tag-remove" onclick="removePlayer('${name}')">×</button>
+                </div>
+            `).join('');
+            playerCount.textContent = state.players.length;
+            startGameBtn.disabled = state.players.length < 5;
+        }
+
+        addPlayerBtn.addEventListener('click', addPlayer);
+        playerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addPlayer();
+        });
+
+        rulesToggle.addEventListener('click', () => {
+            rulesContent.classList.toggle('open');
+            rulesToggle.querySelector('.rules-toggle-icon').textContent =
+                rulesContent.classList.contains('open') ? '▲' : '▼';
+        });
+
+        // Start Game
+        startGameBtn.addEventListener('click', () => {
+            assignRoles();
+            createPolicyDeck();
+            state.roleRevealIndex = 0;
+            state.ceoIndex = Math.floor(Math.random() * state.players.length);
+            showRoleReveal();
+        });
+
+        // Assign Roles
+        function assignRoles() {
+            const dist = roleDistribution[state.players.length];
+            const roles = [];
+
+            for (let i = 0; i < dist.loyalists; i++) roles.push('loyalist');
+            for (let i = 0; i < dist.saboteurs; i++) roles.push('saboteur');
+            roles.push('mole');
+
+            // Shuffle roles
+            for (let i = roles.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [roles[i], roles[j]] = [roles[j], roles[i]];
+            }
+
+            // Assign to players
+            state.players.forEach((player, i) => {
+                state.roles[player] = roles[i];
+            });
+        }
+
+        // Create Policy Deck
+        function createPolicyDeck() {
+            state.policyDeck = [];
+            state.discardPile = [];
+            for (let i = 0; i < 6; i++) state.policyDeck.push('growth');
+            for (let i = 0; i < 11; i++) state.policyDeck.push('austerity');
+            shuffleArray(state.policyDeck);
+        }
+
+        // Fisher-Yates shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Reshuffle discard pile into deck when needed
+        function reshuffleDeck() {
+            // Move all discards back into deck
+            state.policyDeck.push(...state.discardPile);
+            state.discardPile = [];
+            shuffleArray(state.policyDeck);
+        }
+
+        // Role Reveal
+        const rolePlayerName = document.getElementById('rolePlayerName');
+        const roleCard = document.getElementById('roleCard');
+        const roleIcon = document.getElementById('roleIcon');
+        const roleTitle = document.getElementById('roleTitle');
+        const roleTeam = document.getElementById('roleTeam');
+        const roleInfo = document.getElementById('roleInfo');
+        const roleAllies = document.getElementById('roleAllies');
+        const nextRoleBtn = document.getElementById('nextRoleBtn');
+
+        function showRoleReveal() {
+            showScreen('role');
+            const player = state.players[state.roleRevealIndex];
+            rolePlayerName.textContent = player;
+            roleCard.classList.add('hidden');
+            roleCard.className = 'role-card hidden';
+
+            const role = state.roles[player];
+
+            if (role === 'loyalist') {
+                roleIcon.textContent = '💼';
+                roleTitle.textContent = 'Good Guy';
+                roleTeam.textContent = 'Team Good';
+                roleInfo.textContent = 'Help the company! Try to play green cards and find The Mole.';
+                roleAllies.innerHTML = '';
+            } else if (role === 'saboteur') {
+                roleIcon.textContent = '🕵️';
+                roleTitle.textContent = 'Bad Guy';
+                roleTeam.textContent = 'Team Bad';
+                roleInfo.textContent = 'Destroy the company! Play orange cards and help The Mole become Partner.';
+
+                // Show other saboteurs and mole
+                const allies = state.players.filter(p =>
+                    state.roles[p] === 'saboteur' || state.roles[p] === 'mole'
+                );
+                const mole = state.players.find(p => state.roles[p] === 'mole');
+                roleAllies.innerHTML = `Your team: ${allies.join(', ')}<br><strong>The Mole: ${mole}</strong>`;
+            } else {
+                roleIcon.textContent = '🎭';
+                roleTitle.textContent = 'The Mole';
+                roleTeam.textContent = 'Secret Boss';
+                roleInfo.textContent = 'You are the secret leader! Get picked as Partner after 3 orange cards to win!';
+
+                // In 5-6 player games, Mole doesn't know Saboteurs
+                if (state.players.length <= 6) {
+                    roleAllies.innerHTML = 'You don\'t know who the Bad Guys are. Stay hidden!';
+                } else {
+                    const saboteurs = state.players.filter(p => state.roles[p] === 'saboteur');
+                    roleAllies.innerHTML = `Your Bad Guys: <strong>${saboteurs.join(', ')}</strong>`;
+                }
+            }
+
+            nextRoleBtn.textContent = state.roleRevealIndex === state.players.length - 1
+                ? 'Start Game'
+                : 'Next Player';
+        }
+
+        roleCard.addEventListener('click', () => {
+            const role = state.roles[state.players[state.roleRevealIndex]];
+            if (roleCard.classList.contains('hidden')) {
+                roleCard.classList.remove('hidden');
+                roleCard.classList.add(role);
+            } else {
+                roleCard.classList.add('hidden');
+                roleCard.classList.remove('loyalist', 'saboteur', 'mole');
+            }
+        });
+
+        nextRoleBtn.addEventListener('click', () => {
+            state.roleRevealIndex++;
+            if (state.roleRevealIndex >= state.players.length) {
+                startGameBoard();
+            } else {
+                showRoleReveal();
+            }
+        });
+
+        // Game Board
+        function startGameBoard() {
+            showScreen('game');
+            updateGameBoard();
+        }
+
+        function updateGameBoard() {
+            // Update policy tracks
+            document.getElementById('growthCount').textContent = `${state.growthPolicies}/5`;
+            document.getElementById('austerityCount').textContent = `${state.austerityPolicies}/6`;
+
+            const growthSlots = document.getElementById('growthSlots').children;
+            const austeritySlots = document.getElementById('austeritySlots').children;
+
+            for (let i = 0; i < 5; i++) {
+                growthSlots[i].classList.toggle('filled', i < state.growthPolicies);
+                growthSlots[i].classList.toggle('growth', i < state.growthPolicies);
+                growthSlots[i].textContent = i < state.growthPolicies ? '📈' : '';
+            }
+
+            for (let i = 0; i < 6; i++) {
+                austeritySlots[i].classList.toggle('filled', i < state.austerityPolicies);
+                austeritySlots[i].classList.toggle('austerity', i < state.austerityPolicies);
+                const icon = austeritySlots[i].querySelector('.power-icon');
+                if (i < state.austerityPolicies) {
+                    austeritySlots[i].innerHTML = '📉';
+                } else if (icon) {
+                    // Keep power icon
+                }
+            }
+
+            // Update election tracker
+            const electionDots = document.getElementById('electionDots').children;
+            for (let i = 0; i < 3; i++) {
+                electionDots[i].classList.toggle('active', i < state.electionTracker);
+            }
+
+            // Update government
+            document.getElementById('currentCEO').textContent = state.currentCEO || '—';
+            document.getElementById('currentCEO').classList.toggle('empty', !state.currentCEO);
+            document.getElementById('currentCFO').textContent = state.currentCFO || '—';
+            document.getElementById('currentCFO').classList.toggle('empty', !state.currentCFO);
+
+            // Update players grid
+            const playersGrid = document.getElementById('playersGrid');
+            playersGrid.innerHTML = state.players.map((player, i) => {
+                const isCEO = i === state.ceoIndex;
+                const isEliminated = state.eliminated.has(player);
+                const isPrevGov = player === state.previousCEO || player === state.previousCFO;
+
+                return `
+                    <div class="player-chip ${isCEO ? 'ceo' : ''} ${isEliminated ? 'eliminated' : ''} ${isPrevGov ? 'prev-gov' : ''}">
+                        ${player}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Start Election
+        document.getElementById('startElectionBtn').addEventListener('click', () => {
+            // Find next eligible CEO
+            while (state.eliminated.has(state.players[state.ceoIndex])) {
+                state.ceoIndex = (state.ceoIndex + 1) % state.players.length;
+            }
+
+            state.currentCEO = state.players[state.ceoIndex];
+            state.currentCFO = null;
+            state.selectedCFO = null;
+
+            document.getElementById('ceoNominationText').textContent = `${state.currentCEO}, pick your Partner`;
+
+            showScreen('nomination');
+            renderCFOGrid();
+        });
+
+        function renderCFOGrid() {
+            const grid = document.getElementById('cfoGrid');
+            grid.innerHTML = state.players.map(player => {
+                const isEligible = player !== state.currentCEO &&
+                                   !state.eliminated.has(player) &&
+                                   player !== state.previousCFO &&
+                                   (state.getAlivePlayers().length <= 5 || player !== state.previousCEO);
+
+                const isSelected = player === state.selectedCFO;
+
+                return `
+                    <div class="player-chip ${isSelected ? 'selected' : ''} ${!isEligible ? 'disabled' : ''}"
+                         onclick="${isEligible ? `selectCFO('${player}')` : ''}">
+                        ${player}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('confirmCFOBtn').disabled = !state.selectedCFO;
+        }
+
+        state.getAlivePlayers = function() {
+            return state.players.filter(p => !state.eliminated.has(p));
+        };
+
+        window.selectCFO = function(player) {
+            state.selectedCFO = player;
+            renderCFOGrid();
+        };
+
+        document.getElementById('confirmCFOBtn').addEventListener('click', () => {
+            state.currentCFO = state.selectedCFO;
+            startVoting();
+        });
+
+        // Voting
+        function startVoting() {
+            state.votes = {};
+            state.currentVoterIndex = 0;
+            // Skip eliminated players
+            while (state.eliminated.has(state.players[state.currentVoterIndex])) {
+                state.currentVoterIndex++;
+            }
+            showVoteScreen();
+        }
+
+        function showVoteScreen() {
+            showScreen('vote');
+            const voter = state.players[state.currentVoterIndex];
+            document.getElementById('voterName').textContent = voter;
+            document.getElementById('voteCEO').textContent = state.currentCEO;
+            document.getElementById('voteCFO').textContent = state.currentCFO;
+        }
+
+        document.getElementById('voteYes').addEventListener('click', () => castVote(true));
+        document.getElementById('voteNo').addEventListener('click', () => castVote(false));
+
+        function castVote(vote) {
+            const voter = state.players[state.currentVoterIndex];
+            state.votes[voter] = vote;
+
+            // Find next voter
+            state.currentVoterIndex++;
+            while (state.currentVoterIndex < state.players.length &&
+                   state.eliminated.has(state.players[state.currentVoterIndex])) {
+                state.currentVoterIndex++;
+            }
+
+            if (state.currentVoterIndex >= state.players.length) {
+                showVoteResults();
+            } else {
+                showVoteScreen();
+            }
+        }
+
+        function showVoteResults() {
+            showScreen('voteResult');
+
+            const yesVotes = Object.values(state.votes).filter(v => v).length;
+            const noVotes = Object.values(state.votes).filter(v => !v).length;
+            const passed = yesVotes > noVotes;
+
+            document.getElementById('voteResultIcon').textContent = passed ? '✓' : '✗';
+            document.getElementById('voteResultTitle').textContent = passed
+                ? 'Vote Passed!'
+                : 'Vote Failed!';
+            document.getElementById('voteResultMessage').textContent = passed
+                ? `${state.currentCEO} and ${state.currentCFO} will play cards now.`
+                : 'The group said no. Next player becomes Boss.';
+
+            // Show votes
+            const votesDiv = document.getElementById('voteResults');
+            votesDiv.innerHTML = Object.entries(state.votes)
+                .map(([player, vote]) => `
+                    <div class="result-vote ${vote ? 'yes' : 'no'}">
+                        ${player}: ${vote ? 'Yes!' : 'No!'}
+                    </div>
+                `).join('');
+
+            // Set up continue button
+            document.getElementById('continueFromVoteBtn').onclick = () => {
+                if (passed) {
+                    // Check Mole CFO win condition
+                    if (state.austerityPolicies >= 3 && state.roles[state.currentCFO] === 'mole') {
+                        endGame('saboteur', `${state.currentCFO} (The Mole) became Partner after 3 bad cards! Bad Guys win!`);
+                        return;
+                    }
+
+                    state.electionTracker = 0;
+                    startCEOPolicyPhase();
+                } else {
+                    state.electionTracker++;
+
+                    if (state.electionTracker >= 3) {
+                        // Chaos - enact top policy
+                        chaosEnactPolicy();
+                    } else {
+                        // Next CEO
+                        state.ceoIndex = (state.ceoIndex + 1) % state.players.length;
+                        while (state.eliminated.has(state.players[state.ceoIndex])) {
+                            state.ceoIndex = (state.ceoIndex + 1) % state.players.length;
+                        }
+                        state.currentCEO = null;
+                        state.currentCFO = null;
+                        updateGameBoard();
+                        showScreen('game');
+                    }
+                }
+            };
+        }
+
+        function chaosEnactPolicy() {
+            if (state.policyDeck.length < 1) {
+                reshuffleDeck();
+            }
+            const policy = state.policyDeck.pop();
+            enactPolicy(policy, true);
+        }
+
+        // CEO Policy Phase
+        function startCEOPolicyPhase() {
+            showScreen('ceoPolicy');
+            document.getElementById('ceoPolicyName').textContent = state.currentCEO;
+
+            // Draw 3 cards - reshuffle discard pile if needed
+            if (state.policyDeck.length < 3) {
+                reshuffleDeck();
+            }
+            state.currentPolicies = [
+                state.policyDeck.pop(),
+                state.policyDeck.pop(),
+                state.policyDeck.pop()
+            ];
+            state.selectedPolicy = null;
+            state.selectedPolicies = [];
+
+            renderCEOPolicies();
+        }
+
+        function renderCEOPolicies() {
+            const container = document.getElementById('ceoPolicyCards');
+            container.innerHTML = state.currentPolicies.map((policy, i) => `
+                <div class="policy-card ${policy} ${state.selectedPolicies && state.selectedPolicies.includes(i) ? 'selected' : ''}"
+                     onclick="selectCEOPolicy(${i})">
+                    <div class="policy-card-icon">${policy === 'growth' ? '📈' : '📉'}</div>
+                    ${policy === 'growth' ? 'Good' : 'Bad'}
+                </div>
+            `).join('');
+
+            document.getElementById('ceoDiscardBtn').disabled = !state.selectedPolicies || state.selectedPolicies.length !== 2;
+        }
+
+        window.selectCEOPolicy = function(index) {
+            if (!state.selectedPolicies) state.selectedPolicies = [];
+
+            const idx = state.selectedPolicies.indexOf(index);
+            if (idx > -1) {
+                // Deselect if already selected
+                state.selectedPolicies.splice(idx, 1);
+            } else if (state.selectedPolicies.length < 2) {
+                // Select if less than 2 selected
+                state.selectedPolicies.push(index);
+            }
+            renderCEOPolicies();
+        };
+
+        document.getElementById('ceoDiscardBtn').addEventListener('click', () => {
+            // Find the discarded card (the one not selected) and add to discard pile
+            for (let i = 0; i < state.currentPolicies.length; i++) {
+                if (!state.selectedPolicies.includes(i)) {
+                    state.discardPile.push(state.currentPolicies[i]);
+                }
+            }
+            // Keep only the selected policies (the 2 to give to partner)
+            state.currentPolicies = state.selectedPolicies.map(i => state.currentPolicies[i]);
+            state.selectedPolicies = null;
+            state.selectedPolicy = null;
+            startCFOPolicyPhase();
+        });
+
+        // CFO Policy Phase
+        function startCFOPolicyPhase() {
+            showScreen('cfoPolicy');
+            document.getElementById('cfoPolicyName').textContent = state.currentCFO;
+            renderCFOPolicies();
+        }
+
+        function renderCFOPolicies() {
+            const container = document.getElementById('cfoPolicyCards');
+            container.innerHTML = state.currentPolicies.map((policy, i) => `
+                <div class="policy-card ${policy} ${state.selectedPolicy === i ? 'selected' : ''}"
+                     onclick="selectCFOPolicy(${i})">
+                    <div class="policy-card-icon">${policy === 'growth' ? '📈' : '📉'}</div>
+                    ${policy === 'growth' ? 'Good' : 'Bad'}
+                </div>
+            `).join('');
+
+            document.getElementById('cfoEnactBtn').disabled = state.selectedPolicy === null;
+        }
+
+        window.selectCFOPolicy = function(index) {
+            state.selectedPolicy = index;
+            renderCFOPolicies();
+        };
+
+        document.getElementById('cfoEnactBtn').addEventListener('click', () => {
+            const policy = state.currentPolicies[state.selectedPolicy];
+            // Discard the card that wasn't played
+            for (let i = 0; i < state.currentPolicies.length; i++) {
+                if (i !== state.selectedPolicy) {
+                    state.discardPile.push(state.currentPolicies[i]);
+                }
+            }
+            enactPolicy(policy, false);
+        });
+
+        // Enact Policy
+        function enactPolicy(policy, isChaos) {
+            if (policy === 'growth') {
+                state.growthPolicies++;
+            } else {
+                state.austerityPolicies++;
+            }
+
+            // Show enacted screen
+            showScreen('policyEnacted');
+            document.getElementById('policyIcon').textContent = policy === 'growth' ? '📈' : '📉';
+            document.getElementById('policyTitle').textContent = policy === 'growth'
+                ? 'Good Card!'
+                : 'Bad Card!';
+            document.getElementById('policyTitle').style.color = policy === 'growth'
+                ? 'var(--growth)'
+                : 'var(--austerity)';
+            document.getElementById('policyMessage').textContent = policy === 'growth'
+                ? (isChaos ? 'Chaos! A random good card was played.' : 'The company is doing better!')
+                : (isChaos ? 'Chaos! A random bad card was played.' : 'The company is in trouble...');
+
+            // Check win conditions
+            if (state.growthPolicies >= 5) {
+                document.getElementById('continueFromPolicyBtn').onclick = () => {
+                    endGame('loyalist', '5 good cards played! The company is saved!');
+                };
+                return;
+            }
+
+            if (state.austerityPolicies >= 6) {
+                document.getElementById('continueFromPolicyBtn').onclick = () => {
+                    endGame('saboteur', '6 bad cards played! The company is destroyed!');
+                };
+                return;
+            }
+
+            // Check for executive power
+            const power = !isChaos && policy === 'austerity'
+                ? getPower(state.austerityPolicies, state.players.length)
+                : null;
+
+            document.getElementById('continueFromPolicyBtn').onclick = () => {
+                // Update previous government
+                state.previousCEO = state.currentCEO;
+                state.previousCFO = state.currentCFO;
+
+                if (power) {
+                    executePower(power);
+                } else {
+                    nextRound();
+                }
+            };
+        }
+
+        // Executive Powers
+        function executePower(power) {
+            if (power === 'investigate') {
+                showInvestigatePower();
+            } else if (power === 'specialElection') {
+                showSpecialElectionPower();
+            } else if (power === 'fire') {
+                showFirePower();
+            }
+        }
+
+        function showInvestigatePower() {
+            showScreen('investigate');
+            state.selectedTarget = null;
+
+            const grid = document.getElementById('investigateGrid');
+            grid.innerHTML = state.players.map(player => {
+                const canInvestigate = player !== state.currentCEO &&
+                                       !state.eliminated.has(player) &&
+                                       !state.investigated.has(player);
+                const isSelected = player === state.selectedTarget;
+
+                return `
+                    <div class="power-target ${isSelected ? 'selected' : ''} ${!canInvestigate ? 'disabled' : ''}"
+                         onclick="${canInvestigate ? `selectInvestigateTarget('${player}')` : ''}">
+                        ${player}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('investigateBtn').disabled = true;
+        }
+
+        window.selectInvestigateTarget = function(player) {
+            state.selectedTarget = player;
+
+            // Update selection UI
+            document.querySelectorAll('#investigateGrid .power-target').forEach(el => {
+                el.classList.toggle('selected', el.textContent.trim() === player);
+            });
+
+            document.getElementById('investigateBtn').disabled = false;
+        };
+
+        document.getElementById('investigateBtn').addEventListener('click', () => {
+            state.investigated.add(state.selectedTarget);
+
+            const role = state.roles[state.selectedTarget];
+            const isTeamSaboteur = role === 'saboteur' || role === 'mole';
+
+            showScreen('investigateResult');
+            document.getElementById('investigatedPlayer').textContent = state.selectedTarget;
+            document.getElementById('investigatedTeam').textContent = isTeamSaboteur
+                ? 'is a BAD GUY'
+                : 'is a GOOD GUY';
+
+            const resultEl = document.getElementById('investigationResult');
+            resultEl.className = `investigation-result ${isTeamSaboteur ? 'saboteur' : 'loyalist'}`;
+        });
+
+        document.getElementById('continueFromInvestigateBtn').addEventListener('click', nextRound);
+
+        function showSpecialElectionPower() {
+            showScreen('specialElection');
+            state.selectedTarget = null;
+
+            const grid = document.getElementById('specialElectionGrid');
+            grid.innerHTML = state.players.map(player => {
+                const canSelect = player !== state.currentCEO && !state.eliminated.has(player);
+                const isSelected = player === state.selectedTarget;
+
+                return `
+                    <div class="power-target ${isSelected ? 'selected' : ''} ${!canSelect ? 'disabled' : ''}"
+                         onclick="${canSelect ? `selectSpecialElectionTarget('${player}')` : ''}">
+                        ${player}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('specialElectionBtn').disabled = true;
+        }
+
+        window.selectSpecialElectionTarget = function(player) {
+            state.selectedTarget = player;
+
+            document.querySelectorAll('#specialElectionGrid .power-target').forEach(el => {
+                el.classList.toggle('selected', el.textContent.trim() === player);
+            });
+
+            document.getElementById('specialElectionBtn').disabled = false;
+        };
+
+        document.getElementById('specialElectionBtn').addEventListener('click', () => {
+            state.specialElectionCEO = state.selectedTarget;
+            state.ceoIndex = state.players.indexOf(state.selectedTarget);
+            nextRound();
+        });
+
+        function showFirePower() {
+            showScreen('fire');
+            state.selectedTarget = null;
+
+            const grid = document.getElementById('fireGrid');
+            grid.innerHTML = state.players.map(player => {
+                const canFire = player !== state.currentCEO && !state.eliminated.has(player);
+                const isSelected = player === state.selectedTarget;
+
+                return `
+                    <div class="power-target ${isSelected ? 'selected' : ''} ${!canFire ? 'disabled' : ''}"
+                         onclick="${canFire ? `selectFireTarget('${player}')` : ''}">
+                        ${player}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('fireBtn').disabled = true;
+        }
+
+        window.selectFireTarget = function(player) {
+            state.selectedTarget = player;
+
+            document.querySelectorAll('#fireGrid .power-target').forEach(el => {
+                el.classList.toggle('selected', el.textContent.trim() === player);
+            });
+
+            document.getElementById('fireBtn').disabled = false;
+        };
+
+        document.getElementById('fireBtn').addEventListener('click', () => {
+            state.eliminated.add(state.selectedTarget);
+
+            // Check if Mole was fired
+            if (state.roles[state.selectedTarget] === 'mole') {
+                endGame('loyalist', `${state.selectedTarget} was The Mole! You found them! Good Guys win!`);
+                return;
+            }
+
+            nextRound();
+        });
+
+        // Next Round
+        function nextRound() {
+            // Reset special election if used
+            if (!state.specialElectionCEO) {
+                state.ceoIndex = (state.ceoIndex + 1) % state.players.length;
+            }
+            state.specialElectionCEO = null;
+
+            // Skip eliminated players
+            while (state.eliminated.has(state.players[state.ceoIndex])) {
+                state.ceoIndex = (state.ceoIndex + 1) % state.players.length;
+            }
+
+            state.currentCEO = null;
+            state.currentCFO = null;
+            state.selectedCFO = null;
+            state.selectedPolicy = null;
+            state.selectedTarget = null;
+
+            updateGameBoard();
+            showScreen('game');
+        }
+
+        // Game Over
+        function endGame(winner, reason) {
+            showScreen('gameOver');
+
+            const content = document.getElementById('gameOverContent');
+            content.className = `game-over ${winner === 'loyalist' ? 'loyalist-win' : 'saboteur-win'}`;
+
+            document.getElementById('gameOverIcon').textContent = winner === 'loyalist' ? '🏆' : '💀';
+            document.getElementById('gameOverTitle').textContent = winner === 'loyalist'
+                ? 'Good Guys Win!'
+                : 'Bad Guys Win!';
+            document.getElementById('gameOverReason').textContent = reason;
+
+            // Show all roles
+            const rolesDiv = document.getElementById('gameOverRoles');
+            rolesDiv.innerHTML = state.players.map(player => {
+                const role = state.roles[player];
+                const roleLabel = role === 'mole' ? 'The Mole' : (role === 'loyalist' ? 'Good Guy' : 'Bad Guy');
+                const eliminated = state.eliminated.has(player) ? ' (out)' : '';
+
+                return `
+                    <div class="game-over-role">
+                        <span>${player}${eliminated}</span>
+                        <span class="game-over-role-team ${role}">${roleLabel}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // New Game
+        document.getElementById('newGameBtn').addEventListener('click', () => {
+            // Reset state
+            state.roles = {};
+            state.eliminated = new Set();
+            state.growthPolicies = 0;
+            state.austerityPolicies = 0;
+            state.electionTracker = 0;
+            state.ceoIndex = 0;
+            state.currentCEO = null;
+            state.currentCFO = null;
+            state.previousCEO = null;
+            state.previousCFO = null;
+            state.votes = {};
+            state.policyDeck = [];
+            state.discardPile = [];
+            state.currentPolicies = [];
+            state.selectedCFO = null;
+            state.selectedPolicy = null;
+            state.selectedPolicies = [];
+            state.selectedTarget = null;
+            state.specialElectionCEO = null;
+            state.investigated = new Set();
+            state.currentVoterIndex = 0;
+            state.roleRevealIndex = 0;
+
+            showScreen('setup');
+        });
+    </script>
+</body>
+</html>
