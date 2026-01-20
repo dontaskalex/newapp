@@ -144,28 +144,458 @@
         }
 
         .ant-type.worker {
-            background: rgba(139, 90, 43, 0.3);
-            color: #c9a060;
+            background: rgba(70, 50, 35, 0.5);
+            color: #a08060;
         }
 
         .ant-type.soldier {
-            background: rgba(170, 60, 50, 0.3);
-            color: #e08070;
+            background: rgba(180, 50, 50, 0.5);
+            color: #ff9080;
         }
 
         .ant-type.scout {
-            background: rgba(180, 140, 60, 0.3);
-            color: #e0c080;
+            background: rgba(200, 160, 50, 0.5);
+            color: #ffe080;
         }
 
         .ant-type.carrier {
-            background: rgba(100, 80, 60, 0.3);
-            color: #c0a080;
+            background: rgba(70, 90, 120, 0.5);
+            color: #a0c0e0;
         }
 
         .ant-type.queen {
-            background: rgba(200, 150, 100, 0.3);
-            color: #f0d0a0;
+            background: rgba(130, 60, 150, 0.5);
+            color: #e0a0f0;
+        }
+
+        /* Character Card Styles - Tactical Dossier Theme */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
+
+        .character-card {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 420px;
+            background: linear-gradient(165deg, rgba(12, 14, 18, 0.97), rgba(8, 10, 12, 0.99));
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 4px;
+            box-shadow:
+                0 0 40px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(0, 255, 136, 0.1),
+                inset 0 0 60px rgba(0, 255, 136, 0.02);
+            z-index: 1000;
+            overflow: hidden;
+            animation: cardAppear 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .character-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 136, 0.015) 2px,
+                    rgba(0, 255, 136, 0.015) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .character-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 40%,
+                rgba(0, 255, 136, 0.03) 50%,
+                transparent 60%
+            );
+            animation: holographicSweep 4s linear infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes holographicSweep {
+            from { transform: translateX(-30%) translateY(-30%) rotate(0deg); }
+            to { transform: translateX(30%) translateY(30%) rotate(0deg); }
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateX(30px) scale(0.95);
+                filter: blur(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .character-card.hidden {
+            display: none;
+        }
+
+        .card-header {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: linear-gradient(180deg, rgba(0, 255, 136, 0.08), transparent);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+            gap: 12px;
+            z-index: 3;
+        }
+
+        .card-header::before {
+            content: 'UNIT DOSSIER';
+            position: absolute;
+            top: 4px;
+            right: 40px;
+            font-size: 8px;
+            color: rgba(0, 255, 136, 0.4);
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .card-icon {
+            font-size: 48px;
+            filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.4));
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.4)); }
+            50% { filter: drop-shadow(0 0 12px rgba(0, 255, 136, 0.6)); }
+        }
+
+        .card-title-section {
+            flex: 1;
+        }
+
+        .card-title-section h3 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: #00ff88;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: rgba(0, 255, 136, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+
+        .card-close {
+            background: rgba(255, 60, 60, 0.1);
+            border: 1px solid rgba(255, 60, 60, 0.3);
+            color: #ff4444;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 2px;
+            transition: all 0.2s;
+            font-family: 'Orbitron', sans-serif;
+            z-index: 10;
+        }
+
+        .card-close:hover {
+            background: rgba(255, 60, 60, 0.2);
+            border-color: rgba(255, 60, 60, 0.6);
+            box-shadow: 0 0 15px rgba(255, 60, 60, 0.3);
+        }
+
+        .card-body {
+            padding: 20px 24px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .card-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            border-radius: 2px;
+            padding: 12px 14px;
+            position: relative;
+            cursor: help;
+            transition: all 0.2s;
+        }
+
+        .stat-item:hover {
+            border-color: rgba(0, 255, 136, 0.4);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .stat-item:hover .stat-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .stat-item .stat-name {
+            font-size: 11px;
+            color: rgba(0, 255, 136, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .stat-item .stat-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00ff88;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .stat-bar-container {
+            height: 6px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stat-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+        }
+
+        .stat-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: barShine 2s ease-in-out infinite;
+        }
+
+        @keyframes barShine {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .stat-bar.good { background: linear-gradient(90deg, #00ff88, #00cc6a); box-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+        .stat-bar.exceptional { background: linear-gradient(90deg, #a78bfa, #8b5cf6); box-shadow: 0 0 10px rgba(167, 139, 250, 0.5); }
+        .stat-bar.legendary { background: linear-gradient(90deg, #ffd700, #ffaa00); box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .stat-bar.neutral, .stat-bar.default { background: linear-gradient(90deg, #4a9eff, #2d7dd2); box-shadow: 0 0 10px rgba(74, 158, 255, 0.3); }
+        .stat-bar.weak { background: linear-gradient(90deg, #9ca3af, #6b7280); }
+        .stat-bar.poor { background: linear-gradient(90deg, #ef4444, #dc2626); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+
+        .stat-item .stat-val.good { color: #00ff88; }
+        .stat-item .stat-val.exceptional { color: #a78bfa; }
+        .stat-item .stat-val.legendary { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
+        .stat-item .stat-val.weak { color: #9ca3af; }
+        .stat-item .stat-val.poor { color: #ef4444; }
+
+        .stat-tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            background: rgba(8, 12, 16, 0.98);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            border-radius: 4px;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.95);
+            width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.2s ease-out;
+            z-index: 1000;
+            line-height: 1.5;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 255, 136, 0.15);
+            text-align: center;
+        }
+
+        .stat-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: rgba(0, 255, 136, 0.4);
+        }
+
+        .card-exp-section {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.15);
+            border-radius: 2px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+        }
+
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .exp-label {
+            font-size: 11px;
+            color: rgba(0, 255, 136, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .exp-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00ff88;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .exp-details {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .exp-detail {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .exp-detail .count {
+            color: #00ff88;
+            font-weight: 600;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.6;
+            margin-bottom: 18px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .card-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .trait-tag {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 3px;
+            padding: 6px 14px;
+            font-size: 11px;
+            color: rgba(0, 255, 136, 0.8);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .trait-tag:hover {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: rgba(0, 255, 136, 0.4);
+        }
+
+        .trait-tag.positive { border-color: rgba(125, 206, 160, 0.4); color: #7dcea0; }
+        .trait-tag.negative { border-color: rgba(239, 68, 68, 0.4); color: #ef4444; }
+        .trait-tag.special { border-color: rgba(255, 215, 0, 0.4); color: #ffd700; }
+        .trait-tag.legendary {
+            border-color: rgba(255, 215, 0, 0.6);
+            color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 170, 0, 0.1));
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+            animation: legendaryPulse 2s ease-in-out infinite;
+        }
+        .trait-tag.exceptional {
+            border-color: rgba(167, 139, 250, 0.5);
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+        }
+        .trait-tag.good { border-color: rgba(0, 255, 136, 0.4); color: #00ff88; }
+        .trait-tag.weak { border-color: rgba(156, 163, 175, 0.3); color: #9ca3af; }
+        .trait-tag.poor { border-color: rgba(239, 68, 68, 0.3); color: #ef4444; }
+
+        @keyframes legendaryPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+        }
+
+        .card-footer {
+            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: rgba(0, 255, 136, 0.4);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            z-index: 3;
+            position: relative;
+        }
+
+        .card-id {
+            opacity: 0.6;
+        }
+
+        .card-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: statusBlink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
         .instructions {
@@ -379,10 +809,6 @@
                 <span class="stat-value coins" id="coins">50</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">Colony level</span>
-                <span class="stat-value" id="colony-level">1</span>
-            </div>
-            <div class="stat-row">
                 <span class="stat-label">Population</span>
                 <span class="stat-value" id="ant-count">0</span>
             </div>
@@ -399,6 +825,37 @@
             </div>
             <div class="instructions">
                 Drop food to earn coins when ants bring it back. Spawn different ant types using the bottom panel!
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Card Modal -->
+    <div id="character-card" class="character-card hidden">
+        <div class="card-header">
+            <span class="card-icon" id="card-icon"></span>
+            <div class="card-title-section">
+                <h3 id="card-title">Worker</h3>
+                <span class="card-subtitle" id="card-subtitle">Ant</span>
+            </div>
+            <button class="card-close" onclick="closeCharacterCard()">×</button>
+        </div>
+        <div class="card-body">
+            <div class="card-exp-section" id="card-exp-section">
+                <div class="exp-header">
+                    <span class="exp-label">Experience</span>
+                    <span class="exp-value" id="exp-value">0</span>
+                </div>
+                <div class="exp-details" id="exp-details"></div>
+            </div>
+            <div class="card-stats" id="card-stats"></div>
+            <div class="card-description" id="card-description"></div>
+            <div class="card-traits" id="card-traits"></div>
+        </div>
+        <div class="card-footer">
+            <span class="card-id" id="card-id">ID: #000</span>
+            <div class="card-status">
+                <span class="status-dot"></span>
+                <span>ACTIVE</span>
             </div>
         </div>
     </div>
@@ -429,23 +886,23 @@
         </div>
         <div class="ant-selector">
             <span class="ant-label">spawn</span>
-            <button class="ant-btn" data-ant="worker" title="Worker - Balanced ant">
+            <button class="ant-btn" data-ant="worker" title="WORKER - Click ant for details">
                 <span class="emoji">🐜</span>
                 <span class="cost" id="worker-cost">5</span>
             </button>
-            <button class="ant-btn" data-ant="soldier" title="Soldier - Fights predators">
+            <button class="ant-btn" data-ant="soldier" title="SOLDIER - Click ant for details">
                 <span class="emoji">⚔️</span>
                 <span class="cost" id="soldier-cost">15</span>
             </button>
-            <button class="ant-btn" data-ant="scout" title="Scout - Fast explorer">
+            <button class="ant-btn" data-ant="scout" title="SCOUT - Click ant for details">
                 <span class="emoji">🔍</span>
                 <span class="cost" id="scout-cost">25</span>
             </button>
-            <button class="ant-btn" data-ant="carrier" title="Carrier - High carry capacity">
+            <button class="ant-btn" data-ant="carrier" title="CARRIER - Click ant for details">
                 <span class="emoji">💪</span>
                 <span class="cost" id="carrier-cost">40</span>
             </button>
-            <button class="ant-btn" data-ant="queen" title="Queen - Spawns workers over time">
+            <button class="ant-btn" data-ant="queen" title="QUEEN - Click ant for details">
                 <span class="emoji">👑</span>
                 <span class="cost" id="queen-cost">80</span>
             </button>
@@ -502,19 +959,23 @@
                 queen:    { baseCost: 80, emoji: '👑', description: 'Spawns workers over time' }
             },
 
-            // Ant types with their stats
+            // Ant types with their stats - distinct colors for easy recognition
             antTypes: {
                 worker: {
-                    color: { r: 50, g: 30, b: 18 },
+                    // Classic dark brown ant
+                    color: { r: 45, g: 30, b: 20 },
+                    accentColor: { r: 70, g: 50, b: 35 },
                     speed: 0.7,
                     carryCapacity: 10,
-                    carrySpeedBonus: 1.2,  // Less slowdown when carrying
+                    carrySpeedBonus: 1.2,
                     fightChance: 0,
                     pheromoneStrength: 1,
                     foodDetectRadius: 8
                 },
                 soldier: {
-                    color: { r: 85, g: 25, b: 20 },
+                    // Deep red/crimson - aggressive looking
+                    color: { r: 120, g: 25, b: 25 },
+                    accentColor: { r: 180, g: 50, b: 50 },
                     speed: 0.6,
                     carryCapacity: 6,
                     carrySpeedBonus: 1,
@@ -524,7 +985,9 @@
                     foodDetectRadius: 8
                 },
                 scout: {
-                    color: { r: 90, g: 65, b: 25 },
+                    // Bright golden/yellow - fast and visible
+                    color: { r: 180, g: 140, b: 40 },
+                    accentColor: { r: 220, g: 180, b: 60 },
                     speed: 1.0,
                     carryCapacity: 4,
                     carrySpeedBonus: 1,
@@ -534,25 +997,29 @@
                     wanderStrength: 0.4
                 },
                 carrier: {
-                    color: { r: 60, g: 45, b: 30 },
+                    // Steel blue/gray - sturdy looking
+                    color: { r: 50, g: 65, b: 85 },
+                    accentColor: { r: 80, g: 100, b: 130 },
                     speed: 0.5,
                     carryCapacity: 25,
-                    carrySpeedBonus: 1.5,  // Much less slowdown when carrying
+                    carrySpeedBonus: 1.5,
                     fightChance: 0,
                     pheromoneStrength: 0.6,
                     foodDetectRadius: 10,
-                    size: 1.3  // Slightly larger
+                    size: 1.35
                 },
                 queen: {
-                    color: { r: 100, g: 70, b: 50 },
+                    // Royal purple/magenta - regal
+                    color: { r: 100, g: 45, b: 120 },
+                    accentColor: { r: 150, g: 80, b: 170 },
                     speed: 0.3,
                     carryCapacity: 2,
                     carrySpeedBonus: 1,
                     fightChance: 0,
                     pheromoneStrength: 1.5,
                     foodDetectRadius: 6,
-                    size: 1.6,  // Larger
-                    spawnInterval: 600,  // Spawn a worker every 10 seconds
+                    size: 1.6,
+                    spawnInterval: 600,
                     staysNearNest: true
                 }
             },
@@ -1580,11 +2047,14 @@
             }
         }
 
+        const FOOD_LIFETIME_SECONDS = 60;  // 60 seconds until food spoils
+
         class FoodItem {
             constructor(x, y, type) {
                 this.x = x;
                 this.y = y;
                 this.type = type;
+                this.id = Math.random().toString(36).substr(2, 9);  // Unique ID for tracking
                 const config = CONFIG.foodTypes[type];
                 this.size = config.size;  // Current size (units of food remaining)
                 this.maxSize = config.size;  // Original size
@@ -1594,6 +2064,19 @@
                 this.emoji = config.emoji;
                 this.carriers = [];
                 this.inDangerZone = isInDangerZone(x, y);
+                this.spawnTime = Date.now();  // Real timestamp when food was created
+                this.spoiled = false;
+            }
+
+            update() {
+                if (this.getTimeRemaining() <= 0 && !this.spoiled) {
+                    this.spoiled = true;
+                }
+            }
+
+            getTimeRemaining() {
+                const elapsed = (Date.now() - this.spawnTime) / 1000;  // Seconds elapsed
+                return Math.max(0, Math.ceil(FOOD_LIFETIME_SECONDS - elapsed));
             }
 
             getRadius() {
@@ -1638,14 +2121,32 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                // Shadow
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                // Shadow (offset more so it doesn't darken the emoji)
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
                 ctx.beginPath();
-                ctx.ellipse(2, 3, r * 1.1, r * 0.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(3, 5, r * 0.9, r * 0.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Zone-based glow behind emoji
+                const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.2);
+                if (this.inDangerZone) {
+                    // Golden/amber glow for danger zone food
+                    glowGrad.addColorStop(0, 'rgba(255, 200, 80, 0.5)');
+                    glowGrad.addColorStop(0.5, 'rgba(255, 180, 50, 0.2)');
+                    glowGrad.addColorStop(1, 'transparent');
+                } else {
+                    // Green glow for safe zone food
+                    glowGrad.addColorStop(0, 'rgba(120, 255, 150, 0.4)');
+                    glowGrad.addColorStop(0.5, 'rgba(100, 230, 130, 0.15)');
+                    glowGrad.addColorStop(1, 'transparent');
+                }
+                ctx.fillStyle = glowGrad;
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 1.2, 0, Math.PI * 2);
                 ctx.fill();
 
                 // Draw emoji scaled to size
-                const fontSize = Math.max(12, r * 1.8);
+                const fontSize = Math.max(14, r * 2);
                 ctx.font = `${fontSize}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -1653,21 +2154,30 @@
 
                 // Size indicator
                 if (this.size > 1) {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                     ctx.beginPath();
-                    ctx.arc(r * 0.7, -r * 0.5, 10, 0, Math.PI * 2);
+                    ctx.arc(r * 0.8, -r * 0.6, 10, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.fillStyle = '#fff';
                     ctx.font = 'bold 10px "DM Mono", monospace';
-                    ctx.fillText(Math.floor(this.size), r * 0.7, -r * 0.5);
+                    ctx.fillText(Math.floor(this.size), r * 0.8, -r * 0.6);
                 }
 
-                // Danger zone glow
-                if (this.inDangerZone) {
-                    ctx.strokeStyle = 'rgba(244, 208, 63, 0.6)';
+                // Timer indicator - shows seconds remaining
+                const timeLeft = this.getTimeRemaining();
+                const timerColor = timeLeft <= 10 ? 'rgba(255, 80, 80, 0.9)' :
+                                   timeLeft <= 20 ? 'rgba(255, 180, 80, 0.9)' :
+                                   'rgba(255, 255, 255, 0.7)';
+                ctx.fillStyle = timerColor;
+                ctx.font = 'bold 9px "DM Mono", monospace';
+                ctx.fillText(`${timeLeft}s`, 0, r + 12);
+
+                // Spoiling warning flash
+                if (timeLeft <= 10 && Math.floor(time / 15) % 2 === 0) {
+                    ctx.strokeStyle = 'rgba(255, 80, 80, 0.5)';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.arc(0, 0, r + 4, 0, Math.PI * 2);
+                    ctx.arc(0, 0, r + 6, 0, Math.PI * 2);
                     ctx.stroke();
                 }
 
@@ -1675,21 +2185,13 @@
             }
         }
 
-        // Food piece that an ant carries (visual only, smaller version)
+        // Food piece that an ant carries - tracks source food for spoilage and zone
         class CarriedFoodPiece {
-            constructor(type) {
+            constructor(type, sourceFoodId, fromDangerZone) {
                 this.type = type;
                 this.emoji = CONFIG.foodTypes[type].emoji;
-            }
-
-            draw(x, y, size) {
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.font = `${size}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(this.emoji, 0, 0);
-                ctx.restore();
+                this.sourceFoodId = sourceFoodId;  // Track which food this came from
+                this.fromDangerZone = fromDangerZone;  // Track zone for glow color
             }
         }
 
@@ -1707,25 +2209,111 @@
         // ===========================================
 
         let ants = [];
+        let antIdCounter = 0;
+        let selectedAnt = null;  // Currently selected ant for character card
+
+        // Ant name generator - normal human names
+        const ANT_NAMES = [
+            'Gustav', 'Anja', 'Erik', 'Marta', 'Felix', 'Lena', 'Otto', 'Hilda',
+            'Bruno', 'Ingrid', 'Karl', 'Freya', 'Hans', 'Greta', 'Fritz', 'Elsa',
+            'Max', 'Anna', 'Klaus', 'Liesel', 'Hugo', 'Heidi', 'Emil', 'Rosa',
+            'Theo', 'Klara', 'Oscar', 'Maja', 'Lars', 'Petra', 'Nils', 'Vera',
+            'Axel', 'Ida', 'Sven', 'Tilda', 'Rolf', 'Britta', 'Lukas', 'Sonja',
+            'Kasper', 'Astrid', 'Johan', 'Sigrid', 'Anders', 'Helga', 'Olaf', 'Inga',
+            'Finn', 'Linnea', 'Magnus', 'Ylva', 'Bjorn', 'Saga', 'Leif', 'Freja',
+            'Henrik', 'Ebba', 'Stefan', 'Alma', 'Viktor', 'Nova', 'Anton', 'Wilma'
+        ];
+        let usedNames = new Set();
+
+        function generateAntName() {
+            // Try to get an unused name
+            const availableNames = ANT_NAMES.filter(n => !usedNames.has(n));
+            if (availableNames.length > 0) {
+                const name = availableNames[Math.floor(Math.random() * availableNames.length)];
+                usedNames.add(name);
+                return name;
+            }
+            // All names used, add a number suffix
+            const baseName = ANT_NAMES[Math.floor(Math.random() * ANT_NAMES.length)];
+            let suffix = 2;
+            while (usedNames.has(`${baseName} ${suffix}`)) suffix++;
+            const fullName = `${baseName} ${suffix}`;
+            usedNames.add(fullName);
+            return fullName;
+        }
+
+        // Trait quality levels based on roll
+        function getTraitQuality(roll) {
+            if (roll >= 0.95) return { label: 'Legendary', class: 'legendary', multiplier: 1.4 };
+            if (roll >= 0.85) return { label: 'Exceptional', class: 'exceptional', multiplier: 1.25 };
+            if (roll >= 0.65) return { label: 'Good', class: 'good', multiplier: 1.1 };
+            if (roll >= 0.35) return { label: 'Average', class: '', multiplier: 1.0 };
+            if (roll >= 0.15) return { label: 'Below Avg', class: 'weak', multiplier: 0.9 };
+            return { label: 'Poor', class: 'poor', multiplier: 0.8 };
+        }
+
+        // Rank titles based on experience
+        function getAntRank(experience) {
+            if (experience >= 100) return { title: 'Legendary', class: 'legendary' };
+            if (experience >= 50) return { title: 'Veteran', class: 'exceptional' };
+            if (experience >= 25) return { title: 'Experienced', class: 'good' };
+            if (experience >= 10) return { title: 'Skilled', class: '' };
+            if (experience >= 5) return { title: 'Novice', class: 'weak' };
+            return { title: 'Rookie', class: 'poor' };
+        }
 
         class Ant {
             constructor(x, y, type = 'worker') {
                 this.x = x;
                 this.y = y;
                 this.type = type;
+                this.id = ++antIdCounter;
+                this.name = generateAntName();
 
-                // Load type-specific stats
+                // Individual trait rolls (0-1, higher is better)
+                this.traitRolls = {
+                    speed: Math.random(),
+                    efficiency: Math.random(),
+                    detection: Math.random(),
+                    resilience: Math.random()
+                };
+
+                // Experience tracking
+                this.experience = {
+                    totalDeliveries: 0,
+                    dangerDeliveries: 0,
+                    totalValue: 0,
+                    predatorEncounters: 0,
+                    predatorEscapes: 0
+                };
+
+                // Load type-specific stats with trait modifications
                 const typeConfig = CONFIG.antTypes[type] || CONFIG.antTypes.worker;
-                this.baseSpeed = typeConfig.speed * (0.9 + Math.random() * 0.2);
+
+                // Speed affected by speed trait roll
+                const speedQuality = getTraitQuality(this.traitRolls.speed);
+                this.baseSpeed = typeConfig.speed * speedQuality.multiplier;
                 this.speed = this.baseSpeed;
+
+                // Detection radius affected by detection trait
+                const detectionQuality = getTraitQuality(this.traitRolls.detection);
+                this.foodDetectRadius = typeConfig.foodDetectRadius * detectionQuality.multiplier;
+
+                // Efficiency affects carry speed bonus
+                const efficiencyQuality = getTraitQuality(this.traitRolls.efficiency);
+                this.carrySpeedBonus = typeConfig.carrySpeedBonus * efficiencyQuality.multiplier;
+
+                // Resilience affects fight survival (for soldiers)
+                const resilienceQuality = getTraitQuality(this.traitRolls.resilience);
+
                 this.carryCapacity = typeConfig.carryCapacity;
-                this.carrySpeedBonus = typeConfig.carrySpeedBonus;
                 this.fightChance = typeConfig.fightChance || 0;
-                this.fightDeathChance = typeConfig.fightDeathChance || 0;
+                // Better resilience = lower death chance
+                this.fightDeathChance = (typeConfig.fightDeathChance || 0) * (2 - resilienceQuality.multiplier);
                 this.pheromoneStrength = typeConfig.pheromoneStrength;
-                this.foodDetectRadius = typeConfig.foodDetectRadius;
                 this.colorConfig = typeConfig.color;
-                this.sizeMultiplier = typeConfig.size || 1;  // For carrier/queen
+                this.accentColor = typeConfig.accentColor || typeConfig.color;
+                this.sizeMultiplier = typeConfig.size || 1;
 
                 this.angle = Math.random() * Math.PI * 2;
                 this.state = 'exploring';
@@ -1748,6 +2336,35 @@
                 // Queen-specific properties
                 this.spawnTimer = 0;
                 this.staysNearNest = typeConfig.staysNearNest || false;
+            }
+
+            // Get total experience points
+            getTotalExp() {
+                return this.experience.totalDeliveries +
+                       this.experience.dangerDeliveries * 2 +  // Danger zone worth double
+                       this.experience.predatorEscapes * 3;    // Escapes worth triple
+            }
+
+            // Record a successful delivery
+            recordDelivery(value, fromDangerZone) {
+                this.experience.totalDeliveries++;
+                this.experience.totalValue += value;
+                if (fromDangerZone) {
+                    this.experience.dangerDeliveries++;
+                }
+
+                // Experience can boost stats slightly over time
+                const exp = this.getTotalExp();
+                const expBonus = 1 + Math.min(0.2, exp * 0.002);  // Up to 20% bonus at 100 exp
+                this.speed = this.baseSpeed * expBonus;
+            }
+
+            // Record predator encounter
+            recordPredatorEncounter(escaped) {
+                this.experience.predatorEncounters++;
+                if (escaped) {
+                    this.experience.predatorEscapes++;
+                }
             }
 
             // Soldiers can attempt to fight predators
@@ -2063,7 +2680,7 @@
                 // Take 1 unit from the food
                 const units = food.takeUnit();
                 if (units > 0) {
-                    this.carriedFoodPiece = new CarriedFoodPiece(food.type);
+                    this.carriedFoodPiece = new CarriedFoodPiece(food.type, food.id, food.inDangerZone);
                     this.carriedFoodValue = food.getValue();  // Value based on danger zone
                     this.targetFood = food;
                     this.state = 'carrying';
@@ -2105,6 +2722,9 @@
                 // Check if reached nest
                 const distToNest = this.distanceToNest();
                 if (distToNest < getColonySize()) {
+                    // Record experience before clearing the food piece
+                    this.recordDelivery(this.carriedFoodValue, this.carriedFoodPiece.fromDangerZone);
+
                     // Earn coins (no ant spawning - that's separate now)
                     earnCoins(this.carriedFoodValue);
                     foodCollected += 1;
@@ -2175,14 +2795,16 @@
                 const size = CONFIG.antSize * this.sizeMultiplier;
                 const legWave = Math.sin(this.legPhase) * 0.35;
 
-                // Type-based colors
+                // Type-based colors - use accent for highlights
                 const baseColor = this.colorConfig || CONFIG.antTypes.worker.color;
-                const r = baseColor.r + this.colorOffset;
-                const g = baseColor.g + this.colorOffset * 0.5;
-                const b = baseColor.b + this.colorOffset * 0.3;
+                const accent = this.accentColor || baseColor;
+                const r = baseColor.r;
+                const g = baseColor.g;
+                const b = baseColor.b;
                 const bodyColor = `rgb(${r}, ${g}, ${b})`;
-                const darkColor = `rgb(${Math.max(0, r - 15)}, ${Math.max(0, g - 10)}, ${Math.max(0, b - 5)})`;
-                const legColor = `rgb(${Math.min(255, r + 20)}, ${Math.min(255, g + 15)}, ${Math.min(255, b + 10)})`;
+                const darkColor = `rgb(${Math.max(0, r - 20)}, ${Math.max(0, g - 15)}, ${Math.max(0, b - 10)})`;
+                const accentColorStr = `rgb(${accent.r}, ${accent.g}, ${accent.b})`;
+                const legColor = `rgb(${Math.min(255, r + 30)}, ${Math.min(255, g + 25)}, ${Math.min(255, b + 20)})`;
 
                 // Shadow
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
@@ -2190,9 +2812,9 @@
                 ctx.ellipse(0, 2, size * 1.2, size * 0.3, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Legs
-                ctx.strokeStyle = legColor;
-                ctx.lineWidth = size * 0.1;
+                // Legs - use accent color for visibility
+                ctx.strokeStyle = accentColorStr;
+                ctx.lineWidth = size * 0.12;
                 ctx.lineCap = 'round';
 
                 const legPositions = [-0.15, 0.05, 0.25];
@@ -2211,14 +2833,21 @@
                     ctx.stroke();
                 }
 
-                // Gaster
+                // Gaster (abdomen) - main body color
                 ctx.fillStyle = bodyColor;
                 ctx.beginPath();
                 ctx.ellipse(-size * 0.55, 0, size * 0.5, size * 0.35, 0, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Gaster stripe/marking for visibility
+                ctx.fillStyle = accentColorStr;
+                ctx.beginPath();
+                ctx.ellipse(-size * 0.55, 0, size * 0.35, size * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.fillStyle = darkColor;
                 ctx.beginPath();
-                ctx.ellipse(-size * 0.65, 0, size * 0.2, size * 0.28, 0, 0, Math.PI * 2);
+                ctx.ellipse(-size * 0.7, 0, size * 0.15, size * 0.2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 // Petiole
@@ -2227,61 +2856,133 @@
                 ctx.ellipse(-size * 0.1, 0, size * 0.1, size * 0.07, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Thorax
+                // Thorax - with accent highlight
+                ctx.fillStyle = bodyColor;
                 ctx.beginPath();
                 ctx.ellipse(size * 0.2, 0, size * 0.28, size * 0.18, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Head
+                // Thorax accent stripe
+                ctx.fillStyle = accentColorStr;
                 ctx.beginPath();
-                ctx.ellipse(size * 0.55, 0, size * 0.2, size * 0.18, 0, 0, Math.PI * 2);
+                ctx.ellipse(size * 0.2, 0, size * 0.18, size * 0.08, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Eyes
+                // Head
+                ctx.fillStyle = bodyColor;
+                ctx.beginPath();
+                ctx.ellipse(size * 0.55, 0, size * 0.22, size * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Eyes - white with black pupil for visibility
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(size * 0.62, -size * 0.1, size * 0.06, 0, Math.PI * 2);
+                ctx.arc(size * 0.62, size * 0.1, size * 0.06, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.fillStyle = '#000';
                 ctx.beginPath();
-                ctx.arc(size * 0.6, -size * 0.1, size * 0.04, 0, Math.PI * 2);
-                ctx.arc(size * 0.6, size * 0.1, size * 0.04, 0, Math.PI * 2);
+                ctx.arc(size * 0.64, -size * 0.1, size * 0.03, 0, Math.PI * 2);
+                ctx.arc(size * 0.64, size * 0.1, size * 0.03, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Antennae
-                ctx.strokeStyle = legColor;
-                ctx.lineWidth = size * 0.06;
+                // Antennae - use accent color
+                ctx.strokeStyle = accentColorStr;
+                ctx.lineWidth = size * 0.07;
                 const antennaWave = Math.sin(this.legPhase * 0.6) * 0.12;
 
                 ctx.beginPath();
-                ctx.moveTo(size * 0.68, -size * 0.1);
-                ctx.lineTo(size * 0.85, -size * 0.22);
-                ctx.lineTo(size * 1.0, -size * 0.18 + antennaWave * size);
+                ctx.moveTo(size * 0.7, -size * 0.12);
+                ctx.lineTo(size * 0.88, -size * 0.25);
+                ctx.lineTo(size * 1.05, -size * 0.2 + antennaWave * size);
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.moveTo(size * 0.68, size * 0.1);
-                ctx.lineTo(size * 0.85, size * 0.22);
-                ctx.lineTo(size * 1.0, size * 0.18 - antennaWave * size);
+                ctx.moveTo(size * 0.7, size * 0.12);
+                ctx.lineTo(size * 0.88, size * 0.25);
+                ctx.lineTo(size * 1.05, size * 0.2 - antennaWave * size);
                 ctx.stroke();
 
-                // Draw carried food piece
+                // Draw carried food piece with zone-based glow
                 if (this.carriedFoodPiece && this.state === 'carrying') {
                     ctx.save();
-                    ctx.rotate(-this.angle);  // Unrotate for emoji
-                    const pieceSize = 8;
+                    ctx.rotate(-this.angle);
+                    const pieceSize = 10;
+                    const pieceX = size * 0.8;
+                    const pieceY = -size * 0.3;
+
+                    // Zone-based glow
+                    const glowGrad = ctx.createRadialGradient(pieceX, pieceY, 0, pieceX, pieceY, pieceSize * 0.8);
+                    if (this.carriedFoodPiece.fromDangerZone) {
+                        glowGrad.addColorStop(0, 'rgba(255, 200, 80, 0.6)');
+                        glowGrad.addColorStop(1, 'transparent');
+                    } else {
+                        glowGrad.addColorStop(0, 'rgba(120, 255, 150, 0.5)');
+                        glowGrad.addColorStop(1, 'transparent');
+                    }
+                    ctx.fillStyle = glowGrad;
+                    ctx.beginPath();
+                    ctx.arc(pieceX, pieceY, pieceSize * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+
                     ctx.font = `${pieceSize}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(this.carriedFoodPiece.emoji, size * 0.75, 0);
+                    ctx.fillText(this.carriedFoodPiece.emoji, pieceX, pieceY);
                     ctx.restore();
                 }
 
-                // Queen crown indicator
+                // Queen crown indicator only
                 if (this.type === 'queen') {
-                    ctx.fillStyle = '#f4d03f';
-                    ctx.font = `${size * 0.8}px Arial`;
+                    ctx.save();
+                    ctx.rotate(-this.angle);
+                    ctx.font = `${size * 0.7}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
+                    ctx.fillText('👑', 0, -size * 0.7);
+                    ctx.restore();
+                }
+
+                // Selection indicator - large triangle above selected ant
+                if (selectedAnt === this) {
                     ctx.save();
-                    ctx.rotate(-this.angle);  // Unrotate for emoji
-                    ctx.fillText('👑', 0, -size * 0.8);
+                    ctx.rotate(-this.angle);
+
+                    // Animated bounce
+                    const bounce = Math.sin(Date.now() / 150) * 4;
+                    const triangleY = -size * 2.2 - bounce;
+                    const triSize = size * 1.2;  // Much bigger triangle
+
+                    // Strong glow effect
+                    ctx.shadowColor = '#00ff88';
+                    ctx.shadowBlur = 20;
+
+                    // Outer glow ring
+                    ctx.strokeStyle = 'rgba(0, 255, 136, 0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size * 1.5, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Draw main triangle (pointing down)
+                    ctx.fillStyle = '#00ff88';
+                    ctx.beginPath();
+                    ctx.moveTo(0, triangleY + triSize * 0.7);
+                    ctx.lineTo(-triSize * 0.5, triangleY);
+                    ctx.lineTo(triSize * 0.5, triangleY);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Inner lighter triangle
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#80ffbb';
+                    ctx.beginPath();
+                    ctx.moveTo(0, triangleY + triSize * 0.5);
+                    ctx.lineTo(-triSize * 0.28, triangleY + triSize * 0.12);
+                    ctx.lineTo(triSize * 0.28, triangleY + triSize * 0.12);
+                    ctx.closePath();
+                    ctx.fill();
+
                     ctx.restore();
                 }
 
@@ -2357,43 +3058,22 @@
             }
         }
 
-        let colonyLevel = 1;
-        let nextLevelThreshold = 25;
-
         function getColonySize() {
-            return CONFIG.nestRadius * Math.min(3.5, 1 + foodCollected / 40);
-        }
-
-        function updateColonyGrowth() {
-            if (foodCollected >= nextLevelThreshold && colonyLevel < 5) {
-                colonyLevel++;
-                nextLevelThreshold = Math.floor(nextLevelThreshold * 2.2);
-
-                // Level up gives bonus coins instead of spawning ants
-                const bonusCoins = 20 + colonyLevel * 15;
-                earnCoins(bonusCoins);
-
-                // Show level up notification
-                spawnNotifications.push({
-                    text: `Level ${colonyLevel}! +${bonusCoins} coins!`,
-                    color: 'rgba(244, 208, 63, 0.9)',
-                    x: CONFIG.nestX,
-                    y: CONFIG.nestY - getColonySize() - 40,
-                    alpha: 1,
-                    life: 120
-                });
-            }
+            // Colony grows slightly based on ant population
+            return CONFIG.nestRadius * Math.min(2.5, 1 + ants.length / 100);
         }
 
         function drawNest() {
             const currentRadius = getColonySize();
             const cx = CONFIG.nestX;
             const cy = CONFIG.nestY;
+            const antCount = ants.length;
 
             // Excavated dirt
             ctx.fillStyle = '#4a4030';
-            for (let i = 0; i < 20 + colonyLevel * 5; i++) {
-                const angle = (i / (20 + colonyLevel * 5)) * Math.PI * 2 + Math.sin(i * 1.7) * 0.4;
+            const dirtPiles = 20 + Math.min(antCount, 100) * 0.3;
+            for (let i = 0; i < dirtPiles; i++) {
+                const angle = (i / dirtPiles) * Math.PI * 2 + Math.sin(i * 1.7) * 0.4;
                 const dist = currentRadius * (1.1 + Math.sin(i * 2.9) * 0.2);
                 const blobSize = currentRadius * (0.06 + Math.sin(i * 4.1) * 0.03);
                 ctx.beginPath();
@@ -2424,7 +3104,8 @@
             ctx.fill();
 
             // Texture
-            for (let i = 0; i < 25 + colonyLevel * 8; i++) {
+            const textureDots = 25 + Math.min(antCount, 100) * 0.4;
+            for (let i = 0; i < textureDots; i++) {
                 const angle = Math.random() * Math.PI * 2;
                 const dist = Math.random() * currentRadius * 0.9;
                 const brightness = 40 + Math.random() * 25;
@@ -2463,7 +3144,6 @@
 
         function updateUI() {
             document.getElementById('coins').textContent = coins;
-            document.getElementById('colony-level').textContent = colonyLevel;
             document.getElementById('ant-count').textContent = ants.length;
             document.getElementById('food-collected').textContent = foodCollected;
 
@@ -2503,18 +3183,60 @@
         // INPUT HANDLING
         // ===========================================
 
-        let selectedFoodType = 'sugar';
+        let selectedFoodType = null;
         let isPlacing = false;
         let lastPlaceTime = 0;
         let showHint = true;
+        let foodPlacementActive = false;
+        let foodPlacementTimeout = null;
+
+        // Drag selection state
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let dragCurrentX = 0;
+        let dragCurrentY = 0;
+        let dragThreshold = 10; // Minimum pixels to trigger drag vs click
+
+        function activateFoodPlacement(foodType) {
+            // Clear any existing timeout
+            if (foodPlacementTimeout) {
+                clearTimeout(foodPlacementTimeout);
+            }
+
+            selectedFoodType = foodType;
+            foodPlacementActive = true;
+            document.querySelectorAll('.food-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`.food-btn[data-food="${foodType}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Auto-deselect after 10 seconds if no food placed
+            foodPlacementTimeout = setTimeout(() => {
+                deactivateFoodPlacement();
+            }, 10000);
+        }
+
+        function deactivateFoodPlacement() {
+            if (foodPlacementTimeout) {
+                clearTimeout(foodPlacementTimeout);
+                foodPlacementTimeout = null;
+            }
+            foodPlacementActive = false;
+            selectedFoodType = null;
+            document.querySelectorAll('.food-btn').forEach(b => b.classList.remove('active'));
+        }
 
         document.querySelectorAll('.food-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (btn.classList.contains('disabled')) return;
-                document.querySelectorAll('.food-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedFoodType = btn.dataset.food;
+                const foodType = btn.dataset.food;
+                // Toggle: if same food clicked again, deactivate
+                if (selectedFoodType === foodType && foodPlacementActive) {
+                    deactivateFoodPlacement();
+                } else {
+                    activateFoodPlacement(foodType);
+                }
             });
             btn.addEventListener('mousedown', (e) => e.stopPropagation());
             btn.addEventListener('touchstart', (e) => e.stopPropagation());
@@ -2538,44 +3260,699 @@
         document.querySelector('.ant-selector').addEventListener('mousedown', (e) => e.stopPropagation());
         document.querySelector('.ant-selector').addEventListener('touchstart', (e) => e.stopPropagation());
 
-        function placeFood(x, y) {
-            const now = Date.now();
-            const minInterval = selectedFoodType === 'sugar' ? 100 : 200;
-            if (now - lastPlaceTime < minInterval) return;
-            lastPlaceTime = now;
+        // ===========================================
+        // CHARACTER CARD SYSTEM
+        // ===========================================
 
-            const distToNest = Math.hypot(x - CONFIG.nestX, y - CONFIG.nestY);
-            if (distToNest < getColonySize() * 1.5) return;
+        let characterCardOpen = false;
 
-            if (addFood(x, y, selectedFoodType)) {
-                showHint = false;
+        const ANT_CARD_DATA = {
+            worker: {
+                icon: '🐜',
+                title: 'Worker',
+                subtitle: 'Colony Backbone',
+                description: 'The reliable workhorse of the colony. Workers form the majority of any ant colony, tirelessly foraging for food and maintaining trails.',
+                stats: [
+                    { name: 'Speed', value: 'Normal', class: '' },
+                    { name: 'Pheromones', value: 'Normal', class: '' },
+                    { name: 'Detection', value: '8 range', class: '' },
+                    { name: 'Efficiency', value: '+20%', class: 'good' }
+                ],
+                traits: [
+                    { text: 'Balanced', class: '' },
+                    { text: 'Efficient Carrier', class: 'positive' },
+                    { text: 'Common', class: '' }
+                ]
+            },
+            soldier: {
+                icon: '⚔️',
+                title: 'Soldier',
+                subtitle: 'Colony Defender',
+                description: 'Fearless protectors that actively seek out threats. Soldiers patrol danger zones and can stun predators, sacrificing themselves to protect the colony.',
+                stats: [
+                    { name: 'Speed', value: 'Slow', class: 'bad' },
+                    { name: 'Combat', value: '40% stun', class: 'good' },
+                    { name: 'Survival', value: '70%', class: '' },
+                    { name: 'Aggression', value: 'High', class: 'neutral' }
+                ],
+                traits: [
+                    { text: 'Brave', class: 'positive' },
+                    { text: 'Patrols Danger', class: 'special' },
+                    { text: 'May Die Fighting', class: 'negative' }
+                ]
+            },
+            scout: {
+                icon: '🔍',
+                title: 'Scout',
+                subtitle: 'Swift Explorer',
+                description: 'The fastest ants in the colony with exceptional senses. Scouts leave extra-strong pheromone trails, helping others find food quickly.',
+                stats: [
+                    { name: 'Speed', value: 'Fast', class: 'good' },
+                    { name: 'Pheromones', value: '2x Strong', class: 'good' },
+                    { name: 'Detection', value: '15 range', class: 'good' },
+                    { name: 'Wander', value: 'High', class: 'neutral' }
+                ],
+                traits: [
+                    { text: 'Swift', class: 'positive' },
+                    { text: 'Trail Blazer', class: 'special' },
+                    { text: 'Wide Explorer', class: 'positive' }
+                ]
+            },
+            carrier: {
+                icon: '💪',
+                title: 'Carrier',
+                subtitle: 'Heavy Lifter',
+                description: 'Larger, stronger ants bred for hauling. Though slower normally, carriers maintain better speed when carrying food back to the nest.',
+                stats: [
+                    { name: 'Speed', value: 'Slow', class: 'bad' },
+                    { name: 'Carry Speed', value: '+50%', class: 'good' },
+                    { name: 'Detection', value: '10 range', class: '' },
+                    { name: 'Size', value: 'Large', class: 'neutral' }
+                ],
+                traits: [
+                    { text: 'Strong', class: 'positive' },
+                    { text: 'Efficient Hauler', class: 'special' },
+                    { text: 'Slow Walker', class: 'negative' }
+                ]
+            },
+            queen: {
+                icon: '👑',
+                title: 'Queen',
+                subtitle: 'Colony Mother',
+                description: 'The heart of the colony. Queens stay near the nest and periodically spawn new worker ants for free, providing a steady stream of reinforcements.',
+                stats: [
+                    { name: 'Speed', value: 'Very Slow', class: 'bad' },
+                    { name: 'Spawns', value: '1 per 10s', class: 'good' },
+                    { name: 'Pheromones', value: '1.5x', class: '' },
+                    { name: 'Size', value: 'Largest', class: 'neutral' }
+                ],
+                traits: [
+                    { text: 'Royal', class: 'special' },
+                    { text: 'Spawns Workers', class: 'positive' },
+                    { text: 'Stays Near Nest', class: '' }
+                ]
+            }
+        };
+
+        const PREDATOR_CARD_DATA = {
+            spider: {
+                icon: '🕷️',
+                title: 'Spider',
+                subtitle: 'Ambush Predator',
+                description: 'A patient hunter that lurks in its territory. The spider waits for ants to wander too close, then strikes with deadly precision.',
+                stats: [
+                    { name: 'Danger', value: 'High', class: 'bad' },
+                    { name: 'Territory', value: 'Center', class: '' },
+                    { name: 'Style', value: 'Ambush', class: 'neutral' },
+                    { name: 'Reward', value: '2x Gold', class: 'good' }
+                ],
+                traits: [
+                    { text: 'Territorial', class: 'negative' },
+                    { text: 'Can Be Stunned', class: 'positive' },
+                    { text: 'Deadly Strike', class: 'negative' }
+                ]
+            },
+            bird: {
+                icon: '🐦',
+                title: 'Bird',
+                subtitle: 'Aerial Hunter',
+                description: 'A swift predator that swoops down from above. Birds are harder to predict but leave their territory periodically.',
+                stats: [
+                    { name: 'Danger', value: 'High', class: 'bad' },
+                    { name: 'Territory', value: 'Left', class: '' },
+                    { name: 'Style', value: 'Diving', class: 'neutral' },
+                    { name: 'Reward', value: '2x Gold', class: 'good' }
+                ],
+                traits: [
+                    { text: 'Fast', class: 'negative' },
+                    { text: 'Can Be Stunned', class: 'positive' },
+                    { text: 'Unpredictable', class: 'negative' }
+                ]
+            },
+            beetle: {
+                icon: '🪲',
+                title: 'Beetle',
+                subtitle: 'Armored Threat',
+                description: 'A tough, slow-moving predator with heavy armor. Beetles patrol their territory methodically, crushing any ant in their path.',
+                stats: [
+                    { name: 'Danger', value: 'Medium', class: 'neutral' },
+                    { name: 'Territory', value: 'Right', class: '' },
+                    { name: 'Style', value: 'Patrol', class: '' },
+                    { name: 'Reward', value: '2x Gold', class: 'good' }
+                ],
+                traits: [
+                    { text: 'Armored', class: 'negative' },
+                    { text: 'Can Be Stunned', class: 'positive' },
+                    { text: 'Slow Moving', class: 'positive' }
+                ]
+            }
+        };
+
+        // Helper to get stat class based on value comparison
+        function getStatClass(value, baseline) {
+            const ratio = value / baseline;
+            if (ratio >= 1.35) return 'legendary';
+            if (ratio >= 1.2) return 'exceptional';
+            if (ratio >= 1.05) return 'good';
+            if (ratio >= 0.95) return '';
+            if (ratio >= 0.85) return 'weak';
+            return 'poor';
+        }
+
+        // Generate dynamic card data for an individual ant
+        function generateAntCardData(ant) {
+            const baseData = ANT_CARD_DATA[ant.type];
+            const typeConfig = CONFIG.antTypes[ant.type];
+            const rank = getAntRank(ant.getTotalExp());
+
+            // Calculate actual numeric stats
+            const actualSpeed = ant.speed.toFixed(2);
+            const actualDetection = ant.foodDetectRadius.toFixed(1);
+            const actualEfficiency = (ant.carrySpeedBonus * 100).toFixed(0);
+
+            // Fourth stat varies by ant type
+            let fourthStat;
+            if (ant.type === 'soldier') {
+                const combatRating = Math.round((ant.fightChance * 100) * (1 - ant.fightDeathChance));
+                fourthStat = { name: 'Combat', value: combatRating, class: combatRating >= 35 ? 'good' : combatRating >= 25 ? '' : 'weak' };
+            } else if (ant.type === 'scout') {
+                const exploreRating = Math.round(ant.wanderStrength * 250);
+                fourthStat = { name: 'Explore', value: exploreRating, class: exploreRating >= 100 ? 'good' : '' };
+            } else if (ant.type === 'queen') {
+                fourthStat = { name: 'Royalty', value: '★★★', class: 'legendary' };
+            } else {
+                // Worker, Carrier - show resilience as a simple rating
+                const resRating = Math.round(ant.traitRolls.resilience * 100);
+                fourthStat = { name: 'Stamina', value: resRating, class: resRating >= 85 ? 'good' : resRating >= 50 ? '' : 'weak' };
+            }
+
+            // Build dynamic stats with real numbers
+            const stats = [
+                { name: 'Speed', value: actualSpeed, class: getStatClass(ant.speed, typeConfig.speed) },
+                { name: 'Carry Eff.', value: `${actualEfficiency}%`, class: getStatClass(ant.carrySpeedBonus, typeConfig.carrySpeedBonus) },
+                { name: 'Detection', value: actualDetection, class: getStatClass(ant.foodDetectRadius, typeConfig.foodDetectRadius) },
+                fourthStat
+            ];
+
+            // Build dynamic traits
+            const traits = [
+                { text: rank.title, class: rank.class }
+            ];
+
+            // Add experience-based traits
+            if (ant.experience.dangerDeliveries >= 10) {
+                traits.push({ text: 'Daredevil', class: 'exceptional' });
+            } else if (ant.experience.dangerDeliveries >= 5) {
+                traits.push({ text: 'Risk Taker', class: 'good' });
+            }
+
+            if (ant.experience.totalDeliveries >= 20) {
+                traits.push({ text: 'Hardworker', class: 'positive' });
+            }
+
+            if (ant.experience.predatorEscapes >= 3) {
+                traits.push({ text: 'Survivor', class: 'exceptional' });
+            }
+
+            // Add trait-based special labels
+            if (ant.traitRolls.speed >= 0.95) {
+                traits.push({ text: 'Lightning Fast', class: 'legendary' });
+            }
+            if (ant.traitRolls.detection >= 0.95) {
+                traits.push({ text: 'Eagle Eye', class: 'legendary' });
+            }
+
+            // Type indicator
+            traits.push({ text: baseData.title, class: '' });
+
+            // Build description with experience info
+            const expTotal = ant.getTotalExp();
+            let desc = baseData.description;
+            if (expTotal > 0) {
+                desc += ` Has delivered ${ant.experience.totalDeliveries} food items`;
+                if (ant.experience.dangerDeliveries > 0) {
+                    desc += ` (${ant.experience.dangerDeliveries} from danger zones)`;
+                }
+                desc += '.';
+            }
+
+            return {
+                icon: baseData.icon,
+                title: ant.name,
+                subtitle: `${rank.title} ${baseData.title} • EXP: ${expTotal}`,
+                description: desc,
+                stats: stats,
+                traits: traits
+            };
+        }
+
+        // Track update interval for real-time character card updates
+        let cardUpdateInterval = null;
+
+        // Stat tooltips explaining what each stat does
+        const STAT_TOOLTIPS = {
+            'Speed': 'Movement speed when exploring. Higher = faster foraging and escaping predators.',
+            'Carry Eff.': 'Speed retained when carrying food back to nest. Higher = faster deliveries.',
+            'Detection': 'Radius for detecting food sources. Higher = spots food from further away.',
+            'Combat': 'Fighting effectiveness against predators. Combines attack chance and survival.',
+            'Explore': 'Tendency to venture into unexplored areas. Scouts find new food sources faster.',
+            'Stamina': 'Overall endurance and resilience. Affects performance under pressure.',
+            'Royalty': 'The queen is the heart of the colony. Protect her at all costs!'
+        };
+
+        // Calculate bar percentage for a stat
+        function getStatBarPercent(statName, value, antType) {
+            const typeConfig = CONFIG.antTypes[antType] || CONFIG.antTypes.worker;
+            let baseline, max;
+
+            switch(statName) {
+                case 'Speed':
+                    baseline = typeConfig.speed;
+                    max = baseline * 1.5;
+                    return Math.min(100, (parseFloat(value) / max) * 100);
+                case 'Carry Eff.':
+                    baseline = typeConfig.carrySpeedBonus * 100;
+                    max = baseline * 1.5;
+                    return Math.min(100, (parseFloat(value) / max) * 100);
+                case 'Detection':
+                    baseline = typeConfig.foodDetectRadius;
+                    max = baseline * 1.5;
+                    return Math.min(100, (parseFloat(value) / max) * 100);
+                case 'Combat':
+                    return Math.min(100, parseFloat(value) * 2);  // Max combat ~50
+                case 'Explore':
+                    return Math.min(100, parseFloat(value));  // Already 0-100
+                case 'Stamina':
+                    return parseFloat(value);  // Already 0-100
+                case 'Royalty':
+                    return 100;  // Queens always 100%
+                default:
+                    return 50;
             }
         }
 
-        canvas.addEventListener('click', (e) => placeFood(e.clientX, e.clientY));
+        function showCharacterCard(data, ant = null) {
+            selectedAnt = ant;
+            const card = document.getElementById('character-card');
+
+            // Update basic info
+            document.getElementById('card-icon').textContent = data.icon;
+            document.getElementById('card-title').textContent = data.title;
+            document.getElementById('card-subtitle').textContent = data.subtitle;
+            document.getElementById('card-description').textContent = data.description;
+
+            // Update experience section (only for ants)
+            const expSection = document.getElementById('card-exp-section');
+            if (ant && ant.experience) {
+                expSection.style.display = 'block';
+                document.getElementById('exp-value').textContent = ant.getTotalExp();
+                document.getElementById('exp-details').innerHTML = `
+                    <div class="exp-detail">
+                        <span class="count">${ant.experience.totalDeliveries}</span> deliveries
+                    </div>
+                    <div class="exp-detail">
+                        <span class="count">${ant.experience.dangerDeliveries}</span> danger
+                    </div>
+                    <div class="exp-detail">
+                        <span class="count">${ant.experience.predatorEscapes}</span> escapes
+                    </div>
+                `;
+                document.getElementById('card-id').textContent = `ID: #${String(ant.id).padStart(3, '0')}`;
+            } else {
+                expSection.style.display = 'none';
+                document.getElementById('card-id').textContent = 'PREDATOR';
+            }
+
+            // Build stats HTML with bars and tooltips
+            let statsHtml = '';
+            for (const stat of data.stats) {
+                const tooltip = STAT_TOOLTIPS[stat.name] || '';
+                const barPercent = ant ? getStatBarPercent(stat.name, stat.value, ant.type) : 50;
+                const barClass = stat.class || 'default';
+
+                statsHtml += `<div class="stat-item">
+                    <div class="stat-header">
+                        <span class="stat-name">${stat.name}</span>
+                        <span class="stat-val ${stat.class}">${stat.value}</span>
+                    </div>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar ${barClass}" style="width: ${barPercent}%"></div>
+                    </div>
+                    ${tooltip ? `<div class="stat-tooltip">${tooltip}</div>` : ''}
+                </div>`;
+            }
+            document.getElementById('card-stats').innerHTML = statsHtml;
+
+            // Build traits HTML
+            let traitsHtml = '';
+            for (const trait of data.traits) {
+                traitsHtml += `<span class="trait-tag ${trait.class}">${trait.text}</span>`;
+            }
+            document.getElementById('card-traits').innerHTML = traitsHtml;
+
+            card.classList.remove('hidden');
+            characterCardOpen = true;
+
+            // Start real-time updates for ants
+            if (ant) {
+                if (cardUpdateInterval) clearInterval(cardUpdateInterval);
+                cardUpdateInterval = setInterval(() => {
+                    if (selectedAnt && characterCardOpen) {
+                        updateCardRealTime();
+                    }
+                }, 500);
+            }
+        }
+
+        // Real-time update function for the card
+        function updateCardRealTime() {
+            if (!selectedAnt || !characterCardOpen) return;
+
+            // Check if ant still exists
+            if (!ants.includes(selectedAnt)) {
+                closeCharacterCard();
+                return;
+            }
+
+            // Update experience values
+            document.getElementById('exp-value').textContent = selectedAnt.getTotalExp();
+            document.getElementById('exp-details').innerHTML = `
+                <div class="exp-detail">
+                    <span class="count">${selectedAnt.experience.totalDeliveries}</span> deliveries
+                </div>
+                <div class="exp-detail">
+                    <span class="count">${selectedAnt.experience.dangerDeliveries}</span> danger
+                </div>
+                <div class="exp-detail">
+                    <span class="count">${selectedAnt.experience.predatorEscapes}</span> escapes
+                </div>
+            `;
+
+            // Update subtitle with current rank
+            const rank = getAntRank(selectedAnt.getTotalExp());
+            const baseData = ANT_CARD_DATA[selectedAnt.type];
+            document.getElementById('card-subtitle').textContent =
+                `${rank.title} ${baseData.title}`;
+
+            // Update speed stat (can change with experience)
+            const speedStat = document.querySelector('.stat-item:first-child .stat-val');
+            if (speedStat) {
+                speedStat.textContent = selectedAnt.speed.toFixed(2);
+            }
+        }
+
+        function closeCharacterCard() {
+            document.getElementById('character-card').classList.add('hidden');
+            characterCardOpen = false;
+            selectedAnt = null;
+            if (cardUpdateInterval) {
+                clearInterval(cardUpdateInterval);
+                cardUpdateInterval = null;
+            }
+        }
+
+        function findClickedEntity(x, y) {
+            // Check predators first (larger click targets)
+            for (const key in predators) {
+                const p = predators[key];
+                if (!p) continue;
+                const dist = Math.hypot(p.x - x, p.y - y);
+                if (dist < 30) {
+                    return { type: 'predator', key: key };
+                }
+            }
+
+            // Check ants
+            for (const ant of ants) {
+                const dist = Math.hypot(ant.x - x, ant.y - y);
+                if (dist < 15) {
+                    return { type: 'ant', ant: ant };
+                }
+            }
+
+            return null;
+        }
+
+        function findAntsInRect(x1, y1, x2, y2) {
+            // Normalize rectangle coordinates
+            const left = Math.min(x1, x2);
+            const right = Math.max(x1, x2);
+            const top = Math.min(y1, y2);
+            const bottom = Math.max(y1, y2);
+
+            const foundAnts = [];
+            for (const ant of ants) {
+                if (ant.x >= left && ant.x <= right && ant.y >= top && ant.y <= bottom) {
+                    foundAnts.push(ant);
+                }
+            }
+            return foundAnts;
+        }
+
+        function drawSelectionRect() {
+            if (!isDragging) return;
+
+            const left = Math.min(dragStartX, dragCurrentX);
+            const top = Math.min(dragStartY, dragCurrentY);
+            const right = Math.max(dragStartX, dragCurrentX);
+            const bottom = Math.max(dragStartY, dragCurrentY);
+            const w = right - left;
+            const h = bottom - top;
+
+            if (w < dragThreshold && h < dragThreshold) return;
+
+            ctx.save();
+
+            // Semi-transparent fill
+            ctx.fillStyle = 'rgba(0, 255, 136, 0.1)';
+            ctx.fillRect(left, top, w, h);
+
+            // Animated dashed border
+            ctx.strokeStyle = '#00ff88';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 4]);
+            ctx.lineDashOffset = -Date.now() / 50;
+            ctx.strokeRect(left, top, w, h);
+
+            // Corner accents
+            const cornerSize = 12;
+            ctx.setLineDash([]);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#00ff88';
+            ctx.shadowColor = '#00ff88';
+            ctx.shadowBlur = 8;
+
+            // Top-left corner
+            ctx.beginPath();
+            ctx.moveTo(left, top + cornerSize);
+            ctx.lineTo(left, top);
+            ctx.lineTo(left + cornerSize, top);
+            ctx.stroke();
+
+            // Top-right corner
+            ctx.beginPath();
+            ctx.moveTo(right - cornerSize, top);
+            ctx.lineTo(right, top);
+            ctx.lineTo(right, top + cornerSize);
+            ctx.stroke();
+
+            // Bottom-left corner
+            ctx.beginPath();
+            ctx.moveTo(left, bottom - cornerSize);
+            ctx.lineTo(left, bottom);
+            ctx.lineTo(left + cornerSize, bottom);
+            ctx.stroke();
+
+            // Bottom-right corner
+            ctx.beginPath();
+            ctx.moveTo(right - cornerSize, bottom);
+            ctx.lineTo(right, bottom);
+            ctx.lineTo(right, bottom - cornerSize);
+            ctx.stroke();
+
+            // Show count of ants in selection
+            const antsInRect = findAntsInRect(dragStartX, dragStartY, dragCurrentX, dragCurrentY);
+            if (antsInRect.length > 0) {
+                ctx.shadowBlur = 12;
+                ctx.fillStyle = 'rgba(0, 20, 10, 0.9)';
+                ctx.font = 'bold 14px "Orbitron", monospace';
+                const text = `${antsInRect.length} ANT${antsInRect.length > 1 ? 'S' : ''}`;
+                const metrics = ctx.measureText(text);
+                const padding = 8;
+                const boxWidth = metrics.width + padding * 2;
+                const boxHeight = 24;
+                const boxX = left + w / 2 - boxWidth / 2;
+                const boxY = top - boxHeight - 8;
+
+                // Background
+                ctx.fillStyle = 'rgba(0, 20, 10, 0.95)';
+                ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+
+                // Text
+                ctx.fillStyle = '#00ff88';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, left + w / 2, boxY + boxHeight / 2);
+            }
+
+            ctx.restore();
+        }
+
+        function placeFood(x, y) {
+            // Only place food if placement mode is active
+            if (!foodPlacementActive || !selectedFoodType) return false;
+
+            const now = Date.now();
+            const minInterval = selectedFoodType === 'sugar' ? 100 : 200;
+            if (now - lastPlaceTime < minInterval) return false;
+            lastPlaceTime = now;
+
+            const distToNest = Math.hypot(x - CONFIG.nestX, y - CONFIG.nestY);
+            if (distToNest < getColonySize() * 1.5) return false;
+
+            if (addFood(x, y, selectedFoodType)) {
+                showHint = false;
+                // Reset the timeout when food is placed
+                if (foodPlacementTimeout) {
+                    clearTimeout(foodPlacementTimeout);
+                    foodPlacementTimeout = setTimeout(() => {
+                        deactivateFoodPlacement();
+                    }, 10000);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        let wasDragging = false; // Track if we just finished a drag
 
         canvas.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            isPlacing = true;
-            placeFood(e.clientX, e.clientY);
+
+            // If card is open, close it and don't start drag
+            if (characterCardOpen) {
+                closeCharacterCard();
+                return;
+            }
+
+            // If food placement is active, handle food placement mode
+            if (foodPlacementActive) {
+                isPlacing = true;
+                placeFood(e.clientX, e.clientY);
+                return;
+            }
+
+            // Start potential drag selection
+            isDragging = true;
+            wasDragging = false;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragCurrentX = e.clientX;
+            dragCurrentY = e.clientY;
         });
 
         canvas.addEventListener('mousemove', (e) => {
-            if (isPlacing) placeFood(e.clientX, e.clientY);
+            // Handle food placement drag
+            if (isPlacing && foodPlacementActive) {
+                placeFood(e.clientX, e.clientY);
+                return;
+            }
+
+            // Handle selection drag
+            if (isDragging) {
+                dragCurrentX = e.clientX;
+                dragCurrentY = e.clientY;
+
+                // Check if we've exceeded the threshold to be considered a drag
+                const dx = dragCurrentX - dragStartX;
+                const dy = dragCurrentY - dragStartY;
+                if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) {
+                    wasDragging = true;
+                }
+            }
         });
 
-        canvas.addEventListener('mouseup', () => isPlacing = false);
-        canvas.addEventListener('mouseleave', () => isPlacing = false);
+        canvas.addEventListener('mouseup', (e) => {
+            isPlacing = false;
+
+            if (isDragging) {
+                isDragging = false;
+
+                // Check if this was a significant drag
+                const dx = dragCurrentX - dragStartX;
+                const dy = dragCurrentY - dragStartY;
+                const wasDragSelection = Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold;
+
+                if (wasDragSelection) {
+                    // Find ants in selection rectangle
+                    const selectedAnts = findAntsInRect(dragStartX, dragStartY, dragCurrentX, dragCurrentY);
+                    if (selectedAnts.length > 0) {
+                        // Select a random ant from the selection (more interesting than always first)
+                        const randomAnt = selectedAnts[Math.floor(Math.random() * selectedAnts.length)];
+                        showCharacterCard(generateAntCardData(randomAnt), randomAnt);
+                    }
+                    wasDragging = false;
+                    return;
+                }
+            }
+
+            // Only process click if we weren't dragging
+            if (!wasDragging && !foodPlacementActive) {
+                const entity = findClickedEntity(e.clientX, e.clientY);
+                if (entity) {
+                    if (entity.type === 'ant') {
+                        showCharacterCard(generateAntCardData(entity.ant), entity.ant);
+                    } else if (entity.type === 'predator') {
+                        showCharacterCard(PREDATOR_CARD_DATA[entity.key], null);
+                    }
+                }
+            }
+            wasDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isPlacing = false;
+            isDragging = false;
+            wasDragging = false;
+        });
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            isPlacing = true;
-            placeFood(e.touches[0].clientX, e.touches[0].clientY);
+
+            // If card is open, close it on any touch
+            if (characterCardOpen) {
+                closeCharacterCard();
+                return;
+            }
+
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+
+            // If food placement is active, place food
+            if (foodPlacementActive) {
+                isPlacing = true;
+                placeFood(touchX, touchY);
+                return;
+            }
+
+            // Check if touching an entity (only when not placing food)
+            const entity = findClickedEntity(touchX, touchY);
+            if (entity) {
+                if (entity.type === 'ant') {
+                    showCharacterCard(generateAntCardData(entity.ant), entity.ant);
+                } else if (entity.type === 'predator') {
+                    showCharacterCard(PREDATOR_CARD_DATA[entity.key], null);
+                }
+                return;
+            }
         });
 
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if (isPlacing) placeFood(e.touches[0].clientX, e.touches[0].clientY);
+            if (isPlacing && foodPlacementActive && !characterCardOpen) placeFood(e.touches[0].clientX, e.touches[0].clientY);
         });
 
         canvas.addEventListener('touchend', () => isPlacing = false);
@@ -2592,11 +3969,41 @@
             if (predators.bird) predators.bird.update();
             if (predators.beetle) predators.beetle.update();
             decayPheromones();
-            updateColonyGrowth();
             updateAmbientParticles();
             updateSpawnNotifications();
+            updateFoodTimers();
+        }
 
-            // Removed random spawning - ants now spawn only when food is delivered
+        // Track spoiled food IDs this frame
+        let spoiledFoodIds = new Set();
+
+        function updateFoodTimers() {
+            spoiledFoodIds.clear();
+
+            // Update all food items and collect spoiled ones
+            for (let i = foodItems.length - 1; i >= 0; i--) {
+                const food = foodItems[i];
+                food.update();
+
+                if (food.spoiled) {
+                    spoiledFoodIds.add(food.id);
+                    foodItems.splice(i, 1);
+                }
+            }
+
+            // If any food spoiled, remove carried pieces from that food
+            if (spoiledFoodIds.size > 0) {
+                for (const ant of ants) {
+                    if (ant.carriedFoodPiece && spoiledFoodIds.has(ant.carriedFoodPiece.sourceFoodId)) {
+                        // Food went bad - drop the carried piece
+                        ant.carriedFoodPiece = null;
+                        ant.carriedFoodValue = 0;
+                        ant.targetFood = null;
+                        ant.state = 'exploring';
+                        ant.foundFoodRecently = false;
+                    }
+                }
+            }
         }
 
         function drawHint() {
@@ -2634,6 +4041,7 @@
             drawAmbientParticles();
             drawSpawnNotifications();
             drawHint();
+            drawSelectionRect(); // Draw selection rectangle on top
         }
 
         function gameLoop() {
