@@ -6,7 +6,7 @@
     <title>Ant Colony - hafnr</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,19 +15,21 @@
         }
 
         :root {
-            --bg: #1a1a12;
-            --surface: #252518;
-            --border: #3a3a28;
-            --text: #e8e4d8;
-            --text-muted: #a8a090;
-            --accent: #c4a060;
+            --bg: #1a2418;
+            --surface: rgba(28, 32, 26, 0.92);
+            --border: rgba(100, 120, 80, 0.3);
+            --text: #f0ebe0;
+            --text-muted: #a8b0a0;
+            --accent: #b8d468;
+            --accent-glow: rgba(184, 212, 104, 0.15);
+            --gold: #f4d03f;
         }
 
         body {
             background: var(--bg);
             min-height: 100vh;
             min-height: 100dvh;
-            font-family: 'Crimson Pro', Georgia, serif;
+            font-family: 'Playfair Display', Georgia, serif;
             color: var(--text);
             overflow: hidden;
             touch-action: none;
@@ -47,126 +49,191 @@
 
         .ui-overlay {
             position: fixed;
-            top: 16px;
-            left: 16px;
+            top: 20px;
+            left: 20px;
             z-index: 100;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
         .back-link {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 14px;
-            padding: 10px 14px;
-            background: rgba(20, 20, 15, 0.85);
-            border: 1px solid rgba(100, 90, 70, 0.3);
-            border-radius: 6px;
-            backdrop-filter: blur(12px);
-            transition: all 0.2s ease;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            font-size: 13px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            backdrop-filter: blur(16px);
+            transition: all 0.25s ease;
+            font-family: 'DM Mono', monospace;
             letter-spacing: 0.5px;
         }
 
         .back-link:hover {
             color: var(--text);
-            background: rgba(30, 30, 20, 0.9);
-            border-color: rgba(140, 120, 80, 0.4);
+            background: rgba(35, 40, 32, 0.95);
+            border-color: rgba(120, 160, 80, 0.4);
+            transform: translateX(-2px);
         }
 
         .info-panel {
-            background: rgba(20, 20, 15, 0.85);
-            border: 1px solid rgba(100, 90, 70, 0.3);
-            backdrop-filter: blur(12px);
-            border-radius: 8px;
-            padding: 16px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            padding: 20px 22px;
             font-size: 14px;
             color: var(--text-muted);
-            max-width: 240px;
+            max-width: 220px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .info-panel h3 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
             font-weight: 500;
             color: var(--accent);
-            margin-bottom: 12px;
-            letter-spacing: 2px;
+            margin-bottom: 16px;
+            letter-spacing: 3px;
             text-transform: uppercase;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            align-items: center;
+            margin-bottom: 10px;
             font-size: 13px;
+        }
+
+        .stat-label {
+            opacity: 0.7;
         }
 
         .stat-value {
             color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'DM Mono', monospace;
             font-weight: 500;
+            font-size: 14px;
+        }
+
+        .stat-value.coins {
+            color: var(--gold);
+        }
+
+        .ant-breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 12px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+        }
+
+        .ant-type {
+            padding: 2px 8px;
+            border-radius: 4px;
+            opacity: 0.9;
+        }
+
+        .ant-type.worker {
+            background: rgba(139, 90, 43, 0.3);
+            color: #c9a060;
+        }
+
+        .ant-type.soldier {
+            background: rgba(170, 60, 50, 0.3);
+            color: #e08070;
+        }
+
+        .ant-type.scout {
+            background: rgba(180, 140, 60, 0.3);
+            color: #e0c080;
+        }
+
+        .ant-type.carrier {
+            background: rgba(100, 80, 60, 0.3);
+            color: #c0a080;
+        }
+
+        .ant-type.queen {
+            background: rgba(200, 150, 100, 0.3);
+            color: #f0d0a0;
         }
 
         .instructions {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid rgba(100, 90, 70, 0.2);
-            line-height: 1.6;
-            font-size: 13px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            line-height: 1.7;
+            font-size: 12px;
             font-style: italic;
-            color: rgba(168, 160, 144, 0.8);
+            color: rgba(168, 176, 160, 0.75);
         }
 
-        .food-selector {
+        .bottom-ui {
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 6px;
-            background: rgba(20, 20, 15, 0.9);
-            border: 1px solid rgba(100, 90, 70, 0.3);
-            backdrop-filter: blur(12px);
-            border-radius: 10px;
-            padding: 10px 14px;
+            flex-direction: column;
+            gap: 8px;
             z-index: 100;
-            align-items: center;
         }
 
-        .food-label {
+        .food-selector, .ant-selector {
+            display: flex;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+            border-radius: 14px;
+            padding: 12px 18px;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .food-label, .ant-label {
             color: var(--text-muted);
-            font-size: 12px;
-            margin-right: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.5px;
+            font-size: 11px;
+            margin-right: 10px;
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            min-width: 45px;
         }
 
         .food-btn {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border: 2px solid transparent;
-            border-radius: 8px;
-            background: rgba(60, 50, 35, 0.4);
+            border-radius: 10px;
+            background: rgba(50, 60, 45, 0.4);
             cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            gap: 2px;
         }
 
         .food-btn::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 60%);
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), transparent 60%);
             opacity: 0;
             transition: opacity 0.2s;
         }
@@ -176,24 +243,89 @@
         }
 
         .food-btn:hover {
-            background: rgba(80, 70, 50, 0.5);
-            transform: translateY(-2px);
+            background: rgba(70, 80, 60, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .food-btn.active {
             border-color: var(--accent);
-            background: rgba(100, 80, 50, 0.4);
-            box-shadow: 0 0 20px rgba(196, 160, 96, 0.2);
+            background: rgba(80, 100, 60, 0.45);
+            box-shadow: 0 0 24px var(--accent-glow), inset 0 0 20px var(--accent-glow);
         }
 
-        .food-btn span {
-            font-size: 22px;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        .food-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .food-btn span.emoji {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+        }
+
+        .food-btn span.cost, .ant-btn span.cost {
+            font-size: 9px;
+            font-family: 'DM Mono', monospace;
+            color: var(--gold);
+            opacity: 0.9;
+        }
+
+        .ant-btn {
+            width: 52px;
+            height: 52px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            background: rgba(60, 50, 45, 0.4);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            gap: 2px;
+        }
+
+        .ant-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .ant-btn:hover::before {
+            opacity: 1;
+        }
+
+        .ant-btn:hover {
+            background: rgba(80, 70, 60, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .ant-btn:active {
+            transform: translateY(-1px) scale(0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .ant-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .ant-btn span.emoji {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
         }
 
         @media (max-width: 600px) {
             .info-panel {
-                display: none;
+                max-width: 180px;
+                padding: 14px 16px;
             }
 
             .ui-overlay {
@@ -201,17 +333,30 @@
                 left: 12px;
             }
 
-            .food-selector {
+            .bottom-ui {
                 bottom: 12px;
-                padding: 8px 10px;
+                gap: 6px;
             }
 
-            .food-btn {
+            .food-selector, .ant-selector {
+                padding: 8px 12px;
+                gap: 6px;
+            }
+
+            .food-btn, .ant-btn {
                 width: 42px;
                 height: 42px;
             }
 
-            .food-label {
+            .food-btn span.emoji, .ant-btn span.emoji {
+                font-size: 16px;
+            }
+
+            .food-btn span.cost, .ant-btn span.cost {
+                font-size: 8px;
+            }
+
+            .food-label, .ant-label {
                 display: none;
             }
         }
@@ -230,190 +375,490 @@
         <div class="info-panel">
             <h3>Ant Colony</h3>
             <div class="stat-row">
-                <span>Colony level</span>
+                <span class="stat-label">Coins</span>
+                <span class="stat-value coins" id="coins">50</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Colony level</span>
                 <span class="stat-value" id="colony-level">1</span>
             </div>
             <div class="stat-row">
-                <span>Population</span>
+                <span class="stat-label">Population</span>
                 <span class="stat-value" id="ant-count">0</span>
             </div>
+            <div class="ant-breakdown">
+                <span class="ant-type worker" id="worker-count" title="Workers">0</span>
+                <span class="ant-type soldier" id="soldier-count" title="Soldiers">0</span>
+                <span class="ant-type scout" id="scout-count" title="Scouts">0</span>
+                <span class="ant-type carrier" id="carrier-count" title="Carriers">0</span>
+                <span class="ant-type queen" id="queen-count" title="Queens">0</span>
+            </div>
             <div class="stat-row">
-                <span>Food stored</span>
+                <span class="stat-label">Food stored</span>
                 <span class="stat-value" id="food-collected">0</span>
             </div>
-            <div class="stat-row">
-                <span>Food nearby</span>
-                <span class="stat-value" id="food-available">0</span>
-            </div>
             <div class="instructions">
-                Drop morsels on the forest floor and observe the colony at work.
+                Drop food to earn coins when ants bring it back. Spawn different ant types using the bottom panel!
             </div>
         </div>
     </div>
 
-    <div class="food-selector">
-        <span class="food-label">drop:</span>
-        <button class="food-btn active" data-food="crumb" title="Breadcrumb">
-            <span>🍞</span>
-        </button>
-        <button class="food-btn" data-food="morsel" title="Apple piece">
-            <span>🍎</span>
-        </button>
-        <button class="food-btn" data-food="chunk" title="Cookie">
-            <span>🍪</span>
-        </button>
-        <button class="food-btn" data-food="feast" title="Sandwich">
-            <span>🥪</span>
-        </button>
+    <div class="bottom-ui">
+        <div class="food-selector">
+            <span class="food-label">drop</span>
+            <button class="food-btn active" data-food="sugar" data-cost="1" title="Sugar - 1 gold per unit">
+                <span class="emoji">🍬</span>
+                <span class="cost">1</span>
+            </button>
+            <button class="food-btn" data-food="protein" data-cost="5" title="Protein - 1 gold per unit">
+                <span class="emoji">🍖</span>
+                <span class="cost">5</span>
+            </button>
+            <button class="food-btn" data-food="fruit" data-cost="15" title="Fruit - 1 gold per unit">
+                <span class="emoji">🍇</span>
+                <span class="cost">15</span>
+            </button>
+            <button class="food-btn" data-food="feast" data-cost="40" title="Feast - 1 gold per unit">
+                <span class="emoji">🍯</span>
+                <span class="cost">40</span>
+            </button>
+            <button class="food-btn" data-food="nectar" data-cost="100" title="Nectar - 1 gold per unit">
+                <span class="emoji">🌸</span>
+                <span class="cost">100</span>
+            </button>
+        </div>
+        <div class="ant-selector">
+            <span class="ant-label">spawn</span>
+            <button class="ant-btn" data-ant="worker" title="Worker - Balanced ant">
+                <span class="emoji">🐜</span>
+                <span class="cost" id="worker-cost">5</span>
+            </button>
+            <button class="ant-btn" data-ant="soldier" title="Soldier - Fights predators">
+                <span class="emoji">⚔️</span>
+                <span class="cost" id="soldier-cost">15</span>
+            </button>
+            <button class="ant-btn" data-ant="scout" title="Scout - Fast explorer">
+                <span class="emoji">🔍</span>
+                <span class="cost" id="scout-cost">25</span>
+            </button>
+            <button class="ant-btn" data-ant="carrier" title="Carrier - High carry capacity">
+                <span class="emoji">💪</span>
+                <span class="cost" id="carrier-cost">40</span>
+            </button>
+            <button class="ant-btn" data-ant="queen" title="Queen - Spawns workers over time">
+                <span class="emoji">👑</span>
+                <span class="cost" id="queen-cost">80</span>
+            </button>
+        </div>
     </div>
 
     <script>
-        // ===========================================
-        // ANT COLONY SIMULATION
-        // Forest floor aesthetic with realistic behavior
-        // ===========================================
-
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
-        // High DPI support
         let dpr = window.devicePixelRatio || 1;
         let width = window.innerWidth;
         let height = window.innerHeight;
+        let time = 0;
 
         // ===========================================
         // CONFIGURATION
         // ===========================================
 
         const CONFIG = {
-            // Colony
             nestX: 0,
             nestY: 0,
-            nestRadius: 35,
+            nestRadius: 40,
             initialAnts: 50,
-            maxAnts: 250,
+            maxAnts: 300,
 
-            // Ant properties
             antSpeed: 0.7,
             antSize: 6,
             carryCapacity: 8,
-            dragThreshold: 3,
             turnRate: 0.15,
             wanderStrength: 0.25,
 
-            // Pheromones
             pheromoneGridSize: 10,
             pheromoneDecay: 0.996,
             pheromoneDeposit: 1.2,
             pheromoneMax: 255,
             pheromoneFollowStrength: 0.35,
 
-            // Food types with realistic properties
+            // Food types with costs and rewards (no ant spawning - ants are bought separately)
             foodTypes: {
-                crumb:  { weight: 1, radius: 3, value: 1, name: 'breadcrumb' },
-                morsel: { weight: 4, radius: 5, value: 4, name: 'apple' },
-                chunk:  { weight: 12, radius: 8, value: 10, name: 'cookie' },
-                feast:  { weight: 35, radius: 14, value: 30, name: 'sandwich' }
+                sugar:   { size: 1, baseRadius: 12, value: 1, cost: 1, name: 'sugar', emoji: '🍬' },
+                protein: { size: 5, baseRadius: 16, value: 1, cost: 5, name: 'protein', emoji: '🍖' },
+                fruit:   { size: 15, baseRadius: 20, value: 1, cost: 15, name: 'fruit', emoji: '🍇' },
+                feast:   { size: 40, baseRadius: 26, value: 1, cost: 40, name: 'feast', emoji: '🍯' },
+                nectar:  { size: 100, baseRadius: 32, value: 1, cost: 100, name: 'nectar', emoji: '🌸' }
             },
 
-            // Recruitment
-            recruitmentRadius: 50,
-            recruitmentChance: 0.015,
+            // Ant types that can be spawned (costs scale up)
+            antSpawnCosts: {
+                worker:   { baseCost: 5, emoji: '🐜', description: 'Balanced worker ant' },
+                soldier:  { baseCost: 15, emoji: '⚔️', description: 'Fights predators' },
+                scout:    { baseCost: 25, emoji: '🔍', description: 'Fast explorer' },
+                carrier:  { baseCost: 40, emoji: '💪', description: 'High carry capacity' },
+                queen:    { baseCost: 80, emoji: '👑', description: 'Spawns workers over time' }
+            },
+
+            // Ant types with their stats
+            antTypes: {
+                worker: {
+                    color: { r: 50, g: 30, b: 18 },
+                    speed: 0.7,
+                    carryCapacity: 10,
+                    carrySpeedBonus: 1.2,  // Less slowdown when carrying
+                    fightChance: 0,
+                    pheromoneStrength: 1,
+                    foodDetectRadius: 8
+                },
+                soldier: {
+                    color: { r: 85, g: 25, b: 20 },
+                    speed: 0.6,
+                    carryCapacity: 6,
+                    carrySpeedBonus: 1,
+                    fightChance: 0.4,
+                    fightDeathChance: 0.3,
+                    pheromoneStrength: 0.8,
+                    foodDetectRadius: 8
+                },
+                scout: {
+                    color: { r: 90, g: 65, b: 25 },
+                    speed: 1.0,
+                    carryCapacity: 4,
+                    carrySpeedBonus: 1,
+                    fightChance: 0,
+                    pheromoneStrength: 2,
+                    foodDetectRadius: 15,
+                    wanderStrength: 0.4
+                },
+                carrier: {
+                    color: { r: 60, g: 45, b: 30 },
+                    speed: 0.5,
+                    carryCapacity: 25,
+                    carrySpeedBonus: 1.5,  // Much less slowdown when carrying
+                    fightChance: 0,
+                    pheromoneStrength: 0.6,
+                    foodDetectRadius: 10,
+                    size: 1.3  // Slightly larger
+                },
+                queen: {
+                    color: { r: 100, g: 70, b: 50 },
+                    speed: 0.3,
+                    carryCapacity: 2,
+                    carrySpeedBonus: 1,
+                    fightChance: 0,
+                    pheromoneStrength: 1.5,
+                    foodDetectRadius: 6,
+                    size: 1.6,  // Larger
+                    spawnInterval: 600,  // Spawn a worker every 10 seconds
+                    staysNearNest: true
+                }
+            },
+
+            // Predator territories
+            predators: {
+                spider: {
+                    x: 0, y: 0, radius: 120,
+                    multiplier: 3,
+                    color: { r: 80, g: 20, b: 20 },
+                    label: 'SPIDER ZONE',
+                    huntRadius: 100,
+                    killRadius: 12,
+                    speed: 1.8
+                },
+                bird: {
+                    x: 0, y: 0, radius: 100,
+                    multiplier: 5,
+                    color: { r: 70, g: 40, b: 90 },
+                    label: 'BIRD ZONE',
+                    swoopInterval: [240, 420],
+                    swoopSpeed: 12,
+                    killRadius: 25,
+                    warningTime: 90
+                },
+                beetle: {
+                    x: 0, y: 0, radius: 90,
+                    multiplier: 2,
+                    color: { r: 50, g: 70, b: 35 },
+                    label: 'BEETLE ZONE',
+                    patrolSpeed: 0.5,
+                    killRadius: 20,
+                    blockRadius: 35
+                }
+            }
         };
 
-        CONFIG.nestX = width * 0.5;
-        CONFIG.nestY = height * 0.6;
+        // ===========================================
+        // CURRENCY SYSTEM
+        // ===========================================
+
+        let coins = 50;
+
+        function canAfford(cost) {
+            return coins >= cost;
+        }
+
+        function spendCoins(amount) {
+            if (coins >= amount) {
+                coins -= amount;
+                updateUI();
+                return true;
+            }
+            return false;
+        }
+
+        function earnCoins(amount) {
+            coins += amount;
+            updateUI();
+        }
+
+        function isInDangerZone(x, y) {
+            for (const key in CONFIG.predators) {
+                const p = CONFIG.predators[key];
+                if (Math.hypot(x - p.x, y - p.y) < p.radius) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function getDangerZoneMultiplier(x, y) {
+            let maxMultiplier = 1;
+            for (const key in CONFIG.predators) {
+                const p = CONFIG.predators[key];
+                if (Math.hypot(x - p.x, y - p.y) < p.radius) {
+                    maxMultiplier = Math.max(maxMultiplier, p.multiplier);
+                }
+            }
+            return maxMultiplier;
+        }
+
+        function isNearBeetle(x, y) {
+            const beetle = predators.beetle;
+            if (!beetle) return false;
+            return Math.hypot(x - beetle.x, y - beetle.y) < CONFIG.predators.beetle.blockRadius;
+        }
 
         // ===========================================
-        // FOREST FLOOR DECORATION
+        // SPAWN NOTIFICATIONS
+        // ===========================================
+
+        let spawnNotifications = [];
+
+        function addSpawnNotification(antType) {
+            const typeNames = {
+                worker: 'Worker',
+                soldier: 'Soldier',
+                scout: 'Scout',
+                carrier: 'Carrier',
+                queen: 'Queen'
+            };
+            const typeColors = {
+                worker: 'rgba(139, 90, 43, 0.9)',
+                soldier: 'rgba(170, 60, 50, 0.9)',
+                scout: 'rgba(180, 140, 60, 0.9)',
+                carrier: 'rgba(100, 80, 60, 0.9)',
+                queen: 'rgba(200, 150, 100, 0.9)'
+            };
+            spawnNotifications.push({
+                text: `${typeNames[antType]} spawned!`,
+                color: typeColors[antType],
+                x: CONFIG.nestX,
+                y: CONFIG.nestY - getColonySize() - 20,
+                alpha: 1,
+                life: 90
+            });
+        }
+
+        function updateSpawnNotifications() {
+            for (let i = spawnNotifications.length - 1; i >= 0; i--) {
+                const notif = spawnNotifications[i];
+                notif.y -= 0.5;
+                notif.life--;
+                notif.alpha = notif.life / 90;
+                if (notif.life <= 0) {
+                    spawnNotifications.splice(i, 1);
+                }
+            }
+        }
+
+        function drawSpawnNotifications() {
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 12px "DM Mono", monospace';
+            for (const notif of spawnNotifications) {
+                ctx.fillStyle = notif.color.replace('0.9', notif.alpha.toFixed(2));
+                ctx.fillText(notif.text, notif.x, notif.y);
+            }
+        }
+
+        // ===========================================
+        // AMBIENT PARTICLES
+        // ===========================================
+
+        let dustMotes = [];
+
+        function initAmbientParticles() {
+            dustMotes = [];
+            const numDust = Math.floor((width * height) / 25000);
+            for (let i = 0; i < numDust; i++) {
+                dustMotes.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: 0.5 + Math.random() * 1.5,
+                    alpha: 0.08 + Math.random() * 0.15,
+                    speed: 0.08 + Math.random() * 0.15,
+                    wobble: Math.random() * Math.PI * 2,
+                    wobbleSpeed: 0.008 + Math.random() * 0.015
+                });
+            }
+        }
+
+        function updateAmbientParticles() {
+            for (const dust of dustMotes) {
+                dust.wobble += dust.wobbleSpeed;
+                dust.y -= dust.speed * 0.3;
+                dust.x += Math.sin(dust.wobble) * 0.25;
+                if (dust.y < -10) {
+                    dust.y = height + 10;
+                    dust.x = Math.random() * width;
+                }
+            }
+        }
+
+        function drawAmbientParticles() {
+            for (const dust of dustMotes) {
+                const gradient = ctx.createRadialGradient(dust.x, dust.y, 0, dust.x, dust.y, dust.size * 2);
+                gradient.addColorStop(0, `rgba(255, 250, 220, ${dust.alpha})`);
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(dust.x, dust.y, dust.size * 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // ===========================================
+        // GRASS SYSTEM - Reduced density
+        // ===========================================
+
+        let grassClusters = [];
+
+        function generateGrass() {
+            grassClusters = [];
+            const numClusters = Math.floor((width * height) / 50000); // Reduced from 25000
+
+            for (let i = 0; i < numClusters; i++) {
+                const clusterX = Math.random() * width;
+                const clusterY = Math.random() * height;
+
+                const distToNest = Math.hypot(clusterX - CONFIG.nestX, clusterY - CONFIG.nestY);
+                if (distToNest < CONFIG.nestRadius * 3) continue;
+
+                const cluster = {
+                    x: clusterX,
+                    y: clusterY,
+                    blades: []
+                };
+
+                const numBlades = 4 + Math.floor(Math.random() * 5); // Reduced blades per cluster
+                for (let j = 0; j < numBlades; j++) {
+                    cluster.blades.push({
+                        offsetX: (Math.random() - 0.5) * 15,
+                        offsetY: (Math.random() - 0.5) * 6,
+                        height: 12 + Math.random() * 20,
+                        width: 1.5 + Math.random() * 1,
+                        curve: (Math.random() - 0.5) * 0.5,
+                        phase: Math.random() * Math.PI * 2,
+                        swaySpeed: 0.012 + Math.random() * 0.008,
+                        swayAmount: 0.015 + Math.random() * 0.02,
+                        color: `hsl(${95 + Math.random() * 25}, ${35 + Math.random() * 20}%, ${28 + Math.random() * 15}%)`
+                    });
+                }
+
+                grassClusters.push(cluster);
+            }
+        }
+
+        function drawGrass() {
+            for (const cluster of grassClusters) {
+                for (const blade of cluster.blades) {
+                    const x = cluster.x + blade.offsetX;
+                    const y = cluster.y + blade.offsetY;
+                    const sway = Math.sin(time * blade.swaySpeed + blade.phase) * blade.swayAmount * blade.height;
+
+                    ctx.save();
+                    ctx.strokeStyle = blade.color;
+                    ctx.lineWidth = blade.width;
+                    ctx.lineCap = 'round';
+
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+
+                    const cp1x = x + blade.curve * blade.height * 0.5 + sway * 0.3;
+                    const cp1y = y - blade.height * 0.5;
+                    const cp2x = x + blade.curve * blade.height + sway;
+                    const cp2y = y - blade.height * 0.85;
+                    const endX = x + blade.curve * blade.height * 1.2 + sway * 1.2;
+                    const endY = y - blade.height;
+
+                    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endX, endY);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }
+
+        // ===========================================
+        // FOREST FLOOR - Reduced clutter
         // ===========================================
 
         let forestElements = [];
 
         function generateForestElements() {
             forestElements = [];
-            const numElements = Math.floor((width * height) / 8000);
+            const numElements = Math.floor((width * height) / 30000); // Reduced from 12000
 
             for (let i = 0; i < numElements; i++) {
                 const type = Math.random();
                 let element;
 
-                if (type < 0.3) {
+                if (type < 0.4) {
                     // Fallen leaf
                     element = {
                         type: 'leaf',
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        size: 8 + Math.random() * 15,
+                        size: 8 + Math.random() * 12,
                         rotation: Math.random() * Math.PI * 2,
-                        color: ['#5a4020', '#6b4a25', '#4a3518', '#7a5530', '#8b6040'][Math.floor(Math.random() * 5)],
-                        alpha: 0.3 + Math.random() * 0.4
+                        color: ['#5a6040', '#6b7050', '#4a5535', '#7a8560'][Math.floor(Math.random() * 4)],
+                        alpha: 0.3 + Math.random() * 0.25
                     };
-                } else if (type < 0.5) {
-                    // Small pebble
+                } else if (type < 0.7) {
+                    // Pebble
                     element = {
                         type: 'pebble',
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        size: 2 + Math.random() * 5,
-                        color: ['#3a3530', '#4a4540', '#2a2825', '#5a5550'][Math.floor(Math.random() * 4)],
-                        alpha: 0.5 + Math.random() * 0.3
+                        size: 2 + Math.random() * 4,
+                        color: ['#4a4840', '#5a5850', '#3a3835', '#6a6860'][Math.floor(Math.random() * 4)],
+                        alpha: 0.4 + Math.random() * 0.25
                     };
-                } else if (type < 0.65) {
+                } else {
                     // Twig
                     element = {
                         type: 'twig',
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        length: 15 + Math.random() * 30,
+                        length: 15 + Math.random() * 25,
                         rotation: Math.random() * Math.PI,
-                        thickness: 1 + Math.random() * 2,
-                        color: '#3d2a1a',
-                        alpha: 0.4 + Math.random() * 0.3
-                    };
-                } else if (type < 0.75) {
-                    // Grass blade
-                    element = {
-                        type: 'grass',
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        height: 10 + Math.random() * 20,
-                        curve: (Math.random() - 0.5) * 0.5,
-                        color: ['#2a3a20', '#354528', '#283820', '#3a4a30'][Math.floor(Math.random() * 4)],
-                        alpha: 0.3 + Math.random() * 0.3
-                    };
-                } else if (type < 0.82) {
-                    // Moss patch
-                    element = {
-                        type: 'moss',
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        size: 10 + Math.random() * 25,
-                        color: '#2a3a22',
-                        alpha: 0.2 + Math.random() * 0.2
-                    };
-                } else if (type < 0.88) {
-                    // Acorn cap
-                    element = {
-                        type: 'acorn',
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        size: 4 + Math.random() * 4,
-                        rotation: Math.random() * Math.PI * 2,
-                        alpha: 0.5 + Math.random() * 0.3
-                    };
-                } else {
-                    // Small mushroom
-                    element = {
-                        type: 'mushroom',
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        size: 3 + Math.random() * 5,
-                        alpha: 0.4 + Math.random() * 0.3
+                        thickness: 1 + Math.random() * 1.5,
+                        color: '#4d3a2a',
+                        alpha: 0.35 + Math.random() * 0.2
                     };
                 }
 
-                // Don't place too close to nest
                 const distToNest = Math.hypot(element.x - CONFIG.nestX, element.y - CONFIG.nestY);
                 if (distToNest > CONFIG.nestRadius * 2.5) {
                     forestElements.push(element);
@@ -430,15 +875,10 @@
                     ctx.translate(el.x, el.y);
                     ctx.rotate(el.rotation);
                     ctx.fillStyle = el.color;
-                    // Leaf shape
                     ctx.beginPath();
-                    ctx.moveTo(0, -el.size * 0.5);
-                    ctx.quadraticCurveTo(el.size * 0.4, -el.size * 0.2, el.size * 0.3, el.size * 0.3);
-                    ctx.quadraticCurveTo(0, el.size * 0.5, -el.size * 0.3, el.size * 0.3);
-                    ctx.quadraticCurveTo(-el.size * 0.4, -el.size * 0.2, 0, -el.size * 0.5);
+                    ctx.ellipse(0, 0, el.size * 0.35, el.size * 0.5, 0, 0, Math.PI * 2);
                     ctx.fill();
-                    // Vein
-                    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
                     ctx.lineWidth = 0.5;
                     ctx.beginPath();
                     ctx.moveTo(0, -el.size * 0.4);
@@ -449,12 +889,7 @@
                 case 'pebble':
                     ctx.fillStyle = el.color;
                     ctx.beginPath();
-                    ctx.ellipse(el.x, el.y, el.size, el.size * 0.7, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Highlight
-                    ctx.fillStyle = 'rgba(255,255,255,0.1)';
-                    ctx.beginPath();
-                    ctx.ellipse(el.x - el.size * 0.2, el.y - el.size * 0.2, el.size * 0.3, el.size * 0.2, 0, 0, Math.PI * 2);
+                    ctx.ellipse(el.x, el.y, el.size, el.size * 0.65, 0, 0, Math.PI * 2);
                     ctx.fill();
                     break;
 
@@ -468,74 +903,6 @@
                     ctx.moveTo(-el.length / 2, 0);
                     ctx.lineTo(el.length / 2, 0);
                     ctx.stroke();
-                    // Small branch
-                    if (el.length > 20) {
-                        ctx.lineWidth = el.thickness * 0.6;
-                        ctx.beginPath();
-                        ctx.moveTo(el.length * 0.2, 0);
-                        ctx.lineTo(el.length * 0.35, -el.length * 0.15);
-                        ctx.stroke();
-                    }
-                    break;
-
-                case 'grass':
-                    ctx.strokeStyle = el.color;
-                    ctx.lineWidth = 1.5;
-                    ctx.lineCap = 'round';
-                    ctx.beginPath();
-                    ctx.moveTo(el.x, el.y);
-                    ctx.quadraticCurveTo(
-                        el.x + el.curve * el.height,
-                        el.y - el.height * 0.6,
-                        el.x + el.curve * el.height * 1.5,
-                        el.y - el.height
-                    );
-                    ctx.stroke();
-                    break;
-
-                case 'moss':
-                    ctx.fillStyle = el.color;
-                    for (let i = 0; i < 8; i++) {
-                        const angle = (i / 8) * Math.PI * 2;
-                        const dist = el.size * (0.3 + Math.random() * 0.7);
-                        const blobSize = el.size * 0.2 + Math.random() * el.size * 0.15;
-                        ctx.beginPath();
-                        ctx.arc(el.x + Math.cos(angle) * dist, el.y + Math.sin(angle) * dist, blobSize, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    break;
-
-                case 'acorn':
-                    ctx.translate(el.x, el.y);
-                    ctx.rotate(el.rotation);
-                    // Cap
-                    ctx.fillStyle = '#4a3a28';
-                    ctx.beginPath();
-                    ctx.ellipse(0, -el.size * 0.3, el.size * 0.8, el.size * 0.4, 0, 0, Math.PI);
-                    ctx.fill();
-                    // Cap texture
-                    ctx.fillStyle = '#3a2a18';
-                    for (let i = 0; i < 5; i++) {
-                        ctx.beginPath();
-                        ctx.arc((i - 2) * el.size * 0.25, -el.size * 0.2, el.size * 0.12, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    break;
-
-                case 'mushroom':
-                    // Stem
-                    ctx.fillStyle = '#d8d0c0';
-                    ctx.fillRect(el.x - el.size * 0.15, el.y - el.size * 0.3, el.size * 0.3, el.size * 0.6);
-                    // Cap
-                    ctx.fillStyle = '#8a6040';
-                    ctx.beginPath();
-                    ctx.ellipse(el.x, el.y - el.size * 0.4, el.size * 0.5, el.size * 0.3, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Cap highlight
-                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                    ctx.beginPath();
-                    ctx.ellipse(el.x - el.size * 0.15, el.y - el.size * 0.5, el.size * 0.15, el.size * 0.1, 0, 0, Math.PI * 2);
-                    ctx.fill();
                     break;
             }
 
@@ -546,12 +913,7 @@
         // PHEROMONE GRID
         // ===========================================
 
-        let pheromoneGrid = {
-            food: null,
-            home: null,
-            cols: 0,
-            rows: 0
-        };
+        let pheromoneGrid = { food: null, home: null, cols: 0, rows: 0 };
 
         function initPheromoneGrid() {
             const cellSize = CONFIG.pheromoneGridSize;
@@ -565,9 +927,7 @@
         function getPheromoneIndex(x, y) {
             const col = Math.floor(x / CONFIG.pheromoneGridSize);
             const row = Math.floor(y / CONFIG.pheromoneGridSize);
-            if (col < 0 || col >= pheromoneGrid.cols || row < 0 || row >= pheromoneGrid.rows) {
-                return -1;
-            }
+            if (col < 0 || col >= pheromoneGrid.cols || row < 0 || row >= pheromoneGrid.rows) return -1;
             return row * pheromoneGrid.cols + col;
         }
 
@@ -581,40 +941,18 @@
         function getPheromone(x, y, type) {
             const idx = getPheromoneIndex(x, y);
             if (idx === -1) return 0;
-            const grid = type === 'food' ? pheromoneGrid.food : pheromoneGrid.home;
-            return grid[idx];
+            return (type === 'food' ? pheromoneGrid.food : pheromoneGrid.home)[idx];
         }
 
         function samplePheromoneDirection(x, y, currentAngle, type) {
             const sampleDist = 15;
             const sampleAngle = 0.5;
+            const left = getPheromone(x + Math.cos(currentAngle - sampleAngle) * sampleDist, y + Math.sin(currentAngle - sampleAngle) * sampleDist, type);
+            const center = getPheromone(x + Math.cos(currentAngle) * sampleDist, y + Math.sin(currentAngle) * sampleDist, type);
+            const right = getPheromone(x + Math.cos(currentAngle + sampleAngle) * sampleDist, y + Math.sin(currentAngle + sampleAngle) * sampleDist, type);
 
-            const leftAngle = currentAngle - sampleAngle;
-            const rightAngle = currentAngle + sampleAngle;
-
-            const center = getPheromone(
-                x + Math.cos(currentAngle) * sampleDist,
-                y + Math.sin(currentAngle) * sampleDist,
-                type
-            );
-            const left = getPheromone(
-                x + Math.cos(leftAngle) * sampleDist,
-                y + Math.sin(leftAngle) * sampleDist,
-                type
-            );
-            const right = getPheromone(
-                x + Math.cos(rightAngle) * sampleDist,
-                y + Math.sin(rightAngle) * sampleDist,
-                type
-            );
-
-            if (center >= left && center >= right) {
-                return 0;
-            } else if (left > right) {
-                return -sampleAngle * CONFIG.pheromoneFollowStrength;
-            } else {
-                return sampleAngle * CONFIG.pheromoneFollowStrength;
-            }
+            if (center >= left && center >= right) return 0;
+            return (left > right ? -1 : 1) * sampleAngle * CONFIG.pheromoneFollowStrength;
         }
 
         function decayPheromones() {
@@ -628,11 +966,619 @@
         }
 
         // ===========================================
-        // FOOD ITEMS - Realistic appearances
+        // PREDATORS (Spider, Bird, Beetle)
+        // ===========================================
+
+        let predators = { spider: null, bird: null, beetle: null };
+
+        // Helper to kill an ant (handles food release)
+        function killAnt(ant, predator) {
+            // Soldiers can fight back
+            if (ant.type === 'soldier') {
+                const result = ant.attemptFight(predator);
+                if (result === 'win') {
+                    return false; // Ant survives, predator stunned
+                }
+                // 'mutual' or 'lose' - ant dies
+            }
+
+            // With new mechanic, the carried food piece is simply lost when ant dies
+            // (no need to return it to source)
+            const idx = ants.indexOf(ant);
+            if (idx !== -1) ants.splice(idx, 1);
+            return true;
+        }
+
+        class Spider {
+            constructor() {
+                const cfg = CONFIG.predators.spider;
+                this.x = cfg.x;
+                this.y = cfg.y;
+                this.targetX = this.x;
+                this.targetY = this.y;
+                this.angle = Math.random() * Math.PI * 2;
+                this.size = 18;
+                this.speed = cfg.speed;
+                this.legPhase = 0;
+                this.state = 'hunting';
+                this.eatTimer = 0;
+                this.stunTimer = 0;
+            }
+
+            stun(duration) {
+                this.stunTimer = duration;
+                this.state = 'stunned';
+            }
+
+            update() {
+                const cfg = CONFIG.predators.spider;
+                this.legPhase += 0.2;
+
+                if (this.state === 'stunned') {
+                    this.stunTimer--;
+                    if (this.stunTimer <= 0) this.state = 'hunting';
+                    return;
+                }
+
+                if (this.state === 'eating') {
+                    this.eatTimer--;
+                    if (this.eatTimer <= 0) this.state = 'hunting';
+                    return;
+                }
+
+                // Find nearest ant within territory
+                let nearestAnt = null;
+                let nearestDist = cfg.huntRadius;
+
+                for (const ant of ants) {
+                    const distToCenter = Math.hypot(ant.x - cfg.x, ant.y - cfg.y);
+                    if (distToCenter > cfg.radius) continue;
+                    const dist = Math.hypot(ant.x - this.x, ant.y - this.y);
+                    if (dist < nearestDist) {
+                        nearestDist = dist;
+                        nearestAnt = ant;
+                    }
+                }
+
+                if (nearestAnt) {
+                    this.targetX = nearestAnt.x;
+                    this.targetY = nearestAnt.y;
+
+                    if (nearestDist < cfg.killRadius) {
+                        if (killAnt(nearestAnt, this)) {
+                            this.state = 'eating';
+                            this.eatTimer = 60;
+                        }
+                    }
+                } else {
+                    // Wander within territory
+                    if (Math.random() < 0.02) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const dist = Math.random() * cfg.radius * 0.7;
+                        this.targetX = cfg.x + Math.cos(angle) * dist;
+                        this.targetY = cfg.y + Math.sin(angle) * dist;
+                    }
+                }
+
+                // Move toward target but stay in territory
+                const angleToTarget = Math.atan2(this.targetY - this.y, this.targetX - this.x);
+                this.angle = angleToTarget;
+
+                let newX = this.x + Math.cos(this.angle) * this.speed;
+                let newY = this.y + Math.sin(this.angle) * this.speed;
+
+                // Constrain to territory
+                const distFromCenter = Math.hypot(newX - cfg.x, newY - cfg.y);
+                if (distFromCenter > cfg.radius - 10) {
+                    const angleFromCenter = Math.atan2(newY - cfg.y, newX - cfg.x);
+                    newX = cfg.x + Math.cos(angleFromCenter) * (cfg.radius - 10);
+                    newY = cfg.y + Math.sin(angleFromCenter) * (cfg.radius - 10);
+                }
+
+                const dist = Math.hypot(this.targetX - this.x, this.targetY - this.y);
+                if (dist > 5) {
+                    this.x = newX;
+                    this.y = newY;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle + Math.PI / 2);
+
+                const s = this.size;
+                const legWave = Math.sin(this.legPhase) * 0.3;
+
+                // Stun effect
+                if (this.state === 'stunned') {
+                    ctx.globalAlpha = 0.5 + Math.sin(this.stunTimer * 0.3) * 0.3;
+                }
+
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.ellipse(3, 3, s * 0.8, s * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Legs
+                ctx.strokeStyle = '#1a1008';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+
+                for (let side = -1; side <= 1; side += 2) {
+                    for (let i = 0; i < 4; i++) {
+                        const attachY = -s * 0.3 + i * s * 0.2;
+                        const phase = (i % 2 === 0) ? legWave : -legWave;
+
+                        ctx.beginPath();
+                        ctx.moveTo(side * s * 0.2, attachY);
+                        ctx.lineTo(side * s * 0.7, attachY - s * 0.2 + phase * s * 0.15);
+                        ctx.lineTo(side * s * 0.9, attachY + s * 0.3 + phase * s * 0.1);
+                        ctx.stroke();
+                    }
+                }
+
+                // Abdomen
+                ctx.fillStyle = '#2a1a10';
+                ctx.beginPath();
+                ctx.ellipse(0, s * 0.3, s * 0.45, s * 0.55, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#3a2a18';
+                ctx.beginPath();
+                ctx.ellipse(0, s * 0.2, s * 0.2, s * 0.25, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Head
+                ctx.fillStyle = '#2a1a10';
+                ctx.beginPath();
+                ctx.ellipse(0, -s * 0.25, s * 0.3, s * 0.35, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Eyes
+                ctx.fillStyle = '#400808';
+                ctx.beginPath();
+                ctx.arc(-s * 0.1, -s * 0.45, s * 0.08, 0, Math.PI * 2);
+                ctx.arc(s * 0.1, -s * 0.45, s * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255, 80, 80, 0.5)';
+                ctx.beginPath();
+                ctx.arc(-s * 0.1, -s * 0.45, s * 0.04, 0, Math.PI * 2);
+                ctx.arc(s * 0.1, -s * 0.45, s * 0.04, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (this.state === 'eating') {
+                    ctx.fillStyle = 'rgba(200, 50, 50, 0.6)';
+                    ctx.beginPath();
+                    ctx.arc(0, -s * 0.55, s * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Stun stars
+                if (this.state === 'stunned') {
+                    ctx.fillStyle = '#ffff00';
+                    for (let i = 0; i < 3; i++) {
+                        const angle = (i / 3) * Math.PI * 2 + this.stunTimer * 0.1;
+                        const x = Math.cos(angle) * s * 0.6;
+                        const y = Math.sin(angle) * s * 0.6 - s * 0.5;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class Bird {
+            constructor() {
+                const cfg = CONFIG.predators.bird;
+                this.x = cfg.x;
+                this.y = -100; // Start off-screen
+                this.shadowX = cfg.x;
+                this.shadowY = cfg.y;
+                this.state = 'circling';
+                this.swoopTimer = cfg.swoopInterval[0] + Math.random() * (cfg.swoopInterval[1] - cfg.swoopInterval[0]);
+                this.targetX = cfg.x;
+                this.targetY = cfg.y;
+                this.warningTimer = 0;
+                this.angle = 0;
+                this.circleAngle = Math.random() * Math.PI * 2;
+                this.stunTimer = 0;
+            }
+
+            stun(duration) {
+                this.stunTimer = duration;
+                this.state = 'returning';
+                this.y = -100;
+            }
+
+            update() {
+                const cfg = CONFIG.predators.bird;
+
+                if (this.stunTimer > 0) {
+                    this.stunTimer--;
+                    return;
+                }
+
+                switch (this.state) {
+                    case 'circling':
+                        // Shadow circles around territory
+                        this.circleAngle += 0.015;
+                        this.shadowX = cfg.x + Math.cos(this.circleAngle) * cfg.radius * 0.5;
+                        this.shadowY = cfg.y + Math.sin(this.circleAngle) * cfg.radius * 0.5;
+
+                        this.swoopTimer--;
+                        if (this.swoopTimer <= 0) {
+                            // Pick a target - prefer areas with ants
+                            let targetAnt = null;
+                            for (const ant of ants) {
+                                if (Math.hypot(ant.x - cfg.x, ant.y - cfg.y) < cfg.radius) {
+                                    targetAnt = ant;
+                                    break;
+                                }
+                            }
+                            if (targetAnt) {
+                                this.targetX = targetAnt.x;
+                                this.targetY = targetAnt.y;
+                            } else {
+                                this.targetX = cfg.x + (Math.random() - 0.5) * cfg.radius;
+                                this.targetY = cfg.y + (Math.random() - 0.5) * cfg.radius;
+                            }
+                            this.state = 'warning';
+                            this.warningTimer = cfg.warningTime;
+                        }
+                        break;
+
+                    case 'warning':
+                        // Shadow moves to target, warning indicator
+                        this.shadowX += (this.targetX - this.shadowX) * 0.08;
+                        this.shadowY += (this.targetY - this.shadowY) * 0.08;
+                        this.warningTimer--;
+                        if (this.warningTimer <= 0) {
+                            this.state = 'swooping';
+                            this.x = this.targetX;
+                            this.y = -50;
+                        }
+                        break;
+
+                    case 'swooping':
+                        // Fast dive
+                        this.y += cfg.swoopSpeed;
+                        if (this.y >= this.targetY) {
+                            // Kill ants in radius
+                            for (let i = ants.length - 1; i >= 0; i--) {
+                                const ant = ants[i];
+                                if (Math.hypot(ant.x - this.x, ant.y - this.y) < cfg.killRadius) {
+                                    killAnt(ant, this);
+                                }
+                            }
+                            this.state = 'returning';
+                        }
+                        break;
+
+                    case 'returning':
+                        this.y -= cfg.swoopSpeed * 0.7;
+                        if (this.y < -80) {
+                            this.state = 'circling';
+                            this.swoopTimer = cfg.swoopInterval[0] + Math.random() * (cfg.swoopInterval[1] - cfg.swoopInterval[0]);
+                        }
+                        break;
+                }
+            }
+
+            draw() {
+                const cfg = CONFIG.predators.bird;
+
+                // Always draw shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.beginPath();
+                ctx.ellipse(this.shadowX, this.shadowY, 25, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Warning indicator
+                if (this.state === 'warning') {
+                    const pulse = Math.sin(this.warningTimer * 0.3) * 0.3 + 0.5;
+                    ctx.strokeStyle = `rgba(255, 100, 100, ${pulse})`;
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([6, 6]);
+                    ctx.beginPath();
+                    ctx.arc(this.targetX, this.targetY, cfg.killRadius + 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Target crosshair
+                    ctx.strokeStyle = `rgba(255, 50, 50, ${pulse})`;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(this.targetX - 15, this.targetY);
+                    ctx.lineTo(this.targetX + 15, this.targetY);
+                    ctx.moveTo(this.targetX, this.targetY - 15);
+                    ctx.lineTo(this.targetX, this.targetY + 15);
+                    ctx.stroke();
+                }
+
+                // Draw bird when swooping/returning
+                if (this.state === 'swooping' || this.state === 'returning') {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+
+                    const wingPhase = Math.sin(Date.now() * 0.02) * 0.4;
+
+                    // Body
+                    ctx.fillStyle = '#2a2030';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 12, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Wings
+                    ctx.fillStyle = '#3a3040';
+                    ctx.beginPath();
+                    ctx.ellipse(-20, 0, 18, 5 + wingPhase * 8, -0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.ellipse(20, 0, 18, 5 + wingPhase * 8, 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Head
+                    ctx.fillStyle = '#2a2030';
+                    ctx.beginPath();
+                    ctx.arc(0, -10, 6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Beak
+                    ctx.fillStyle = '#d4a040';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(-3, -18);
+                    ctx.lineTo(3, -18);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.restore();
+                }
+            }
+        }
+
+        class Beetle {
+            constructor() {
+                const cfg = CONFIG.predators.beetle;
+                this.x = cfg.x;
+                this.y = cfg.y;
+                this.angle = Math.random() * Math.PI * 2;
+                this.patrolAngle = 0;
+                this.size = 22;
+                this.legPhase = 0;
+                this.state = 'patrolling';
+                this.stunTimer = 0;
+            }
+
+            stun(duration) {
+                this.stunTimer = duration;
+                this.state = 'stunned';
+            }
+
+            update() {
+                const cfg = CONFIG.predators.beetle;
+                this.legPhase += 0.12;
+
+                if (this.state === 'stunned') {
+                    this.stunTimer--;
+                    if (this.stunTimer <= 0) this.state = 'patrolling';
+                    return;
+                }
+
+                // Slow circular patrol
+                this.patrolAngle += 0.008;
+                const targetX = cfg.x + Math.cos(this.patrolAngle) * cfg.radius * 0.5;
+                const targetY = cfg.y + Math.sin(this.patrolAngle) * cfg.radius * 0.5;
+
+                const angleToTarget = Math.atan2(targetY - this.y, targetX - this.x);
+                this.angle = angleToTarget;
+
+                this.x += Math.cos(this.angle) * cfg.patrolSpeed;
+                this.y += Math.sin(this.angle) * cfg.patrolSpeed;
+
+                // Kill ants in radius
+                for (let i = ants.length - 1; i >= 0; i--) {
+                    const ant = ants[i];
+                    if (Math.hypot(ant.x - this.x, ant.y - this.y) < cfg.killRadius) {
+                        killAnt(ant, this);
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle + Math.PI / 2);
+
+                const s = this.size;
+                const legWave = Math.sin(this.legPhase) * 0.2;
+
+                if (this.state === 'stunned') {
+                    ctx.globalAlpha = 0.5 + Math.sin(this.stunTimer * 0.3) * 0.3;
+                }
+
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.ellipse(4, 4, s * 0.7, s * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Legs (6 legs, 3 per side)
+                ctx.strokeStyle = '#1a2010';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+
+                for (let side = -1; side <= 1; side += 2) {
+                    for (let i = 0; i < 3; i++) {
+                        const attachY = -s * 0.2 + i * s * 0.25;
+                        const phase = (i % 2 === 0) ? legWave : -legWave;
+
+                        ctx.beginPath();
+                        ctx.moveTo(side * s * 0.3, attachY);
+                        ctx.lineTo(side * s * 0.6, attachY - s * 0.1 + phase * s * 0.1);
+                        ctx.lineTo(side * s * 0.75, attachY + s * 0.15 + phase * s * 0.1);
+                        ctx.stroke();
+                    }
+                }
+
+                // Shell (elytra)
+                ctx.fillStyle = '#2a3520';
+                ctx.beginPath();
+                ctx.ellipse(0, s * 0.1, s * 0.5, s * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Shell line
+                ctx.strokeStyle = '#1a2510';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, -s * 0.4);
+                ctx.lineTo(0, s * 0.6);
+                ctx.stroke();
+
+                // Shell highlights
+                ctx.fillStyle = '#3a4530';
+                ctx.beginPath();
+                ctx.ellipse(-s * 0.15, 0, s * 0.15, s * 0.3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(s * 0.15, 0, s * 0.15, s * 0.3, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Head
+                ctx.fillStyle = '#1a2010';
+                ctx.beginPath();
+                ctx.ellipse(0, -s * 0.55, s * 0.3, s * 0.25, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Mandibles
+                ctx.strokeStyle = '#2a1010';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-s * 0.15, -s * 0.7);
+                ctx.lineTo(-s * 0.25, -s * 0.85);
+                ctx.moveTo(s * 0.15, -s * 0.7);
+                ctx.lineTo(s * 0.25, -s * 0.85);
+                ctx.stroke();
+
+                // Antennae
+                ctx.strokeStyle = '#1a2010';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(-s * 0.1, -s * 0.65);
+                ctx.lineTo(-s * 0.2, -s * 0.9);
+                ctx.lineTo(-s * 0.15, -s * 1.0);
+                ctx.moveTo(s * 0.1, -s * 0.65);
+                ctx.lineTo(s * 0.2, -s * 0.9);
+                ctx.lineTo(s * 0.15, -s * 1.0);
+                ctx.stroke();
+
+                // Stun stars
+                if (this.state === 'stunned') {
+                    ctx.fillStyle = '#ffff00';
+                    for (let i = 0; i < 3; i++) {
+                        const angle = (i / 3) * Math.PI * 2 + this.stunTimer * 0.1;
+                        const x = Math.cos(angle) * s * 0.5;
+                        const y = Math.sin(angle) * s * 0.5 - s * 0.5;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                ctx.restore();
+            }
+        }
+
+        function drawDangerZones() {
+            for (const key in CONFIG.predators) {
+                const cfg = CONFIG.predators[key];
+                const cx = cfg.x;
+                const cy = cfg.y;
+                const r = cfg.radius;
+                const c = cfg.color;
+
+                // Danger zone background
+                const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                gradient.addColorStop(0, `rgba(${c.r}, ${c.g}, ${c.b}, 0.15)`);
+                gradient.addColorStop(0.7, `rgba(${c.r * 0.75}, ${c.g * 0.75}, ${c.b * 0.75}, 0.1)`);
+                gradient.addColorStop(1, `rgba(${c.r * 0.5}, ${c.g * 0.5}, ${c.b * 0.5}, 0.05)`);
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Danger zone border
+                ctx.strokeStyle = `rgba(${Math.min(255, c.r * 2)}, ${Math.min(255, c.g * 2)}, ${Math.min(255, c.b * 2)}, 0.4)`;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 8]);
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Label
+                ctx.fillStyle = `rgba(${Math.min(255, c.r * 2.5)}, ${Math.min(255, c.g * 2.5)}, ${Math.min(255, c.b * 2.5)}, 0.6)`;
+                ctx.font = 'bold 12px "DM Mono", monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(cfg.label, cx, cy - r + 18);
+                ctx.fillStyle = 'rgba(244, 208, 63, 0.8)';
+                ctx.font = 'bold 16px "DM Mono", monospace';
+                ctx.fillText(`${cfg.multiplier}x REWARD`, cx, cy - r + 36);
+            }
+        }
+
+        // ===========================================
+        // FOOD ITEMS
         // ===========================================
 
         let foodItems = [];
         let foodCollected = 0;
+
+        // Track ant spawn counts for scaling costs
+        let antSpawnCounts = { worker: 0, soldier: 0, scout: 0, carrier: 0, queen: 0 };
+
+        function getAntSpawnCost(antType) {
+            const base = CONFIG.antSpawnCosts[antType].baseCost;
+            const count = antSpawnCounts[antType];
+            // Cost increases by 20% for each ant of that type spawned
+            return Math.floor(base * Math.pow(1.2, count));
+        }
+
+        function spawnAnt(antType) {
+            const cost = getAntSpawnCost(antType);
+            if (!canAfford(cost)) return false;
+            if (ants.length >= CONFIG.maxAnts) return false;
+
+            spendCoins(cost);
+            antSpawnCounts[antType]++;
+
+            const angle = Math.random() * Math.PI * 2;
+            const spawnDist = getColonySize() * 0.3;
+            const newAnt = new Ant(
+                CONFIG.nestX + Math.cos(angle) * spawnDist,
+                CONFIG.nestY + Math.sin(angle) * spawnDist,
+                antType
+            );
+            ants.push(newAnt);
+            addSpawnNotification(antType);
+            updateAntCosts();
+            return true;
+        }
+
+        function updateAntCosts() {
+            for (const antType in CONFIG.antSpawnCosts) {
+                const costEl = document.getElementById(`${antType}-cost`);
+                if (costEl) {
+                    costEl.textContent = getAntSpawnCost(antType);
+                }
+            }
+        }
 
         class FoodItem {
             constructor(x, y, type) {
@@ -640,250 +1586,437 @@
                 this.y = y;
                 this.type = type;
                 const config = CONFIG.foodTypes[type];
-                this.weight = config.weight;
-                this.radius = config.radius;
-                this.value = config.value;
+                this.size = config.size;  // Current size (units of food remaining)
+                this.maxSize = config.size;  // Original size
+                this.baseRadius = config.baseRadius;
+                this.valuePerUnit = config.value;  // Gold per unit of food
                 this.name = config.name;
-                this.originalWeight = config.weight;
+                this.emoji = config.emoji;
                 this.carriers = [];
-                this.beingBrokenDown = false;
-                this.breakdownProgress = 0;
-                this.rotation = Math.random() * Math.PI * 2;
+                this.inDangerZone = isInDangerZone(x, y);
             }
 
-            canBeCarriedBy(numAnts) {
-                return this.weight <= numAnts * CONFIG.carryCapacity;
+            getRadius() {
+                // Radius scales with sqrt of remaining size
+                return this.baseRadius * Math.sqrt(this.size / this.maxSize);
             }
 
-            getRequiredAnts() {
-                return Math.ceil(this.weight / CONFIG.carryCapacity);
+            getValue() {
+                // Value per unit times danger zone multiplier
+                const multiplier = getDangerZoneMultiplier(this.x, this.y);
+                return this.valuePerUnit * multiplier;
+            }
+
+            // Single ant can always carry 1 unit
+            canTakeUnit() {
+                return this.size >= 1;
+            }
+
+            takeUnit() {
+                if (this.size < 1) return 0;
+                this.size -= 1;
+                return 1;
+            }
+
+            isEmpty() {
+                return this.size < 1;
             }
 
             addCarrier(ant) {
-                if (!this.carriers.includes(ant)) {
-                    this.carriers.push(ant);
-                }
+                if (!this.carriers.includes(ant)) this.carriers.push(ant);
             }
 
             removeCarrier(ant) {
                 const idx = this.carriers.indexOf(ant);
-                if (idx !== -1) {
-                    this.carriers.splice(idx, 1);
-                }
-            }
-
-            breakOffPiece() {
-                if (this.weight <= 1) return null;
-
-                const pieceWeight = Math.min(CONFIG.carryCapacity, Math.floor(this.weight / 2));
-                this.weight -= pieceWeight;
-                this.value = Math.ceil(this.value * (this.weight / this.originalWeight));
-                this.radius = Math.max(3, this.radius * Math.sqrt(this.weight / this.originalWeight));
-
-                const angle = Math.random() * Math.PI * 2;
-                const dist = this.radius + 4;
-                const piece = new FoodItem(
-                    this.x + Math.cos(angle) * dist,
-                    this.y + Math.sin(angle) * dist,
-                    'crumb'
-                );
-                piece.weight = pieceWeight;
-                piece.value = pieceWeight;
-                piece.radius = Math.max(2, 3 * Math.sqrt(pieceWeight));
-                piece.name = this.name + ' piece';
-
-                return piece;
+                if (idx !== -1) this.carriers.splice(idx, 1);
             }
 
             draw() {
+                const r = this.getRadius();
+                if (r < 3) return;  // Too small to draw
+
                 ctx.save();
                 ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation);
 
                 // Shadow
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
                 ctx.beginPath();
-                ctx.ellipse(2, 3, this.radius * 1.1, this.radius * 0.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(2, 3, r * 1.1, r * 0.5, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                const r = this.radius;
+                // Draw emoji scaled to size
+                const fontSize = Math.max(12, r * 1.8);
+                ctx.font = `${fontSize}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.emoji, 0, 0);
 
-                switch (this.name) {
-                    case 'breadcrumb':
-                        // Irregular bread crumb shape
-                        ctx.fillStyle = '#d4a050';
-                        ctx.beginPath();
-                        ctx.moveTo(-r * 0.8, -r * 0.3);
-                        ctx.quadraticCurveTo(-r * 0.5, -r * 0.9, r * 0.2, -r * 0.7);
-                        ctx.quadraticCurveTo(r * 0.9, -r * 0.4, r * 0.7, r * 0.3);
-                        ctx.quadraticCurveTo(r * 0.3, r * 0.8, -r * 0.4, r * 0.6);
-                        ctx.quadraticCurveTo(-r * 0.9, r * 0.2, -r * 0.8, -r * 0.3);
-                        ctx.fill();
-                        // Texture
-                        ctx.fillStyle = '#c49040';
-                        ctx.beginPath();
-                        ctx.arc(-r * 0.2, -r * 0.1, r * 0.25, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = '#e4b060';
-                        ctx.beginPath();
-                        ctx.arc(r * 0.1, r * 0.2, r * 0.15, 0, Math.PI * 2);
-                        ctx.fill();
-                        break;
-
-                    case 'apple':
-                        // Apple chunk - red with white flesh visible
-                        ctx.fillStyle = '#f8f0e0';  // Flesh
-                        ctx.beginPath();
-                        ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
-                        ctx.fill();
-                        // Red skin on edge
-                        ctx.fillStyle = '#c82020';
-                        ctx.beginPath();
-                        ctx.arc(0, 0, r, Math.PI * 0.3, Math.PI * 1.2);
-                        ctx.lineTo(0, 0);
-                        ctx.fill();
-                        // Seeds
-                        ctx.fillStyle = '#4a3020';
-                        ctx.beginPath();
-                        ctx.ellipse(-r * 0.2, r * 0.1, r * 0.12, r * 0.06, -0.3, 0, Math.PI * 2);
-                        ctx.fill();
-                        // Browning
-                        ctx.fillStyle = 'rgba(139, 90, 43, 0.15)';
-                        ctx.beginPath();
-                        ctx.arc(r * 0.2, -r * 0.2, r * 0.4, 0, Math.PI * 2);
-                        ctx.fill();
-                        break;
-
-                    case 'cookie':
-                        // Chocolate chip cookie
-                        ctx.fillStyle = '#d4a050';
-                        ctx.beginPath();
-                        ctx.arc(0, 0, r, 0, Math.PI * 2);
-                        ctx.fill();
-                        // Cookie edge texture
-                        ctx.fillStyle = '#c49040';
-                        ctx.beginPath();
-                        ctx.arc(0, 0, r, 0, Math.PI * 2);
-                        ctx.stroke();
-                        // Chocolate chips
-                        const chips = [[0.3, -0.4], [-0.4, 0.2], [0.2, 0.4], [-0.2, -0.2], [0.5, 0.1]];
-                        ctx.fillStyle = '#3a2010';
-                        chips.forEach(([cx, cy]) => {
-                            ctx.beginPath();
-                            ctx.ellipse(cx * r, cy * r, r * 0.18, r * 0.14, Math.random(), 0, Math.PI * 2);
-                            ctx.fill();
-                        });
-                        // Highlight
-                        ctx.fillStyle = 'rgba(255,255,255,0.1)';
-                        ctx.beginPath();
-                        ctx.ellipse(-r * 0.3, -r * 0.3, r * 0.3, r * 0.2, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        break;
-
-                    case 'sandwich':
-                    default:
-                        // Sandwich piece - layered
-                        // Bottom bread
-                        ctx.fillStyle = '#c49040';
-                        ctx.fillRect(-r, r * 0.2, r * 2, r * 0.5);
-                        // Lettuce
-                        ctx.fillStyle = '#5a8030';
-                        ctx.beginPath();
-                        ctx.moveTo(-r, r * 0.2);
-                        for (let i = 0; i <= 8; i++) {
-                            ctx.lineTo(-r + (i / 8) * r * 2, r * 0.15 + Math.sin(i * 1.5) * r * 0.15);
-                        }
-                        ctx.lineTo(r, r * 0.2);
-                        ctx.fill();
-                        // Meat/filling
-                        ctx.fillStyle = '#d08080';
-                        ctx.fillRect(-r * 0.9, -r * 0.1, r * 1.8, r * 0.35);
-                        // Cheese
-                        ctx.fillStyle = '#f0c020';
-                        ctx.fillRect(-r * 0.85, -r * 0.3, r * 1.7, r * 0.25);
-                        // Top bread
-                        ctx.fillStyle = '#d4a050';
-                        ctx.beginPath();
-                        ctx.moveTo(-r, -r * 0.3);
-                        ctx.lineTo(-r, -r * 0.6);
-                        ctx.quadraticCurveTo(0, -r * 0.9, r, -r * 0.6);
-                        ctx.lineTo(r, -r * 0.3);
-                        ctx.fill();
-                        // Bread texture
-                        ctx.fillStyle = '#c49040';
-                        ctx.beginPath();
-                        ctx.arc(0, -r * 0.5, r * 0.15, 0, Math.PI * 2);
-                        ctx.fill();
-                        break;
+                // Size indicator
+                if (this.size > 1) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                    ctx.beginPath();
+                    ctx.arc(r * 0.7, -r * 0.5, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 10px "DM Mono", monospace';
+                    ctx.fillText(Math.floor(this.size), r * 0.7, -r * 0.5);
                 }
 
-                // Breaking indicator
-                if (this.beingBrokenDown) {
-                    ctx.strokeStyle = 'rgba(255, 220, 150, 0.6)';
+                // Danger zone glow
+                if (this.inDangerZone) {
+                    ctx.strokeStyle = 'rgba(244, 208, 63, 0.6)';
                     ctx.lineWidth = 2;
-                    ctx.setLineDash([4, 4]);
                     ctx.beginPath();
-                    ctx.arc(0, 0, r + 5, 0, Math.PI * 2 * this.breakdownProgress);
+                    ctx.arc(0, 0, r + 4, 0, Math.PI * 2);
                     ctx.stroke();
-                    ctx.setLineDash([]);
                 }
 
                 ctx.restore();
             }
         }
 
+        // Food piece that an ant carries (visual only, smaller version)
+        class CarriedFoodPiece {
+            constructor(type) {
+                this.type = type;
+                this.emoji = CONFIG.foodTypes[type].emoji;
+            }
+
+            draw(x, y, size) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.font = `${size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.emoji, 0, 0);
+                ctx.restore();
+            }
+        }
+
         function addFood(x, y, type) {
-            foodItems.push(new FoodItem(x, y, type));
+            const cost = CONFIG.foodTypes[type].cost;
+            if (spendCoins(cost)) {
+                foodItems.push(new FoodItem(x, y, type));
+                return true;
+            }
+            return false;
         }
 
         // ===========================================
-        // ANTS - More visible with better contrast
+        // ANTS
         // ===========================================
 
         let ants = [];
 
         class Ant {
-            constructor(x, y) {
+            constructor(x, y, type = 'worker') {
                 this.x = x;
                 this.y = y;
+                this.type = type;
+
+                // Load type-specific stats
+                const typeConfig = CONFIG.antTypes[type] || CONFIG.antTypes.worker;
+                this.baseSpeed = typeConfig.speed * (0.9 + Math.random() * 0.2);
+                this.speed = this.baseSpeed;
+                this.carryCapacity = typeConfig.carryCapacity;
+                this.carrySpeedBonus = typeConfig.carrySpeedBonus;
+                this.fightChance = typeConfig.fightChance || 0;
+                this.fightDeathChance = typeConfig.fightDeathChance || 0;
+                this.pheromoneStrength = typeConfig.pheromoneStrength;
+                this.foodDetectRadius = typeConfig.foodDetectRadius;
+                this.colorConfig = typeConfig.color;
+                this.sizeMultiplier = typeConfig.size || 1;  // For carrier/queen
+
                 this.angle = Math.random() * Math.PI * 2;
-                this.speed = CONFIG.antSpeed * (0.9 + Math.random() * 0.2);
                 this.state = 'exploring';
                 this.targetFood = null;
-                this.carriedFood = null;
+                this.carriedFoodPiece = null;  // Now stores a CarriedFoodPiece
+                this.carriedFoodValue = 0;  // Value of the piece being carried
                 this.wanderBias = (Math.random() - 0.5) * 0.1;
-                this.isScout = Math.random() < 0.12;
+                this.isScout = type === 'scout';
+                this.wanderStrength = typeConfig.wanderStrength || CONFIG.wanderStrength;
                 this.depositTimer = 0;
                 this.foundFoodRecently = false;
                 this.legPhase = Math.random() * Math.PI * 2;
-                // Individual color variation
-                this.colorOffset = Math.floor(Math.random() * 20) - 10;
+                this.colorOffset = Math.floor(Math.random() * 15) - 7;
+                this.panicTimer = 0;
+
+                // Soldier-specific properties
+                this.targetPredator = null;
+                this.escortTarget = null;
+
+                // Queen-specific properties
+                this.spawnTimer = 0;
+                this.staysNearNest = typeConfig.staysNearNest || false;
+            }
+
+            // Soldiers can attempt to fight predators
+            attemptFight(predator) {
+                if (this.type !== 'soldier' || this.fightChance <= 0) return 'lose';
+
+                if (Math.random() < this.fightChance) {
+                    // Soldier wins - stun predator
+                    predator.stun(180); // 3 seconds stun
+                    if (Math.random() < this.fightDeathChance) {
+                        return 'mutual'; // Both affected
+                    }
+                    return 'win';
+                }
+                return 'lose';
             }
 
             update() {
                 this.legPhase += 0.25;
 
+                // Flee from nearby predators if in danger zone and not carrying
+                // Soldiers don't flee - they fight!
+                if (this.type !== 'soldier' && isInDangerZone(this.x, this.y) && this.state !== 'carrying') {
+                    let nearestPredator = null;
+                    let nearestDist = 60;
+
+                    // Check all predators
+                    for (const key in predators) {
+                        const p = predators[key];
+                        if (!p || p.state === 'stunned') continue;
+                        const dist = Math.hypot(p.x - this.x, p.y - this.y);
+                        if (dist < nearestDist) {
+                            nearestDist = dist;
+                            nearestPredator = p;
+                        }
+                    }
+
+                    if (nearestPredator) {
+                        this.panicTimer = 30;
+                        const fleeAngle = Math.atan2(this.y - nearestPredator.y, this.x - nearestPredator.x);
+                        this.angle = fleeAngle + (Math.random() - 0.5) * 0.5;
+                        this.x += Math.cos(this.angle) * this.speed * 2.5;
+                        this.y += Math.sin(this.angle) * this.speed * 2.5;
+                        this.bounceOffWalls();
+                        return;
+                    }
+                }
+
+                // Soldiers actively engage predators when nearby
+                if (this.type === 'soldier' && this.state !== 'hunting' && this.state !== 'escorting') {
+                    for (const key in predators) {
+                        const p = predators[key];
+                        if (!p || p.state === 'stunned') continue;
+                        const dist = Math.hypot(p.x - this.x, p.y - this.y);
+                        if (dist < 40) {
+                            this.targetPredator = p;
+                            this.state = 'hunting';
+                            break;
+                        }
+                    }
+                }
+
+                if (this.panicTimer > 0) this.panicTimer--;
+
+                // Queen behavior - spawn workers over time
+                if (this.type === 'queen') {
+                    this.spawnTimer++;
+                    const typeConfig = CONFIG.antTypes.queen;
+                    if (this.spawnTimer >= typeConfig.spawnInterval && ants.length < CONFIG.maxAnts) {
+                        this.spawnTimer = 0;
+                        const angle = Math.random() * Math.PI * 2;
+                        const spawnDist = 15;
+                        const newAnt = new Ant(
+                            this.x + Math.cos(angle) * spawnDist,
+                            this.y + Math.sin(angle) * spawnDist,
+                            'worker'
+                        );
+                        ants.push(newAnt);
+                        addSpawnNotification('worker');
+                    }
+                    // Queen stays near nest
+                    if (this.staysNearNest && this.distanceToNest() > getColonySize() * 1.5) {
+                        const angleToNest = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
+                        this.angle = angleToNest;
+                    }
+                }
+
                 switch (this.state) {
-                    case 'exploring':
-                        this.explore();
-                        break;
-                    case 'returning':
-                        this.returnToNest();
-                        break;
-                    case 'carrying':
-                        this.carryFood();
-                        break;
-                    case 'breaking':
-                        this.breakDownFood();
-                        break;
+                    case 'exploring': this.explore(); break;
+                    case 'returning': this.returnToNest(); break;
+                    case 'carrying': this.carryFood(); break;
+                    case 'hunting': this.huntPredator(); break;
+                    case 'escorting': this.escortAnt(); break;
                 }
 
                 this.bounceOffWalls();
             }
 
+            // Soldiers: Find a predator to hunt or ant to escort
+            findSoldierTask() {
+                // Priority 1: Hunt predators in danger zones
+                let nearestPredator = null;
+                let nearestPredatorDist = 200;
+
+                for (const key in predators) {
+                    const p = predators[key];
+                    if (!p || p.state === 'stunned') continue;
+                    const dist = Math.hypot(p.x - this.x, p.y - this.y);
+                    if (dist < nearestPredatorDist) {
+                        nearestPredatorDist = dist;
+                        nearestPredator = p;
+                    }
+                }
+
+                if (nearestPredator && nearestPredatorDist < 150) {
+                    this.targetPredator = nearestPredator;
+                    this.state = 'hunting';
+                    return true;
+                }
+
+                // Priority 2: Escort non-soldier ants heading into danger zones
+                let nearestVulnerable = null;
+                let nearestVulnerableDist = 80;
+
+                for (const ant of ants) {
+                    if (ant === this || ant.type === 'soldier') continue;
+                    if (ant.state !== 'carrying') continue; // Only escort carriers
+
+                    // Check if ant is near or heading toward danger
+                    if (isInDangerZone(ant.x, ant.y)) {
+                        const dist = Math.hypot(ant.x - this.x, ant.y - this.y);
+                        if (dist < nearestVulnerableDist) {
+                            nearestVulnerableDist = dist;
+                            nearestVulnerable = ant;
+                        }
+                    }
+                }
+
+                if (nearestVulnerable) {
+                    this.escortTarget = nearestVulnerable;
+                    this.state = 'escorting';
+                    return true;
+                }
+
+                return false;
+            }
+
+            // Soldier behavior: Hunt predators
+            huntPredator() {
+                const predator = this.targetPredator;
+
+                // Check if predator is still valid target
+                if (!predator || predator.state === 'stunned') {
+                    this.targetPredator = null;
+                    this.state = 'exploring';
+                    return;
+                }
+
+                const dist = Math.hypot(predator.x - this.x, predator.y - this.y);
+
+                // If close enough, attempt to stun
+                if (dist < 15) {
+                    const result = this.attemptFight(predator);
+                    if (result === 'win') {
+                        // Soldier survived and stunned predator
+                        this.targetPredator = null;
+                        this.state = 'exploring';
+                    } else if (result === 'mutual') {
+                        // Both affected - soldier dies
+                        const idx = ants.indexOf(this);
+                        if (idx !== -1) ants.splice(idx, 1);
+                    } else {
+                        // Soldier lost - dies
+                        const idx = ants.indexOf(this);
+                        if (idx !== -1) ants.splice(idx, 1);
+                    }
+                    return;
+                }
+
+                // Move toward predator
+                const angleToTarget = Math.atan2(predator.y - this.y, predator.x - this.x);
+                this.angle = angleToTarget + (Math.random() - 0.5) * 0.2;
+                this.move();
+
+                // Give up if too far
+                if (dist > 250) {
+                    this.targetPredator = null;
+                    this.state = 'exploring';
+                }
+            }
+
+            // Soldier behavior: Escort vulnerable ants
+            escortAnt() {
+                const target = this.escortTarget;
+
+                // Check if target is still valid
+                if (!target || !ants.includes(target) || target.state !== 'carrying') {
+                    this.escortTarget = null;
+                    this.state = 'exploring';
+                    return;
+                }
+
+                const dist = Math.hypot(target.x - this.x, target.y - this.y);
+
+                // Stay close to the target
+                if (dist > 25) {
+                    const angleToTarget = Math.atan2(target.y - this.y, target.x - this.x);
+                    this.angle = angleToTarget + (Math.random() - 0.5) * 0.3;
+                    this.move();
+                } else {
+                    // Circle around the target protectively
+                    this.angle = Math.atan2(target.y - this.y, target.x - this.x) + Math.PI / 2;
+                    this.x += Math.cos(this.angle) * this.speed * 0.5;
+                    this.y += Math.sin(this.angle) * this.speed * 0.5;
+                }
+
+                // If predator gets close, intercept it
+                for (const key in predators) {
+                    const p = predators[key];
+                    if (!p || p.state === 'stunned') continue;
+                    const predatorDist = Math.hypot(p.x - target.x, p.y - target.y);
+                    if (predatorDist < 50) {
+                        this.targetPredator = p;
+                        this.escortTarget = null;
+                        this.state = 'hunting';
+                        return;
+                    }
+                }
+
+                // Stop escorting if target leaves danger zone
+                if (!isInDangerZone(target.x, target.y)) {
+                    this.escortTarget = null;
+                    this.state = 'exploring';
+                }
+            }
+
             explore() {
-                if (this.isScout || Math.random() < 0.25) {
-                    this.angle += (Math.random() - 0.5) * CONFIG.wanderStrength + this.wanderBias;
+                // Soldiers look for tasks instead of food
+                if (this.type === 'soldier') {
+                    // Check for tasks more frequently
+                    if (Math.random() < 0.1) {
+                        if (this.findSoldierTask()) return;
+                    }
+
+                    // Soldiers patrol toward danger zones - much more focused
+                    let nearestPred = null;
+                    let nearestDist = Infinity;
+                    for (const key in predators) {
+                        const p = predators[key];
+                        if (!p || p.state === 'stunned') continue;
+                        const dist = Math.hypot(p.x - this.x, p.y - this.y);
+                        if (dist < nearestDist) {
+                            nearestDist = dist;
+                            nearestPred = p;
+                        }
+                    }
+                    if (nearestPred) {
+                        const angleToTarget = Math.atan2(nearestPred.y - this.y, nearestPred.x - this.x);
+                        // Strong bias toward predator (80% follow, 20% wander)
+                        if (Math.random() < 0.8) {
+                            this.angle = angleToTarget + (Math.random() - 0.5) * 0.3;
+                        } else {
+                            this.angle += (Math.random() - 0.5) * this.wanderStrength;
+                        }
+                    } else {
+                        this.angle += (Math.random() - 0.5) * this.wanderStrength;
+                    }
+                } else if (this.isScout || Math.random() < 0.25) {
+                    this.angle += (Math.random() - 0.5) * this.wanderStrength + this.wanderBias;
                 } else {
                     const turn = samplePheromoneDirection(this.x, this.y, this.angle, 'food');
                     this.angle += turn + (Math.random() - 0.5) * CONFIG.wanderStrength * 0.4;
@@ -892,13 +2025,16 @@
                 this.depositTimer++;
                 if (this.depositTimer > 6) {
                     const distToNest = this.distanceToNest();
-                    const amount = CONFIG.pheromoneDeposit * Math.max(0.15, 1 - distToNest / 350);
-                    depositPheromone(this.x, this.y, 'home', amount);
+                    depositPheromone(this.x, this.y, 'home', CONFIG.pheromoneDeposit * Math.max(0.15, 1 - distToNest / 350));
                     this.depositTimer = 0;
                 }
 
                 this.move();
-                this.checkForFood();
+
+                // Soldiers still pick up food if they find it, but less eagerly
+                if (this.type !== 'soldier' || Math.random() < 0.3) {
+                    this.checkForFood();
+                }
 
                 if (Math.random() < 0.0004) {
                     this.state = 'returning';
@@ -909,12 +2045,11 @@
             checkForFood() {
                 for (const food of foodItems) {
                     const dist = Math.hypot(this.x - food.x, this.y - food.y);
-                    if (dist < food.radius + 8) {
-                        if (food.canBeCarriedBy(1) && food.carriers.length === 0) {
-                            this.pickUpFood(food);
-                        } else if (food.carriers.length < food.getRequiredAnts()) {
-                            this.joinCarrying(food);
+                    if (dist < food.getRadius() + 8) {
+                        if (food.canTakeUnit()) {
+                            this.pickUpFoodUnit(food);
                         } else {
+                            // Food is depleted, leave pheromone and mark as found
                             depositPheromone(this.x, this.y, 'food', CONFIG.pheromoneDeposit * 6);
                             this.state = 'returning';
                             this.foundFoodRecently = true;
@@ -924,116 +2059,63 @@
                 }
             }
 
-            pickUpFood(food) {
-                this.carriedFood = food;
-                this.targetFood = food;
-                food.addCarrier(this);
-                this.state = 'carrying';
-                this.angle = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
-            }
+            pickUpFoodUnit(food) {
+                // Take 1 unit from the food
+                const units = food.takeUnit();
+                if (units > 0) {
+                    this.carriedFoodPiece = new CarriedFoodPiece(food.type);
+                    this.carriedFoodValue = food.getValue();  // Value based on danger zone
+                    this.targetFood = food;
+                    this.state = 'carrying';
+                    this.angle = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
 
-            joinCarrying(food) {
-                this.targetFood = food;
-                food.addCarrier(this);
-                this.state = 'carrying';
+                    // Remove food if empty
+                    if (food.isEmpty()) {
+                        const idx = foodItems.indexOf(food);
+                        if (idx !== -1) foodItems.splice(idx, 1);
+                    }
+                }
             }
 
             carryFood() {
-                const food = this.targetFood;
-                if (!food || !foodItems.includes(food)) {
-                    this.carriedFood = null;
-                    this.targetFood = null;
+                // Ant is carrying a food piece back to nest
+                if (!this.carriedFoodPiece) {
                     this.state = 'exploring';
                     return;
                 }
 
-                if (!food.canBeCarriedBy(food.carriers.length)) {
-                    if (food.carriers.length >= 3 && food.weight > CONFIG.carryCapacity) {
-                        this.state = 'breaking';
-                        food.beingBrokenDown = true;
-                    } else {
-                        depositPheromone(food.x, food.y, 'food', CONFIG.pheromoneDeposit * 4);
-                        const angleToFood = Math.atan2(food.y - this.y, food.x - this.x);
-                        this.angle = angleToFood + Math.PI / 2;
-                        this.x += Math.cos(this.angle) * this.speed * 0.25;
-                        this.y += Math.sin(this.angle) * this.speed * 0.25;
-                    }
-                    return;
-                }
+                // Move toward nest
+                const angleToNest = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
+                const turnRate = 0.1;
+                const angleDiff = this.angleDiff(angleToNest, this.angle);
+                this.angle += angleDiff * turnRate;
 
-                const angleToNest = Math.atan2(CONFIG.nestY - food.y, CONFIG.nestX - food.x);
+                // Carriers move slower when carrying, adjusted by carrySpeedBonus
+                const carrySpeed = this.speed * 0.6 * this.carrySpeedBonus;
+                this.x += Math.cos(this.angle) * carrySpeed;
+                this.y += Math.sin(this.angle) * carrySpeed;
 
-                // MUCH SLOWER carrying for heavy items
-                const weightRatio = food.weight / CONFIG.carryCapacity;
-                const carrierEfficiency = food.carriers.length / food.getRequiredAnts();
-                // Heavy items move very slowly even with enough carriers
-                const baseSpeedReduction = Math.max(0.08, 0.5 / (1 + weightRatio * 0.5));
-                const speedFactor = baseSpeedReduction * Math.min(1, carrierEfficiency);
-                const moveSpeed = this.speed * speedFactor;
-
-                food.x += Math.cos(angleToNest) * moveSpeed;
-                food.y += Math.sin(angleToNest) * moveSpeed;
-
-                const offsetAngle = angleToNest + Math.PI + (food.carriers.indexOf(this) * 0.6);
-                this.x = food.x + Math.cos(offsetAngle) * (food.radius + 4);
-                this.y = food.y + Math.sin(offsetAngle) * (food.radius + 4);
-                this.angle = angleToNest;
-
+                // Deposit pheromones
                 this.depositTimer++;
                 if (this.depositTimer > 4) {
-                    const distToNest = Math.hypot(CONFIG.nestX - food.x, CONFIG.nestY - food.y);
-                    const nearFoodBonus = Math.max(1, 12 - distToNest / 40);
-                    depositPheromone(this.x, this.y, 'food', CONFIG.pheromoneDeposit * nearFoodBonus);
+                    depositPheromone(this.x, this.y, 'food', CONFIG.pheromoneDeposit * 3);
                     this.depositTimer = 0;
                 }
 
-                const distToNest = Math.hypot(CONFIG.nestX - food.x, CONFIG.nestY - food.y);
+                // Check if reached nest
+                const distToNest = this.distanceToNest();
                 if (distToNest < getColonySize()) {
-                    foodCollected += food.value;
+                    // Earn coins (no ant spawning - that's separate now)
+                    earnCoins(this.carriedFoodValue);
+                    foodCollected += 1;
 
-                    for (const carrier of food.carriers) {
-                        carrier.carriedFood = null;
-                        carrier.targetFood = null;
-                        carrier.state = 'exploring';
-                        carrier.foundFoodRecently = true;
-                    }
-
-                    const idx = foodItems.indexOf(food);
-                    if (idx !== -1) {
-                        foodItems.splice(idx, 1);
-                    }
-                }
-            }
-
-            breakDownFood() {
-                const food = this.targetFood;
-                if (!food || !foodItems.includes(food)) {
+                    // Reset state
+                    this.carriedFoodPiece = null;
+                    this.carriedFoodValue = 0;
+                    this.targetFood = null;
                     this.state = 'exploring';
-                    return;
-                }
-
-                food.breakdownProgress += 0.008 * food.carriers.length;
-
-                const offsetAngle = food.breakdownProgress * 2.5 + food.carriers.indexOf(this) * (Math.PI * 2 / food.carriers.length);
-                this.x = food.x + Math.cos(offsetAngle) * (food.radius + 4);
-                this.y = food.y + Math.sin(offsetAngle) * (food.radius + 4);
-                this.angle = offsetAngle + Math.PI;
-
-                depositPheromone(food.x, food.y, 'food', CONFIG.pheromoneDeposit * 2.5);
-
-                if (food.breakdownProgress >= 1) {
-                    const piece = food.breakOffPiece();
-                    if (piece) {
-                        foodItems.push(piece);
-                    }
-                    food.breakdownProgress = 0;
-                    food.beingBrokenDown = false;
-
-                    if (food.canBeCarriedBy(food.carriers.length)) {
-                        for (const carrier of food.carriers) {
-                            carrier.state = 'carrying';
-                        }
-                    }
+                    this.foundFoodRecently = true;
+                    this.angle += Math.PI + (Math.random() - 0.5) * 1.2;
                 }
             }
 
@@ -1068,22 +2150,10 @@
 
             bounceOffWalls() {
                 const margin = 15;
-                if (this.x < margin) {
-                    this.x = margin;
-                    this.angle = Math.PI - this.angle;
-                }
-                if (this.x > width - margin) {
-                    this.x = width - margin;
-                    this.angle = Math.PI - this.angle;
-                }
-                if (this.y < margin) {
-                    this.y = margin;
-                    this.angle = -this.angle;
-                }
-                if (this.y > height - margin) {
-                    this.y = height - margin;
-                    this.angle = -this.angle;
-                }
+                if (this.x < margin) { this.x = margin; this.angle = Math.PI - this.angle; }
+                if (this.x > width - margin) { this.x = width - margin; this.angle = Math.PI - this.angle; }
+                if (this.y < margin) { this.y = margin; this.angle = -this.angle; }
+                if (this.y > height - margin) { this.y = height - margin; this.angle = -this.angle; }
             }
 
             distanceToNest() {
@@ -1102,24 +2172,25 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
-                const size = CONFIG.antSize;
+                const size = CONFIG.antSize * this.sizeMultiplier;
                 const legWave = Math.sin(this.legPhase) * 0.35;
 
-                // Reddish-brown ant color - visible against forest floor
-                const r = 45 + this.colorOffset;
-                const g = 25 + this.colorOffset * 0.5;
-                const b = 15;
+                // Type-based colors
+                const baseColor = this.colorConfig || CONFIG.antTypes.worker.color;
+                const r = baseColor.r + this.colorOffset;
+                const g = baseColor.g + this.colorOffset * 0.5;
+                const b = baseColor.b + this.colorOffset * 0.3;
                 const bodyColor = `rgb(${r}, ${g}, ${b})`;
-                const darkColor = `rgb(${r - 15}, ${g - 10}, ${b - 5})`;
-                const legColor = `rgb(${r + 20}, ${g + 15}, ${b + 10})`;
+                const darkColor = `rgb(${Math.max(0, r - 15)}, ${Math.max(0, g - 10)}, ${Math.max(0, b - 5)})`;
+                const legColor = `rgb(${Math.min(255, r + 20)}, ${Math.min(255, g + 15)}, ${Math.min(255, b + 10)})`;
 
-                // Subtle shadow under ant
+                // Shadow
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
                 ctx.beginPath();
                 ctx.ellipse(0, 2, size * 1.2, size * 0.3, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Draw legs
+                // Legs
                 ctx.strokeStyle = legColor;
                 ctx.lineWidth = size * 0.1;
                 ctx.lineCap = 'round';
@@ -1129,64 +2200,51 @@
                     const attachX = legPositions[i] * size;
                     const phase = (i === 1) ? -legWave : legWave;
 
-                    // Left legs
                     ctx.beginPath();
                     ctx.moveTo(attachX, -size * 0.12);
-                    ctx.quadraticCurveTo(
-                        attachX - size * 0.25,
-                        -size * 0.45 - phase * size * 0.15,
-                        attachX - size * 0.1,
-                        -size * 0.7 - phase * size * 0.1
-                    );
+                    ctx.quadraticCurveTo(attachX - size * 0.25, -size * 0.45 - phase * size * 0.15, attachX - size * 0.1, -size * 0.7 - phase * size * 0.1);
                     ctx.stroke();
 
-                    // Right legs
                     ctx.beginPath();
                     ctx.moveTo(attachX, size * 0.12);
-                    ctx.quadraticCurveTo(
-                        attachX - size * 0.25,
-                        size * 0.45 + phase * size * 0.15,
-                        attachX - size * 0.1,
-                        size * 0.7 + phase * size * 0.1
-                    );
+                    ctx.quadraticCurveTo(attachX - size * 0.25, size * 0.45 + phase * size * 0.15, attachX - size * 0.1, size * 0.7 + phase * size * 0.1);
                     ctx.stroke();
                 }
 
-                // GASTER (abdomen) - larger, oval
+                // Gaster
                 ctx.fillStyle = bodyColor;
                 ctx.beginPath();
                 ctx.ellipse(-size * 0.55, 0, size * 0.5, size * 0.35, 0, 0, Math.PI * 2);
                 ctx.fill();
-                // Gaster segments/shine
                 ctx.fillStyle = darkColor;
                 ctx.beginPath();
                 ctx.ellipse(-size * 0.65, 0, size * 0.2, size * 0.28, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // PETIOLE (waist)
+                // Petiole
                 ctx.fillStyle = bodyColor;
                 ctx.beginPath();
                 ctx.ellipse(-size * 0.1, 0, size * 0.1, size * 0.07, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // THORAX
+                // Thorax
                 ctx.beginPath();
                 ctx.ellipse(size * 0.2, 0, size * 0.28, size * 0.18, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // HEAD
+                // Head
                 ctx.beginPath();
                 ctx.ellipse(size * 0.55, 0, size * 0.2, size * 0.18, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Eyes (small dots)
+                // Eyes
                 ctx.fillStyle = '#000';
                 ctx.beginPath();
                 ctx.arc(size * 0.6, -size * 0.1, size * 0.04, 0, Math.PI * 2);
                 ctx.arc(size * 0.6, size * 0.1, size * 0.04, 0, Math.PI * 2);
                 ctx.fill();
 
-                // ANTENNAE
+                // Antennae
                 ctx.strokeStyle = legColor;
                 ctx.lineWidth = size * 0.06;
                 const antennaWave = Math.sin(this.legPhase * 0.6) * 0.12;
@@ -1203,16 +2261,29 @@
                 ctx.lineTo(size * 1.0, size * 0.18 - antennaWave * size);
                 ctx.stroke();
 
-                // MANDIBLES
-                ctx.lineWidth = size * 0.07;
-                ctx.beginPath();
-                ctx.moveTo(size * 0.7, -size * 0.06);
-                ctx.lineTo(size * 0.82, -size * 0.1);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(size * 0.7, size * 0.06);
-                ctx.lineTo(size * 0.82, size * 0.1);
-                ctx.stroke();
+                // Draw carried food piece
+                if (this.carriedFoodPiece && this.state === 'carrying') {
+                    ctx.save();
+                    ctx.rotate(-this.angle);  // Unrotate for emoji
+                    const pieceSize = 8;
+                    ctx.font = `${pieceSize}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.carriedFoodPiece.emoji, size * 0.75, 0);
+                    ctx.restore();
+                }
+
+                // Queen crown indicator
+                if (this.type === 'queen') {
+                    ctx.fillStyle = '#f4d03f';
+                    ctx.font = `${size * 0.8}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.save();
+                    ctx.rotate(-this.angle);  // Unrotate for emoji
+                    ctx.fillText('👑', 0, -size * 0.8);
+                    ctx.restore();
+                }
 
                 ctx.restore();
             }
@@ -1223,10 +2294,8 @@
             for (let i = 0; i < CONFIG.initialAnts; i++) {
                 const angle = Math.random() * Math.PI * 2;
                 const dist = Math.random() * CONFIG.nestRadius * 0.7;
-                ants.push(new Ant(
-                    CONFIG.nestX + Math.cos(angle) * dist,
-                    CONFIG.nestY + Math.sin(angle) * dist
-                ));
+                // Start with all workers
+                ants.push(new Ant(CONFIG.nestX + Math.cos(angle) * dist, CONFIG.nestY + Math.sin(angle) * dist, 'worker'));
             }
         }
 
@@ -1235,55 +2304,36 @@
         // ===========================================
 
         function drawGround() {
-            // Rich forest floor gradient
-            const gradient = ctx.createRadialGradient(
-                width / 2, height / 2, 0,
-                width / 2, height / 2, Math.max(width, height) * 0.7
-            );
-            gradient.addColorStop(0, '#252518');
-            gradient.addColorStop(0.5, '#1e1e14');
-            gradient.addColorStop(1, '#151510');
+            // Brighter, greener forest floor
+            const gradient = ctx.createRadialGradient(width * 0.4, height * 0.35, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.8);
+            gradient.addColorStop(0, '#3a4a30');
+            gradient.addColorStop(0.3, '#2e3d28');
+            gradient.addColorStop(0.6, '#243320');
+            gradient.addColorStop(1, '#1a2818');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
 
-            // Noise texture overlay
-            ctx.fillStyle = 'rgba(40, 35, 25, 0.3)';
-            for (let i = 0; i < 400; i++) {
-                const x = (i * 73 + 17) % width;
-                const y = (i * 97 + 31) % height;
-                const size = 0.5 + Math.random() * 1.5;
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Draw forest elements
-            for (const el of forestElements) {
-                drawForestElement(el);
-            }
-
-            // Vignette effect
-            const vignetteGradient = ctx.createRadialGradient(
-                width / 2, height / 2, Math.min(width, height) * 0.3,
-                width / 2, height / 2, Math.max(width, height) * 0.8
-            );
-            vignetteGradient.addColorStop(0, 'transparent');
-            vignetteGradient.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
-            ctx.fillStyle = vignetteGradient;
+            // Warm light beam
+            const beamGradient = ctx.createRadialGradient(width * 0.3, height * 0.2, 0, width * 0.3, height * 0.2, height * 0.8);
+            beamGradient.addColorStop(0, 'rgba(255, 250, 220, 0.08)');
+            beamGradient.addColorStop(0.3, 'rgba(255, 240, 200, 0.04)');
+            beamGradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = beamGradient;
             ctx.fillRect(0, 0, width, height);
 
-            // Edge shadows suggesting surrounding trees
-            const edgeShadow = ctx.createLinearGradient(0, 0, 0, height * 0.15);
-            edgeShadow.addColorStop(0, 'rgba(0, 10, 5, 0.5)');
-            edgeShadow.addColorStop(1, 'transparent');
-            ctx.fillStyle = edgeShadow;
-            ctx.fillRect(0, 0, width, height * 0.15);
+            // Draw forest elements
+            for (const el of forestElements) drawForestElement(el);
 
-            const bottomShadow = ctx.createLinearGradient(0, height * 0.85, 0, height);
-            bottomShadow.addColorStop(0, 'transparent');
-            bottomShadow.addColorStop(1, 'rgba(0, 10, 5, 0.4)');
-            ctx.fillStyle = bottomShadow;
-            ctx.fillRect(0, height * 0.85, width, height * 0.15);
+            // Draw grass
+            drawGrass();
+
+            // Subtle vignette
+            const vignetteGradient = ctx.createRadialGradient(width / 2, height / 2, Math.min(width, height) * 0.35, width / 2, height / 2, Math.max(width, height) * 0.85);
+            vignetteGradient.addColorStop(0, 'transparent');
+            vignetteGradient.addColorStop(0.8, 'rgba(0, 0, 0, 0.1)');
+            vignetteGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+            ctx.fillStyle = vignetteGradient;
+            ctx.fillRect(0, 0, width, height);
         }
 
         function drawPheromones() {
@@ -1293,40 +2343,25 @@
                 for (let col = 0; col < pheromoneGrid.cols; col++) {
                     const idx = row * pheromoneGrid.cols + col;
                     const foodPh = pheromoneGrid.food[idx];
-                    const homePh = pheromoneGrid.home[idx];
 
-                    if (foodPh > 0.8 || homePh > 0.8) {
+                    if (foodPh > 0.8) {
                         const x = col * cellSize;
                         const y = row * cellSize;
-
-                        if (foodPh > 0.8) {
-                            const alpha = Math.min(0.35, foodPh / CONFIG.pheromoneMax * 0.45);
-                            ctx.fillStyle = `rgba(120, 180, 80, ${alpha})`;
-                            ctx.beginPath();
-                            ctx.arc(x + cellSize/2, y + cellSize/2, cellSize * 0.6, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-
-                        if (homePh > 0.8) {
-                            const alpha = Math.min(0.12, homePh / CONFIG.pheromoneMax * 0.15);
-                            ctx.fillStyle = `rgba(150, 180, 220, ${alpha})`;
-                            ctx.beginPath();
-                            ctx.arc(x + cellSize/2, y + cellSize/2, cellSize * 0.5, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
+                        const alpha = Math.min(0.3, foodPh / CONFIG.pheromoneMax * 0.4);
+                        ctx.fillStyle = `rgba(160, 220, 120, ${alpha})`;
+                        ctx.beginPath();
+                        ctx.arc(x + cellSize / 2, y + cellSize / 2, cellSize * 0.5, 0, Math.PI * 2);
+                        ctx.fill();
                     }
                 }
             }
         }
 
-        // Colony growth
         let colonyLevel = 1;
         let nextLevelThreshold = 25;
 
         function getColonySize() {
-            const baseRadius = CONFIG.nestRadius;
-            const growth = Math.min(3.5, 1 + foodCollected / 40);
-            return baseRadius * growth;
+            return CONFIG.nestRadius * Math.min(3.5, 1 + foodCollected / 40);
         }
 
         function updateColonyGrowth() {
@@ -1334,142 +2369,141 @@
                 colonyLevel++;
                 nextLevelThreshold = Math.floor(nextLevelThreshold * 2.2);
 
-                const newAnts = 12 + colonyLevel * 6;
-                for (let i = 0; i < newAnts; i++) {
-                    if (ants.length < CONFIG.maxAnts) {
-                        const angle = Math.random() * Math.PI * 2;
-                        ants.push(new Ant(
-                            CONFIG.nestX + Math.cos(angle) * CONFIG.nestRadius * 0.4,
-                            CONFIG.nestY + Math.sin(angle) * CONFIG.nestRadius * 0.4
-                        ));
-                    }
-                }
+                // Level up gives bonus coins instead of spawning ants
+                const bonusCoins = 20 + colonyLevel * 15;
+                earnCoins(bonusCoins);
+
+                // Show level up notification
+                spawnNotifications.push({
+                    text: `Level ${colonyLevel}! +${bonusCoins} coins!`,
+                    color: 'rgba(244, 208, 63, 0.9)',
+                    x: CONFIG.nestX,
+                    y: CONFIG.nestY - getColonySize() - 40,
+                    alpha: 1,
+                    life: 120
+                });
             }
         }
 
         function drawNest() {
             const currentRadius = getColonySize();
+            const cx = CONFIG.nestX;
+            const cy = CONFIG.nestY;
 
-            // Excavated dirt ring
-            ctx.fillStyle = '#2d2518';
-            for (let i = 0; i < 12 + colonyLevel * 4; i++) {
-                const angle = (i / (12 + colonyLevel * 4)) * Math.PI * 2 + Math.sin(i * 1.3) * 0.25;
-                const dist = currentRadius * (1.0 + Math.sin(i * 2.3) * 0.25);
-                const blobSize = currentRadius * (0.12 + Math.sin(i * 3.7) * 0.06);
+            // Excavated dirt
+            ctx.fillStyle = '#4a4030';
+            for (let i = 0; i < 20 + colonyLevel * 5; i++) {
+                const angle = (i / (20 + colonyLevel * 5)) * Math.PI * 2 + Math.sin(i * 1.7) * 0.4;
+                const dist = currentRadius * (1.1 + Math.sin(i * 2.9) * 0.2);
+                const blobSize = currentRadius * (0.06 + Math.sin(i * 4.1) * 0.03);
                 ctx.beginPath();
-                ctx.ellipse(
-                    CONFIG.nestX + Math.cos(angle) * dist,
-                    CONFIG.nestY + Math.sin(angle) * dist * 0.55,
-                    blobSize,
-                    blobSize * 0.5,
-                    angle * 0.3, 0, Math.PI * 2
-                );
+                ctx.ellipse(cx + Math.cos(angle) * dist, cy + Math.sin(angle) * dist * 0.5, blobSize * 1.2, blobSize * 0.4, angle * 0.3, 0, Math.PI * 2);
                 ctx.fill();
             }
+
+            // Shadow
+            const shadowGrad = ctx.createRadialGradient(cx + currentRadius * 0.1, cy + currentRadius * 0.15, 0, cx, cy, currentRadius * 1.3);
+            shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+            shadowGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.12)');
+            shadowGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = shadowGrad;
+            ctx.beginPath();
+            ctx.ellipse(cx + currentRadius * 0.1, cy + currentRadius * 0.12, currentRadius * 1.2, currentRadius * 0.7, 0, 0, Math.PI * 2);
+            ctx.fill();
 
             // Main mound
-            const gradient = ctx.createRadialGradient(
-                CONFIG.nestX, CONFIG.nestY - currentRadius * 0.15, 0,
-                CONFIG.nestX, CONFIG.nestY, currentRadius * 1.2
-            );
-            gradient.addColorStop(0, '#4a3a28');
-            gradient.addColorStop(0.25, '#3d2d1f');
-            gradient.addColorStop(0.6, '#2a2018');
-            gradient.addColorStop(1, 'transparent');
+            const baseGrad = ctx.createRadialGradient(cx - currentRadius * 0.2, cy - currentRadius * 0.25, 0, cx, cy, currentRadius * 1.2);
+            baseGrad.addColorStop(0, '#6a5a45');
+            baseGrad.addColorStop(0.3, '#5a4a38');
+            baseGrad.addColorStop(0.6, '#4a3a2a');
+            baseGrad.addColorStop(1, '#3a2a1f');
 
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = baseGrad;
             ctx.beginPath();
-            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 1.1, currentRadius * 0.7, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, cy, currentRadius, currentRadius * 0.6, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Dirt texture
-            ctx.fillStyle = '#3d2d1d';
-            for (let i = 0; i < 20 + colonyLevel * 6; i++) {
+            // Texture
+            for (let i = 0; i < 25 + colonyLevel * 8; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const dist = Math.random() * currentRadius * 0.85;
-                const size = 1 + Math.random() * 2.5;
+                const dist = Math.random() * currentRadius * 0.9;
+                const brightness = 40 + Math.random() * 25;
+                ctx.fillStyle = `rgb(${brightness + 25}, ${brightness + 15}, ${brightness})`;
                 ctx.beginPath();
-                ctx.arc(
-                    CONFIG.nestX + Math.cos(angle) * dist,
-                    CONFIG.nestY + Math.sin(angle) * dist * 0.55,
-                    size, 0, Math.PI * 2
-                );
+                ctx.arc(cx + Math.cos(angle) * dist, cy + Math.sin(angle) * dist * 0.55, 1 + Math.random() * 2, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Central mound
-            const innerGradient = ctx.createRadialGradient(
-                CONFIG.nestX, CONFIG.nestY - currentRadius * 0.08, 0,
-                CONFIG.nestX, CONFIG.nestY, currentRadius * 0.55
-            );
-            innerGradient.addColorStop(0, '#5a4a35');
-            innerGradient.addColorStop(0.4, '#4a3a28');
-            innerGradient.addColorStop(1, '#3a2a1a');
+            // Entrance
+            const entranceGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, currentRadius * 0.25);
+            entranceGrad.addColorStop(0, '#080604');
+            entranceGrad.addColorStop(0.6, '#100e0a');
+            entranceGrad.addColorStop(1, '#2a2218');
 
-            ctx.fillStyle = innerGradient;
+            ctx.fillStyle = entranceGrad;
             ctx.beginPath();
-            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 0.45, currentRadius * 0.32, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Entrance hole
-            const entranceGradient = ctx.createRadialGradient(
-                CONFIG.nestX, CONFIG.nestY, 0,
-                CONFIG.nestX, CONFIG.nestY, currentRadius * 0.22
-            );
-            entranceGradient.addColorStop(0, '#080604');
-            entranceGradient.addColorStop(0.6, '#0f0a08');
-            entranceGradient.addColorStop(1, '#1a1210');
-
-            ctx.fillStyle = entranceGradient;
-            ctx.beginPath();
-            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 0.22, currentRadius * 0.16, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, cy, currentRadius * 0.22, currentRadius * 0.15, 0, 0, Math.PI * 2);
             ctx.fill();
 
             // Entrance rim
-            ctx.strokeStyle = '#5a4830';
+            ctx.strokeStyle = '#6a5838';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.ellipse(CONFIG.nestX, CONFIG.nestY, currentRadius * 0.25, currentRadius * 0.18, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, cy, currentRadius * 0.25, currentRadius * 0.17, 0, Math.PI * 0.8, Math.PI * 0.2);
             ctx.stroke();
-
-            // Level indicator pebbles
-            ctx.fillStyle = '#6a5a40';
-            for (let i = 0; i < colonyLevel; i++) {
-                const angle = (i / Math.max(colonyLevel, 1)) * Math.PI * 2 - Math.PI / 2;
-                ctx.beginPath();
-                ctx.arc(
-                    CONFIG.nestX + Math.cos(angle) * currentRadius * 0.38,
-                    CONFIG.nestY + Math.sin(angle) * currentRadius * 0.26,
-                    2.5, 0, Math.PI * 2
-                );
-                ctx.fill();
-            }
         }
 
         function drawFood() {
-            for (const food of foodItems) {
-                food.draw();
-            }
+            for (const food of foodItems) food.draw();
         }
 
         function drawAnts() {
-            for (const ant of ants) {
-                ant.draw();
-            }
+            for (const ant of ants) ant.draw();
         }
 
         function updateUI() {
+            document.getElementById('coins').textContent = coins;
             document.getElementById('colony-level').textContent = colonyLevel;
             document.getElementById('ant-count').textContent = ants.length;
             document.getElementById('food-collected').textContent = foodCollected;
-            document.getElementById('food-available').textContent = foodItems.length;
+
+            // Count ant types
+            let workerCount = 0, soldierCount = 0, scoutCount = 0, carrierCount = 0, queenCount = 0;
+            for (const ant of ants) {
+                if (ant.type === 'worker') workerCount++;
+                else if (ant.type === 'soldier') soldierCount++;
+                else if (ant.type === 'scout') scoutCount++;
+                else if (ant.type === 'carrier') carrierCount++;
+                else if (ant.type === 'queen') queenCount++;
+            }
+            document.getElementById('worker-count').textContent = workerCount;
+            document.getElementById('soldier-count').textContent = soldierCount;
+            document.getElementById('scout-count').textContent = scoutCount;
+            document.getElementById('carrier-count').textContent = carrierCount;
+            document.getElementById('queen-count').textContent = queenCount;
+
+            // Update food button states based on affordability
+            document.querySelectorAll('.food-btn').forEach(btn => {
+                const cost = parseInt(btn.dataset.cost);
+                btn.classList.toggle('disabled', coins < cost);
+            });
+
+            // Update ant button states and costs
+            document.querySelectorAll('.ant-btn').forEach(btn => {
+                const antType = btn.dataset.ant;
+                const cost = getAntSpawnCost(antType);
+                btn.classList.toggle('disabled', coins < cost || ants.length >= CONFIG.maxAnts);
+            });
+
+            // Update displayed costs
+            updateAntCosts();
         }
 
         // ===========================================
         // INPUT HANDLING
         // ===========================================
 
-        let selectedFoodType = 'crumb';
+        let selectedFoodType = 'sugar';
         let isPlacing = false;
         let lastPlaceTime = 0;
         let showHint = true;
@@ -1477,6 +2511,7 @@
         document.querySelectorAll('.food-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                if (btn.classList.contains('disabled')) return;
                 document.querySelectorAll('.food-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 selectedFoodType = btn.dataset.food;
@@ -1488,22 +2523,36 @@
         document.querySelector('.food-selector').addEventListener('mousedown', (e) => e.stopPropagation());
         document.querySelector('.food-selector').addEventListener('touchstart', (e) => e.stopPropagation());
 
+        // Ant spawn button handlers
+        document.querySelectorAll('.ant-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (btn.classList.contains('disabled')) return;
+                const antType = btn.dataset.ant;
+                spawnAnt(antType);
+            });
+            btn.addEventListener('mousedown', (e) => e.stopPropagation());
+            btn.addEventListener('touchstart', (e) => e.stopPropagation());
+        });
+
+        document.querySelector('.ant-selector').addEventListener('mousedown', (e) => e.stopPropagation());
+        document.querySelector('.ant-selector').addEventListener('touchstart', (e) => e.stopPropagation());
+
         function placeFood(x, y) {
             const now = Date.now();
-            const minInterval = selectedFoodType === 'crumb' ? 80 : 150;
+            const minInterval = selectedFoodType === 'sugar' ? 100 : 200;
             if (now - lastPlaceTime < minInterval) return;
             lastPlaceTime = now;
 
             const distToNest = Math.hypot(x - CONFIG.nestX, y - CONFIG.nestY);
             if (distToNest < getColonySize() * 1.5) return;
 
-            addFood(x, y, selectedFoodType);
-            showHint = false;
+            if (addFood(x, y, selectedFoodType)) {
+                showHint = false;
+            }
         }
 
-        canvas.addEventListener('click', (e) => {
-            placeFood(e.clientX, e.clientY);
-        });
+        canvas.addEventListener('click', (e) => placeFood(e.clientX, e.clientY));
 
         canvas.addEventListener('mousedown', (e) => {
             e.preventDefault();
@@ -1512,87 +2561,78 @@
         });
 
         canvas.addEventListener('mousemove', (e) => {
-            if (isPlacing) {
-                placeFood(e.clientX, e.clientY);
-            }
+            if (isPlacing) placeFood(e.clientX, e.clientY);
         });
 
-        canvas.addEventListener('mouseup', () => {
-            isPlacing = false;
-        });
-
-        canvas.addEventListener('mouseleave', () => {
-            isPlacing = false;
-        });
+        canvas.addEventListener('mouseup', () => isPlacing = false);
+        canvas.addEventListener('mouseleave', () => isPlacing = false);
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             isPlacing = true;
-            const touch = e.touches[0];
-            placeFood(touch.clientX, touch.clientY);
+            placeFood(e.touches[0].clientX, e.touches[0].clientY);
         });
 
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if (isPlacing) {
-                const touch = e.touches[0];
-                placeFood(touch.clientX, touch.clientY);
-            }
+            if (isPlacing) placeFood(e.touches[0].clientX, e.touches[0].clientY);
         });
 
-        canvas.addEventListener('touchend', () => {
-            isPlacing = false;
-        });
+        canvas.addEventListener('touchend', () => isPlacing = false);
 
         // ===========================================
         // MAIN LOOP
         // ===========================================
 
         function update() {
-            for (const ant of ants) {
-                ant.update();
-            }
-
+            time++;
+            for (const ant of ants) ant.update();
+            // Update all predators
+            if (predators.spider) predators.spider.update();
+            if (predators.bird) predators.bird.update();
+            if (predators.beetle) predators.beetle.update();
             decayPheromones();
             updateColonyGrowth();
+            updateAmbientParticles();
+            updateSpawnNotifications();
 
-            if (ants.length < CONFIG.maxAnts && foodCollected > 0 && Math.random() < 0.0025) {
-                const angle = Math.random() * Math.PI * 2;
-                const currentRadius = getColonySize();
-                ants.push(new Ant(
-                    CONFIG.nestX + Math.cos(angle) * currentRadius * 0.4,
-                    CONFIG.nestY + Math.sin(angle) * currentRadius * 0.4
-                ));
-            }
+            // Removed random spawning - ants now spawn only when food is delivered
         }
 
         function drawHint() {
             if (!showHint) return;
 
             ctx.save();
-            ctx.fillStyle = 'rgba(232, 228, 216, 0.5)';
-            ctx.font = 'italic 15px "Crimson Pro", Georgia, serif';
+            ctx.fillStyle = 'rgba(240, 235, 224, 0.5)';
+            ctx.font = 'italic 16px "Playfair Display", Georgia, serif';
             ctx.textAlign = 'center';
-            ctx.fillText('click to scatter food on the forest floor', width / 2, height * 0.22);
+            ctx.fillText('click to drop food', width / 2, height * 0.18);
 
-            ctx.strokeStyle = 'rgba(232, 228, 216, 0.3)';
+            ctx.strokeStyle = 'rgba(240, 235, 224, 0.3)';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.moveTo(width / 2, height * 0.25);
-            ctx.lineTo(width / 2, height * 0.32);
-            ctx.moveTo(width / 2 - 6, height * 0.30);
-            ctx.lineTo(width / 2, height * 0.32);
-            ctx.lineTo(width / 2 + 6, height * 0.30);
+            ctx.moveTo(width / 2, height * 0.21);
+            ctx.lineTo(width / 2, height * 0.28);
+            ctx.moveTo(width / 2 - 6, height * 0.26);
+            ctx.lineTo(width / 2, height * 0.28);
+            ctx.lineTo(width / 2 + 6, height * 0.26);
             ctx.stroke();
             ctx.restore();
         }
 
         function render() {
             drawGround();
+            drawDangerZones();
             drawPheromones();
             drawNest();
             drawFood();
             drawAnts();
+            // Draw all predators
+            if (predators.spider) predators.spider.draw();
+            if (predators.bird) predators.bird.draw();
+            if (predators.beetle) predators.beetle.draw();
+            drawAmbientParticles();
+            drawSpawnNotifications();
             drawHint();
         }
 
@@ -1612,15 +2652,44 @@
             canvas.style.width = width + 'px';
             canvas.style.height = height + 'px';
             ctx.scale(dpr, dpr);
+
             initPheromoneGrid();
             CONFIG.nestX = width * 0.5;
             CONFIG.nestY = height * 0.6;
+
+            // Position predator territories
+            const baseRadius = Math.min(width, height) * 0.12;
+
+            // Spider: center-top
+            CONFIG.predators.spider.x = width * 0.5;
+            CONFIG.predators.spider.y = height * 0.22;
+            CONFIG.predators.spider.radius = baseRadius;
+
+            // Bird: left-top
+            CONFIG.predators.bird.x = width * 0.25;
+            CONFIG.predators.bird.y = height * 0.28;
+            CONFIG.predators.bird.radius = baseRadius * 0.9;
+
+            // Beetle: right-top
+            CONFIG.predators.beetle.x = width * 0.75;
+            CONFIG.predators.beetle.y = height * 0.28;
+            CONFIG.predators.beetle.radius = baseRadius * 0.85;
+
             generateForestElements();
+            generateGrass();
+            initAmbientParticles();
+        }
+
+        function initPredators() {
+            predators.spider = new Spider();
+            predators.bird = new Bird();
+            predators.beetle = new Beetle();
         }
 
         // Initialize
         resize();
         initAnts();
+        initPredators();
         gameLoop();
 
         window.addEventListener('resize', resize);
