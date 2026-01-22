@@ -102,6 +102,28 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .info-panel h3 .collapse-icon {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .info-panel.collapsed h3 .collapse-icon {
+            transform: rotate(180deg);
+        }
+
+        .info-panel.collapsed .panel-content {
+            display: none;
+        }
+
+        .info-panel h3:hover {
+            color: var(--text);
             border-bottom: 1px solid var(--border);
         }
 
@@ -184,7 +206,7 @@
                 0 0 20px rgba(0, 255, 136, 0.1),
                 inset 0 0 60px rgba(0, 255, 136, 0.02);
             z-index: 1000;
-            overflow: hidden;
+            overflow: visible;
             animation: cardAppear 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             font-family: 'Share Tech Mono', monospace;
         }
@@ -474,6 +496,39 @@
             transform: translateX(-50%);
             border: 8px solid transparent;
             border-top-color: rgba(0, 255, 136, 0.4);
+        }
+
+        /* HP tooltip dynamic styling */
+        .stat-tooltip .hp-current {
+            font-weight: 700;
+            color: #00ff88;
+            font-size: 14px;
+        }
+
+        .stat-tooltip .hp-max {
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .stat-tooltip .hp-status {
+            display: block;
+            margin-top: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-tooltip .hp-status.good { color: #00ff88; }
+        .stat-tooltip .hp-status.weak { color: #f59e0b; }
+        .stat-tooltip .hp-status.bad { color: #ef4444; }
+
+        .stat-tooltip small {
+            display: block;
+            margin-top: 6px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
         }
 
         .card-exp-section {
@@ -855,6 +910,47 @@
             cursor: not-allowed;
         }
 
+        /* Food cooldown overlay styles */
+        .food-btn.on-cooldown {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .food-btn .cooldown-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .food-btn.on-cooldown .cooldown-overlay {
+            opacity: 1;
+        }
+
+        .food-btn .cooldown-timer {
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .food-btn .cooldown-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--accent));
+            border-radius: 0 0 8px 8px;
+            transition: width 0.1s linear;
+        }
+
         .food-btn span.emoji {
             font-size: 20px;
             filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
@@ -955,6 +1051,85 @@
             .food-label, .ant-label {
                 display: none;
             }
+        }
+
+        /* Hive Placement Overlay */
+        .hive-placement-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            cursor: none;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Hive cursor that follows mouse during placement */
+        .hive-cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1600;
+            font-size: 48px;
+            transform: translate(-50%, -50%);
+            opacity: 0.85;
+            filter: drop-shadow(0 0 12px rgba(244, 208, 63, 0.8)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+            transition: transform 0.1s ease-out, opacity 0.2s ease;
+        }
+
+        .hive-cursor.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .hive-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(244, 208, 63, 0.5);
+            border-radius: 50%;
+            animation: hiveCursorPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes hiveCursorPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.8; }
+        }
+
+        .hive-placement-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .hive-placement-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(244, 208, 63, 0.6);
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+            animation: hivePulse 2s ease-in-out infinite;
+        }
+
+        .hive-placement-subtitle {
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+        }
+
+        @keyframes hivePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
         }
 
         /* Game Over Modal */
@@ -1110,23 +1285,39 @@
             50% { box-shadow: 0 0 20px rgba(255, 60, 60, 0.6); }
         }
 
-        /* Upgrade Selection Panel - Centered modal */
+        /* Upgrade Selection Panel - TFT-Style Centered Modal */
         .upgrade-modal {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
-            background: linear-gradient(165deg, rgba(20, 25, 18, 0.95), rgba(15, 18, 12, 0.98));
-            border: 2px solid rgba(184, 212, 104, 0.4);
-            border-radius: 16px;
-            padding: 24px;
+            background: linear-gradient(180deg, rgba(18, 22, 16, 0.97) 0%, rgba(12, 15, 10, 0.99) 100%);
+            border: 2px solid rgba(184, 212, 104, 0.35);
+            border-radius: 20px;
+            padding: 28px 36px 32px;
             z-index: 2000;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(184, 212, 104, 0.1);
-            min-width: 320px;
-            max-width: 400px;
+            box-shadow:
+                0 0 80px rgba(0, 0, 0, 0.7),
+                0 0 40px rgba(184, 212, 104, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            min-width: 720px;
+            max-width: 880px;
             opacity: 0;
             pointer-events: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .upgrade-modal::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(184, 212, 104, 0.6), transparent);
+            border-radius: 2px;
         }
 
         .upgrade-modal.visible {
@@ -1136,99 +1327,166 @@
         }
 
         .upgrade-modal.minimized {
-            transform: translate(-50%, -50%) scale(0.9);
-            opacity: 0;
-            pointer-events: none;
+            transform: translate(-50%, 0) scale(1);
+            top: 20px;
+            opacity: 1;
+            pointer-events: auto;
+            padding: 12px 20px;
+            min-width: auto;
+            max-width: none;
+            width: auto;
+            border-radius: 10px;
+        }
+
+        .upgrade-modal.minimized .upgrade-header,
+        .upgrade-modal.minimized .upgrade-subtitle,
+        .upgrade-modal.minimized .upgrade-options,
+        .upgrade-modal.minimized .upgrade-count {
+            display: none;
+        }
+
+        .upgrade-modal.minimized .upgrade-timer {
+            margin-bottom: 0;
+            padding: 4px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .upgrade-modal.minimized .upgrade-timer-bar {
+            width: 100px;
+            margin-top: 0;
         }
 
         .upgrade-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .upgrade-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
+            font-size: 20px;
             color: var(--gold);
-            text-shadow: 0 0 15px rgba(244, 208, 63, 0.4);
-            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(244, 208, 63, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
         .upgrade-hide-btn {
-            background: rgba(184, 212, 104, 0.2);
-            border: 1px solid rgba(184, 212, 104, 0.4);
+            background: rgba(184, 212, 104, 0.15);
+            border: 1px solid rgba(184, 212, 104, 0.35);
             color: var(--accent);
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .upgrade-hide-btn:hover {
-            background: rgba(184, 212, 104, 0.3);
+            background: rgba(184, 212, 104, 0.25);
             transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(184, 212, 104, 0.3);
         }
 
         .upgrade-subtitle {
             font-family: 'DM Mono', monospace;
             font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 16px;
-            letter-spacing: 1px;
+            margin-bottom: 20px;
+            letter-spacing: 1.5px;
+            text-align: center;
+            opacity: 0.8;
         }
 
         .upgrade-timer {
             font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--gold);
             text-align: center;
-            margin-bottom: 12px;
-            padding: 6px 12px;
-            background: rgba(244, 208, 63, 0.1);
-            border-radius: 6px;
-            border: 1px solid rgba(244, 208, 63, 0.3);
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(180deg, rgba(244, 208, 63, 0.12) 0%, rgba(244, 208, 63, 0.06) 100%);
+            border-radius: 10px;
+            border: 1px solid rgba(244, 208, 63, 0.25);
+            box-shadow: inset 0 1px 0 rgba(244, 208, 63, 0.1);
         }
 
         .upgrade-timer-bar {
-            height: 3px;
-            background: rgba(244, 208, 63, 0.2);
-            border-radius: 2px;
-            margin-top: 6px;
+            height: 4px;
+            background: rgba(244, 208, 63, 0.15);
+            border-radius: 4px;
+            margin-top: 8px;
             overflow: hidden;
         }
 
         .upgrade-timer-fill {
             height: 100%;
-            background: var(--gold);
-            transition: width 1s linear;
+            background: linear-gradient(90deg, var(--gold), rgba(244, 230, 100, 1));
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px rgba(244, 208, 63, 0.6);
         }
 
+        .upgrade-expand-btn {
+            display: none;
+            background: rgba(244, 208, 63, 0.15);
+            border: 1px solid rgba(244, 208, 63, 0.35);
+            color: var(--gold);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+            margin-left: auto;
+        }
+
+        .upgrade-expand-btn:hover {
+            background: rgba(244, 208, 63, 0.25);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(244, 208, 63, 0.3);
+        }
+
+        .upgrade-modal.minimized .upgrade-expand-btn {
+            display: flex;
+        }
+
+        /* TFT-Style Horizontal Card Layout */
         .upgrade-options {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            flex-direction: row;
+            gap: 16px;
+            justify-content: center;
+            padding: 8px 0;
         }
 
+        /* TFT-Style Upgrade Card */
         .upgrade-card {
-            background: linear-gradient(165deg, rgba(30, 35, 28, 0.95), rgba(20, 24, 18, 0.98));
-            border: 2px solid rgba(184, 212, 104, 0.25);
-            border-radius: 10px;
-            padding: 14px 16px;
-            text-align: left;
+            background: linear-gradient(165deg, rgba(35, 42, 32, 0.95) 0%, rgba(22, 26, 20, 0.98) 100%);
+            border: 2px solid rgba(184, 212, 104, 0.2);
+            border-radius: 16px;
+            padding: 24px 20px 20px;
+            text-align: center;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
             overflow: hidden;
             display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 12px;
+            flex: 1;
+            min-width: 180px;
+            max-width: 220px;
+            min-height: 200px;
         }
 
         .upgrade-card::before {
@@ -1236,64 +1494,101 @@
             position: absolute;
             top: 0;
             left: 0;
-            bottom: 0;
-            width: 3px;
-            background: var(--accent);
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s;
+        }
+
+        .upgrade-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center top, rgba(184, 212, 104, 0.08) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
         }
 
         .upgrade-card:hover {
             border-color: var(--accent);
-            transform: translateX(-4px);
-            box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(184, 212, 104, 0.15);
+            transform: translateY(-8px) scale(1.03);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(184, 212, 104, 0.2),
+                0 0 60px rgba(184, 212, 104, 0.1);
         }
 
         .upgrade-card:hover::before {
             opacity: 1;
         }
 
+        .upgrade-card:hover::after {
+            opacity: 1;
+        }
+
         .upgrade-card:active {
-            transform: translateX(-2px) scale(0.98);
+            transform: translateY(-4px) scale(1.01);
         }
 
+        /* Card Emoji/Icon */
         .upgrade-emoji {
-            font-size: 28px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            font-size: 48px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
             flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            margin-top: 8px;
         }
 
+        .upgrade-card:hover .upgrade-emoji {
+            transform: scale(1.15);
+        }
+
+        /* Card Info Container */
         .upgrade-info {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
+        /* Card Name */
         .upgrade-name {
             font-family: 'Orbitron', sans-serif;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--accent);
-            margin-bottom: 4px;
             letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(184, 212, 104, 0.3);
+            line-height: 1.3;
         }
 
+        /* Card Description */
         .upgrade-desc {
             font-family: 'DM Mono', monospace;
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
-            line-height: 1.4;
+            line-height: 1.5;
+            opacity: 0.85;
         }
 
+        /* Stack Count Badge */
         .upgrade-stacks {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--accent);
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, var(--accent), rgba(160, 190, 90, 1));
             color: var(--bg);
             font-family: 'Orbitron', sans-serif;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 3px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(184, 212, 104, 0.4);
         }
 
         /* Upgrade count display in UI */
@@ -1302,10 +1597,10 @@
             font-size: 11px;
             color: var(--accent);
             text-align: center;
-            padding: 8px;
-            margin-top: 8px;
-            background: rgba(184, 212, 104, 0.1);
-            border-radius: 6px;
+            padding: 10px 16px;
+            margin-top: 16px;
+            background: linear-gradient(180deg, rgba(184, 212, 104, 0.1) 0%, rgba(184, 212, 104, 0.05) 100%);
+            border-radius: 8px;
             border: 1px solid rgba(184, 212, 104, 0.2);
         }
 
@@ -1313,33 +1608,77 @@
         .upgrade-card-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 0;
+            flex: 1;
+            min-width: 180px;
+            max-width: 220px;
         }
 
-        /* Premium upgrade option */
+        /* Category label above upgrade card */
+        .upgrade-category {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 4px 12px;
+            margin-bottom: 6px;
+            border: 1px solid;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0.9;
+        }
+
+        /* When wrapper has premium, adjust card border radius */
+        .upgrade-card-wrapper:has(.upgrade-premium) .upgrade-card {
+            border-radius: 16px 16px 0 0;
+            border-bottom: none;
+        }
+
+        /* Premium upgrade option - connected to card */
         .upgrade-premium {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(165deg, rgba(244, 208, 63, 0.15), rgba(244, 180, 63, 0.1));
-            border: 1px solid rgba(244, 208, 63, 0.4);
-            border-radius: 6px;
-            padding: 8px 12px;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(165deg, rgba(244, 208, 63, 0.12) 0%, rgba(244, 180, 63, 0.08) 100%);
+            border: 2px solid rgba(244, 208, 63, 0.35);
+            border-top: 1px dashed rgba(244, 208, 63, 0.4);
+            border-radius: 0 0 16px 16px;
+            padding: 12px 14px;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-left: 40px;
+            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+            margin-top: 0;
+            position: relative;
+        }
+
+        /* Subtle connector line between card and premium */
+        .upgrade-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(244, 208, 63, 0.5), transparent);
         }
 
         .upgrade-premium:hover:not(.disabled) {
-            background: linear-gradient(165deg, rgba(244, 208, 63, 0.25), rgba(244, 180, 63, 0.2));
+            background: linear-gradient(165deg, rgba(244, 208, 63, 0.2) 0%, rgba(244, 180, 63, 0.15) 100%);
             border-color: var(--gold);
-            transform: translateX(-2px);
+            border-top-color: rgba(244, 208, 63, 0.6);
+            box-shadow: 0 4px 15px rgba(244, 208, 63, 0.2);
+        }
+
+        /* Hover on wrapper lifts both elements together */
+        .upgrade-card-wrapper:hover .upgrade-premium:not(.disabled) {
+            border-top-color: rgba(244, 208, 63, 0.5);
         }
 
         .upgrade-premium.disabled {
-            opacity: 0.4;
+            opacity: 0.35;
             cursor: not-allowed;
-            filter: grayscale(0.5);
+            filter: grayscale(0.6);
         }
 
         .premium-cost {
@@ -1347,7 +1686,7 @@
             font-size: 12px;
             color: var(--gold);
             font-weight: bold;
-            text-shadow: 0 0 8px rgba(244, 208, 63, 0.4);
+            text-shadow: 0 0 10px rgba(244, 208, 63, 0.5);
             flex-shrink: 0;
         }
 
@@ -1355,9 +1694,8 @@
             font-family: 'DM Mono', monospace;
             font-size: 9px;
             color: var(--gold);
-            opacity: 0.85;
-            text-align: right;
-            margin-left: 12px;
+            opacity: 0.9;
+            text-align: center;
         }
     </style>
 </head>
@@ -1371,33 +1709,32 @@
             </svg>
             back
         </a>
-        <div class="info-panel">
-            <h3>Ant Colony</h3>
-            <div class="timer-display" id="timer-display">
-                <span class="timer-label">Survival Time</span>
-                <span id="survival-timer">0:00</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Coins</span>
-                <span class="stat-value coins" id="coins">50</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Population</span>
-                <span class="stat-value" id="ant-count">0</span>
-            </div>
-            <div class="ant-breakdown">
-                <span class="ant-type worker" id="worker-count" title="Workers">0</span>
-                <span class="ant-type soldier" id="soldier-count" title="Soldiers">0</span>
-                <span class="ant-type scout" id="scout-count" title="Scouts">0</span>
-                <span class="ant-type carrier" id="carrier-count" title="Carriers">0</span>
-                <span class="ant-type queen" id="queen-count" title="Queens">0</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Food stored</span>
-                <span class="stat-value" id="food-collected">0</span>
-            </div>
-            <div class="instructions">
-                Drop food to earn coins when ants bring it back. Spawn different ant types using the bottom panel!
+        <div class="info-panel" id="info-panel">
+            <h3 onclick="toggleInfoPanel()">Ant Colony <span class="collapse-icon">▼</span></h3>
+            <div class="panel-content">
+                <div class="timer-display" id="timer-display">
+                    <span class="timer-label">Survival Time</span>
+                    <span id="survival-timer">0:00</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Coins</span>
+                    <span class="stat-value coins" id="coins">50</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Population</span>
+                    <span class="stat-value" id="ant-count">0</span>
+                </div>
+                <div class="ant-breakdown">
+                    <span class="ant-type worker" id="worker-count" title="Workers">0</span>
+                    <span class="ant-type soldier" id="soldier-count" title="Soldiers">0</span>
+                    <span class="ant-type scout" id="scout-count" title="Scouts">0</span>
+                    <span class="ant-type carrier" id="carrier-count" title="Carriers">0</span>
+                    <span class="ant-type queen" id="queen-count" title="Queens">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Food stored</span>
+                    <span class="stat-value" id="food-collected">0</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1436,28 +1773,37 @@
     <div class="bottom-ui">
         <div class="food-selector">
             <span class="food-label">drop</span>
-            <button class="food-btn active" data-food="sugar" data-cost="1" title="Sugar - 1 gold per unit">
+            <button class="food-btn active" data-food="sugar" data-cost="1" title="Sugar (1g) - Basic food, no special effect">
                 <span class="emoji">🍬</span>
                 <span class="cost">1</span>
             </button>
-            <button class="food-btn" data-food="protein" data-cost="5" title="Protein - 1 gold per unit">
+            <button class="food-btn" data-food="protein" data-cost="5" title="Protein (5g) - Delivering ant gets +1 ATK permanently!">
                 <span class="emoji">🍖</span>
                 <span class="cost">5</span>
             </button>
-            <button class="food-btn" data-food="fruit" data-cost="15" title="Fruit - 1 gold per unit">
+            <button class="food-btn" data-food="fruit" data-cost="15" title="Fruit (15g) - Heals delivering ant by 1 HP!">
                 <span class="emoji">🍇</span>
                 <span class="cost">15</span>
             </button>
-            <button class="food-btn" data-food="feast" data-cost="40" title="Feast - 1 gold per unit">
+            <button class="food-btn" data-food="feast" data-cost="40" title="Feast (40g) - Delivering ant gets +1 DEF permanently!">
                 <span class="emoji">🍯</span>
                 <span class="cost">40</span>
             </button>
-            <button class="food-btn" data-food="nectar" data-cost="100" title="Nectar - 1 gold per unit">
+            <button class="food-btn" data-food="nectar" data-cost="100" title="Nectar (100g) - Delivering ant gets +3 Max HP permanently!">
                 <span class="emoji">🌸</span>
                 <span class="cost">100</span>
             </button>
         </div>
     </div>
+
+    <!-- Hive Placement Overlay -->
+    <div id="hive-placement-overlay" class="hive-placement-overlay">
+        <div class="hive-placement-text">CLICK TO PLACE YOUR HIVE</div>
+        <div class="hive-placement-subtitle">Choose where your colony will begin</div>
+    </div>
+
+    <!-- Hive Cursor (follows mouse during placement) -->
+    <div id="hive-cursor" class="hive-cursor hidden">🏠</div>
 
     <!-- Game Over Modal -->
     <div id="game-over-modal" class="game-over-modal">
@@ -1492,7 +1838,8 @@
         </div>
         <div class="upgrade-subtitle">Pick an upgrade</div>
         <div class="upgrade-timer" id="upgrade-timer">
-            Auto-select in: <span id="upgrade-countdown">60</span>s
+            <span class="upgrade-timer-text">Auto-select in: <span id="upgrade-countdown">60</span>s</span>
+            <button class="upgrade-expand-btn" id="upgrade-expand-btn" title="Show upgrade choices">▼</button>
             <div class="upgrade-timer-bar">
                 <div class="upgrade-timer-fill" id="upgrade-timer-fill" style="width: 100%"></div>
             </div>
@@ -1510,6 +1857,223 @@
         let width = window.innerWidth;
         let height = window.innerHeight;
         let time = 0;
+
+        // ===========================================
+        // FLOATING TEXT & COMBAT EFFECTS SYSTEM
+        // ===========================================
+
+        let floatingTexts = [];
+        let combatEffects = [];
+        let deathEffects = [];
+
+        // Spawn a death effect (particle explosion + skull)
+        function spawnDeathEffect(x, y, type = 'ant', color = null) {
+            const isAnt = type === 'ant';
+            const baseColor = color || (isAnt ? { r: 80, g: 50, b: 30 } : { r: 100, g: 100, b: 100 });
+            const particleCount = isAnt ? 12 : 20;
+            const particles = [];
+
+            // Create particles that explode outward
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (i / particleCount) * Math.PI * 2 + Math.random() * 0.3;
+                const speed = 1.5 + Math.random() * 2.5;
+                particles.push({
+                    x: 0,
+                    y: 0,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1,  // Slight upward bias
+                    size: isAnt ? (2 + Math.random() * 2) : (3 + Math.random() * 3),
+                    color: `rgb(${baseColor.r + Math.random() * 30}, ${baseColor.g + Math.random() * 30}, ${baseColor.b + Math.random() * 20})`,
+                    rotation: Math.random() * Math.PI * 2
+                });
+            }
+
+            deathEffects.push({
+                x: x,
+                y: y,
+                type: type,
+                particles: particles,
+                life: 50,  // frames
+                maxLife: 50,
+                skullScale: 0,
+                emoji: isAnt ? '💀' : '☠️'
+            });
+        }
+
+        function updateDeathEffects() {
+            for (let i = deathEffects.length - 1; i >= 0; i--) {
+                const de = deathEffects[i];
+                de.life--;
+
+                // Animate skull pop-in then fade
+                if (de.life > 35) {
+                    de.skullScale += (1.2 - de.skullScale) * 0.3;
+                } else if (de.life > 25) {
+                    de.skullScale += (1.0 - de.skullScale) * 0.2;
+                }
+
+                // Update particles
+                for (const p of de.particles) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.15;  // Gravity
+                    p.vx *= 0.96;  // Air resistance
+                    p.rotation += 0.1;
+                }
+
+                if (de.life <= 0) {
+                    deathEffects.splice(i, 1);
+                }
+            }
+        }
+
+        function drawDeathEffects() {
+            ctx.save();
+            for (const de of deathEffects) {
+                const alpha = de.life / de.maxLife;
+
+                // Draw particles
+                for (const p of de.particles) {
+                    ctx.save();
+                    ctx.globalAlpha = alpha * 0.8;
+                    ctx.translate(de.x + p.x, de.y + p.y);
+                    ctx.rotate(p.rotation);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                }
+
+                // Draw skull emoji with pop-in effect
+                if (de.skullScale > 0.1) {
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.translate(de.x, de.y - 10);
+                    ctx.scale(de.skullScale, de.skullScale);
+                    ctx.font = de.type === 'ant' ? '16px serif' : '22px serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(de.emoji, 0, 0);
+                    ctx.restore();
+                }
+            }
+            ctx.restore();
+        }
+
+        function spawnFloatingText(x, y, text, color = '#ffd700', size = 14) {
+            floatingTexts.push({
+                x: x,
+                y: y,
+                text: text,
+                color: color,
+                size: size,
+                alpha: 1,
+                life: 60,  // frames
+                vy: -1.5   // float upward
+            });
+        }
+
+        function spawnCombatEffect(x, y, antHp, antMaxHp, predatorHp, predatorMaxHp) {
+            combatEffects.push({
+                x: x,
+                y: y,
+                antHp: antHp,
+                antMaxHp: antMaxHp,
+                predatorHp: predatorHp,
+                predatorMaxHp: predatorMaxHp,
+                life: 40,  // frames
+                scale: 0,
+                targetScale: 1
+            });
+        }
+
+        function updateFloatingTexts() {
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.y += ft.vy;
+                ft.life--;
+                ft.alpha = ft.life / 60;
+                if (ft.life <= 0) {
+                    floatingTexts.splice(i, 1);
+                }
+            }
+        }
+
+        function drawFloatingTexts() {
+            ctx.save();
+            for (const ft of floatingTexts) {
+                ctx.globalAlpha = ft.alpha;
+                ctx.font = `bold ${ft.size}px 'Orbitron', sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.fillStyle = ft.color;
+                ctx.shadowColor = ft.color;
+                ctx.shadowBlur = 8;
+                ctx.fillText(ft.text, ft.x, ft.y);
+            }
+            ctx.restore();
+        }
+
+        function updateCombatEffects() {
+            for (let i = combatEffects.length - 1; i >= 0; i--) {
+                const ce = combatEffects[i];
+                ce.life--;
+                ce.scale += (ce.targetScale - ce.scale) * 0.3;
+                if (ce.life <= 0) {
+                    combatEffects.splice(i, 1);
+                }
+            }
+        }
+
+        function drawCombatEffects() {
+            ctx.save();
+            for (const ce of combatEffects) {
+                const alpha = ce.life / 40;
+                ctx.globalAlpha = alpha;
+                ctx.translate(ce.x, ce.y);
+                ctx.scale(ce.scale, ce.scale);
+
+                // Draw combat clash effect
+                const clashSize = 25;
+                ctx.strokeStyle = '#ff4444';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = '#ff4444';
+                ctx.shadowBlur = 10;
+
+                // Clash lines
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI * 2 + ce.life * 0.1;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(angle) * 5, Math.sin(angle) * 5);
+                    ctx.lineTo(Math.cos(angle) * clashSize, Math.sin(angle) * clashSize);
+                    ctx.stroke();
+                }
+
+                // Health bars below
+                const barWidth = 40;
+                const barHeight = 6;
+                const barY = 20;
+
+                // Ant HP bar (green)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(-barWidth/2 - 25, barY, barWidth, barHeight);
+                ctx.fillStyle = '#00ff88';
+                ctx.fillRect(-barWidth/2 - 25, barY, barWidth * (ce.antHp / ce.antMaxHp), barHeight);
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(-barWidth/2 - 25, barY, barWidth, barHeight);
+
+                // Predator HP bar (red)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(barWidth/2 - 15, barY, barWidth, barHeight);
+                ctx.fillStyle = '#ff4444';
+                ctx.fillRect(barWidth/2 - 15, barY, barWidth * (ce.predatorHp / ce.predatorMaxHp), barHeight);
+                ctx.strokeStyle = '#ff4444';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(barWidth/2 - 15, barY, barWidth, barHeight);
+
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+            }
+            ctx.restore();
+        }
 
         // ===========================================
         // SEEDED RANDOM NUMBER GENERATOR
@@ -1556,8 +2120,9 @@
 
             const margin = 100;
             const nestSafeRadius = 150;  // Keep spots away from nest
+            const foodSpotSpacing = 350; // Minimum distance between food spots for better spread
 
-            // Generate 3 food spots
+            // Generate 3 food spots - well spaced across the map
             for (let i = 0; i < 3; i++) {
                 let spot;
                 let attempts = 0;
@@ -1566,12 +2131,13 @@
                         x: rng.nextRange(margin, width - margin),
                         y: rng.nextRange(margin, height - margin),
                         type: 'food',
-                        radius: 60
+                        radius: 60,
+                        multiplier: 1  // Default multiplier, will be set in placeHive()
                     };
                     attempts++;
                 } while (
                     (Math.hypot(spot.x - CONFIG.nestX, spot.y - CONFIG.nestY) < nestSafeRadius ||
-                    foodSpots.some(s => Math.hypot(s.x - spot.x, s.y - spot.y) < 120)) &&
+                    foodSpots.some(s => Math.hypot(s.x - spot.x, s.y - spot.y) < foodSpotSpacing)) &&
                     attempts < 50
                 );
                 foodSpots.push(spot);
@@ -1601,22 +2167,37 @@
         }
 
         function drawSpots() {
-            // Draw food spots
+            // Draw food spots with distance-based multipliers
             for (const spot of foodSpots) {
                 ctx.save();
 
+                // Color varies based on multiplier (x1=green, x2=yellow, x3=gold)
+                // Use getDisplayMultiplier to show preview during hive placement
+                const multiplier = getDisplayMultiplier(spot);
+                let baseColor, labelColor;
+                if (multiplier === 3) {
+                    baseColor = { r: 255, g: 180, b: 50 };  // Gold for x3
+                    labelColor = 'rgba(255, 200, 80, 0.9)';
+                } else if (multiplier === 2) {
+                    baseColor = { r: 220, g: 200, b: 80 };  // Yellow for x2
+                    labelColor = 'rgba(220, 200, 80, 0.9)';
+                } else {
+                    baseColor = { r: 184, g: 212, b: 104 }; // Green for x1
+                    labelColor = 'rgba(184, 212, 104, 0.7)';
+                }
+
                 // Glowing circle for food spot
                 const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
-                gradient.addColorStop(0, 'rgba(184, 212, 104, 0.15)');
-                gradient.addColorStop(0.7, 'rgba(184, 212, 104, 0.08)');
-                gradient.addColorStop(1, 'rgba(184, 212, 104, 0)');
+                gradient.addColorStop(0, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.15)`);
+                gradient.addColorStop(0.7, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.08)`);
+                gradient.addColorStop(1, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0)`);
                 ctx.fillStyle = gradient;
                 ctx.beginPath();
                 ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
                 ctx.fill();
 
                 // Dashed border
-                ctx.strokeStyle = 'rgba(184, 212, 104, 0.4)';
+                ctx.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.4)`;
                 ctx.lineWidth = 2;
                 ctx.setLineDash([6, 6]);
                 ctx.beginPath();
@@ -1624,11 +2205,22 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Label
-                ctx.fillStyle = 'rgba(184, 212, 104, 0.7)';
+                // Label with multiplier
+                ctx.fillStyle = labelColor;
                 ctx.font = 'bold 10px "DM Mono", monospace';
                 ctx.textAlign = 'center';
                 ctx.fillText('FOOD ZONE', spot.x, spot.y - spot.radius - 8);
+
+                // Multiplier badge
+                const badgeX = spot.x + spot.radius * 0.7;
+                const badgeY = spot.y - spot.radius * 0.5;
+                ctx.fillStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.9)`;
+                ctx.beginPath();
+                ctx.arc(badgeX, badgeY, 14, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#1a1a1a';
+                ctx.font = 'bold 11px "DM Mono", monospace';
+                ctx.fillText(`x${multiplier}`, badgeX, badgeY + 4);
 
                 ctx.restore();
             }
@@ -1700,11 +2292,36 @@
 
             // Food types with costs and rewards (no ant spawning - ants are bought separately)
             foodTypes: {
-                sugar:   { size: 1, baseRadius: 12, value: 1, cost: 1, name: 'sugar', emoji: '🍬' },
-                protein: { size: 5, baseRadius: 16, value: 1, cost: 5, name: 'protein', emoji: '🍖' },
-                fruit:   { size: 15, baseRadius: 20, value: 1, cost: 15, name: 'fruit', emoji: '🍇' },
-                feast:   { size: 40, baseRadius: 26, value: 1, cost: 40, name: 'feast', emoji: '🍯' },
-                nectar:  { size: 100, baseRadius: 32, value: 1, cost: 100, name: 'nectar', emoji: '🌸' }
+                sugar: {
+                    size: 1, baseRadius: 12, value: 1, cost: 1, name: 'sugar', emoji: '🍬',
+                    effect: null, effectDesc: 'Basic food - no special effect'
+                },
+                protein: {
+                    size: 5, baseRadius: 16, value: 1, cost: 5, name: 'protein', emoji: '🍖',
+                    effect: { type: 'permAtkBoost', value: 1 },
+                    effectDesc: '+1 ATK permanent', effectColor: '#ff6b6b'
+                },
+                fruit: {
+                    size: 15, baseRadius: 20, value: 1, cost: 15, name: 'fruit', emoji: '🍇',
+                    effect: { type: 'heal', value: 1 },
+                    effectDesc: 'Heals 1 HP', effectColor: '#7bed9f'
+                },
+                feast: {
+                    size: 40, baseRadius: 26, value: 1, cost: 40, name: 'feast', emoji: '🍯',
+                    effect: { type: 'permDefBoost', value: 1 },
+                    effectDesc: '+1 DEF permanent', effectColor: '#ffa502'
+                },
+                nectar: {
+                    size: 100, baseRadius: 32, value: 1, cost: 100, name: 'nectar', emoji: '🌸',
+                    effect: { type: 'permHpBoost', value: 3 },
+                    effectDesc: '+3 Max HP permanent', effectColor: '#ff6b81'
+                },
+                goldenApple: {
+                    size: 3, baseRadius: 18, value: 5, cost: 0, name: 'golden apple', emoji: '🍎',
+                    effect: { type: 'goldenBonus', goldMultiplier: 3.0 },
+                    effectDesc: '3x gold value!', isRare: true,
+                    glowColor: { r: 255, g: 215, b: 0 }, effectColor: '#ffd700'
+                }
             },
 
             // Ant types that can be spawned (costs scale up)
@@ -1731,7 +2348,7 @@
                     carryCapacity: 1,
                     carrySpeedBonus: 1.0,
                     pheromoneStrength: 0.8,
-                    foodDetectRadius: 12,
+                    foodDetectRadius: 48,    // 4x detection radius
                     // Level bonuses per level (1-5)
                     levelBonuses: {
                         hp: 2,               // +2 HP per level
@@ -1868,12 +2485,12 @@
                     multiplier: 3,
                     color: { r: 80, g: 20, b: 20 },
                     label: 'SPIDER ZONE',
-                    huntRadius: 100,
+                    huntRadius: 500,  // Hunt ants from far away
                     killRadius: 12,
                     speed: 1.8,
                     // Pokemon-style stats
                     hp: 50,                  // Lower HP, but deadly
-                    atk: 15,                 // High attack - kills most ants in 1-2 hits
+                    atk: 5,                  // Lowered for early game balance - ants can survive and fight back
                     def: 3                   // Low defense
                 },
                 beetle: {
@@ -1881,12 +2498,13 @@
                     multiplier: 2,
                     color: { r: 50, g: 70, b: 35 },
                     label: 'BEETLE ZONE',
-                    patrolSpeed: 0.5,
+                    patrolSpeed: 0.7,
+                    huntRadius: 300,  // Hunt ants from moderate distance
                     killRadius: 20,
                     blockRadius: 35,
                     // Pokemon-style stats
                     hp: 80,                  // Tanky
-                    atk: 10,                 // Moderate attack
+                    atk: 6,                  // Lowered for early game balance
                     def: 8                   // High defense - hard to damage
                 }
             }
@@ -1903,17 +2521,26 @@
         // ===========================================
 
         let gameOver = false;
-        let gameStartTime = Date.now();
+        let gameStarted = false;  // Game starts paused until hive is placed
+        let gameStartTime = null;  // Will be set when hive is placed
+        let pausedTime = 0;  // Track total paused time for accurate timer
+        let pauseStartTime = null;  // When the current pause started
         let totalAntsSpawned = 0;
         let totalCoinsEarned = 0;
         let lastUpdateTime = Date.now();
-        
+
         // Arrays to hold multiple predators of each type
         let spiderPredators = [];
         let beetlePredators = [];
 
         function getElapsedSeconds() {
-            return (Date.now() - gameStartTime) / 1000;
+            if (!gameStartTime) return 0;
+            // Account for paused time
+            let currentPausedTime = pausedTime;
+            if (pauseStartTime !== null) {
+                currentPausedTime += Date.now() - pauseStartTime;
+            }
+            return (Date.now() - gameStartTime - currentPausedTime) / 1000;
         }
 
         function formatTime(seconds) {
@@ -1974,6 +2601,98 @@
         }
 
         // ===========================================
+        // RARE FOOD SPAWN SYSTEM
+        // ===========================================
+
+        let lastRareFoodSpawnTime = 0;
+        const RARE_FOOD_SPAWN_INTERVAL = 45;  // Check every 45 seconds
+        const RARE_FOOD_SPAWN_CHANCE = 0.35;  // 35% chance per check
+
+        function checkRareFoodSpawn() {
+            if (gameOver) return;
+
+            const elapsed = getElapsedSeconds();
+
+            // Check if enough time has passed since last rare food check
+            if (elapsed - lastRareFoodSpawnTime >= RARE_FOOD_SPAWN_INTERVAL) {
+                lastRareFoodSpawnTime = elapsed;
+
+                // Roll for spawn
+                if (Math.random() < RARE_FOOD_SPAWN_CHANCE) {
+                    spawnRareFood();
+                }
+            }
+        }
+
+        function spawnRareFood() {
+            // Spawn a golden apple at a random location on the map
+            // Prefer spawning away from the nest but not too far
+            const margin = 100;
+            const maxDist = Math.min(width, height) * 0.4;
+            const minDist = 150;  // Not too close to nest
+
+            let x, y, dist;
+            let attempts = 0;
+
+            // Find a valid spawn location
+            do {
+                x = margin + Math.random() * (width - margin * 2);
+                y = margin + Math.random() * (height - margin * 2);
+                dist = Math.hypot(x - CONFIG.nestX, y - CONFIG.nestY);
+                attempts++;
+            } while ((dist < minDist || dist > maxDist) && attempts < 50);
+
+            // Create the rare food item
+            const goldenApple = new FoodItem(x, y, 'goldenApple');
+            foodItems.push(goldenApple);
+
+            // Show a notification using rare food notification system
+            addRareFoodNotification(`Golden Apple appeared!`, x, y);
+        }
+
+        // Rare food notification system (separate from ant spawn notifications)
+        let rareFoodNotifications = [];
+
+        function addRareFoodNotification(text, x, y) {
+            rareFoodNotifications.push({
+                text,
+                x,
+                y,
+                startTime: Date.now(),
+                duration: 3000
+            });
+        }
+
+        function updateRareFoodNotifications() {
+            const now = Date.now();
+            rareFoodNotifications = rareFoodNotifications.filter(n => now - n.startTime < n.duration);
+        }
+
+        function drawRareFoodNotifications() {
+            const now = Date.now();
+            for (const notif of rareFoodNotifications) {
+                const elapsed = now - notif.startTime;
+                const progress = elapsed / notif.duration;
+                const alpha = 1 - progress;
+                const yOffset = -30 * progress;  // Float upward
+                const scale = 1 + Math.sin(elapsed / 100) * 0.1;  // Subtle pulse
+
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.translate(notif.x, notif.y + yOffset);
+                ctx.scale(scale, scale);
+                ctx.fillStyle = '#ffd700';
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+                ctx.lineWidth = 3;
+                ctx.font = 'bold 16px "DM Mono", monospace';
+                ctx.textAlign = 'center';
+                ctx.strokeText(notif.text, 0, 0);
+                ctx.fillText(notif.text, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        // ===========================================
         // UPGRADE SYSTEM (Vampire Survivors style)
         // ===========================================
 
@@ -1985,123 +2704,37 @@
         let activeUpgrades = [];  // Track which upgrades player has chosen
         let upgradeMultipliers = {
             antSpeed: 1,
-            carryCapacity: 1,
+            carryCapacity: 0,          // Changed to flat bonus (was misleading multiplier)
             spawnCostReduction: 1,
             foodValue: 1,
             coinBonus: 0,
             maxAnts: 0,
             detectionRadius: 1,
-            atkBonus: 0,       // Flat ATK bonus for all ants
-            defBonus: 0,       // Flat DEF bonus for all ants
-            hpBonus: 0,        // Flat HP bonus for all ants
-            queenSpawnRate: 1
+            atkBonus: 0,               // Flat ATK bonus for all ants
+            defBonus: 0,               // Flat DEF bonus for all ants
+            hpBonus: 0,                // Flat HP bonus for all ants
+            queenSpawnRate: 1,
+            nestDefenseRadius: 80,     // Radius around nest for defense bonus
+            nestDefenseBonus: 0,       // DEF bonus when near nest
+            pheromoneStrength: 1,      // Multiplier for pheromone deposits
+            predatorHpMultiplier: 1,   // Multiplier for predator max HP (lower = weaker predators)
+            goldRushActive: false,     // Temporary gold bonus flag
+            goldRushEndTime: 0,        // When gold rush expires
+            goldRushMultiplier: 1      // Gold multiplier during rush
         };
 
         const UPGRADE_POOL = [
-            {
-                id: 'speed_boost',
-                name: 'Swift Legs',
-                description: 'All ants move 15% faster',
-                emoji: '⚡',
-                apply: () => { upgradeMultipliers.antSpeed *= 1.15; },
-                maxStacks: 5,
-                premium: {
-                    cost: 25,
-                    description: 'All ants move 35% faster',
-                    apply: () => { upgradeMultipliers.antSpeed *= 1.35; }
-                }
-            },
-            {
-                id: 'carry_boost',
-                name: 'Strong Mandibles',
-                description: 'Carry capacity +1 for all ants',
-                emoji: '💪',
-                apply: () => { upgradeMultipliers.carryCapacity += 0.25; },
-                maxStacks: 4,
-                premium: {
-                    cost: 30,
-                    description: 'Carry capacity +3 for all ants',
-                    apply: () => { upgradeMultipliers.carryCapacity += 0.75; }
-                }
-            },
-            {
-                id: 'cheap_spawns',
-                name: 'Efficient Breeding',
-                description: 'Ant spawn costs reduced by 15%',
-                emoji: '🥚',
-                apply: () => { upgradeMultipliers.spawnCostReduction *= 0.85; },
-                maxStacks: 4,
-                premium: {
-                    cost: 40,
-                    description: 'Ant spawn costs reduced by 40%',
-                    apply: () => { upgradeMultipliers.spawnCostReduction *= 0.6; }
-                }
-            },
-            {
-                id: 'food_value',
-                name: 'Nutrient Rich',
-                description: 'Food gives 25% more value',
-                emoji: '🍯',
-                apply: () => { upgradeMultipliers.foodValue *= 1.25; },
-                maxStacks: 4,
-                premium: {
-                    cost: 35,
-                    description: 'Food gives 60% more value',
-                    apply: () => { upgradeMultipliers.foodValue *= 1.60; }
-                }
-            },
-            {
-                id: 'coin_bonus',
-                name: 'Golden Harvest',
-                description: '+2 coins per food delivery',
-                emoji: '💰',
-                apply: () => { upgradeMultipliers.coinBonus += 2; },
-                maxStacks: 5,
-                premium: {
-                    cost: 20,
-                    description: '+5 coins per food delivery',
-                    apply: () => { upgradeMultipliers.coinBonus += 5; }
-                }
-            },
-            {
-                id: 'max_ants',
-                name: 'Colony Expansion',
-                description: 'Max colony size +25 ants',
-                emoji: '🏠',
-                apply: () => {
-                    upgradeMultipliers.maxAnts += 25;
-                    CONFIG.maxAnts += 25;
-                },
-                maxStacks: 4,
-                premium: {
-                    cost: 50,
-                    description: 'Max colony size +75 ants',
-                    apply: () => {
-                        upgradeMultipliers.maxAnts += 75;
-                        CONFIG.maxAnts += 75;
-                    }
-                }
-            },
-            {
-                id: 'detection',
-                name: 'Keen Senses',
-                description: 'Food detection radius +30%',
-                emoji: '👁️',
-                apply: () => { upgradeMultipliers.detectionRadius *= 1.3; },
-                maxStacks: 3,
-                premium: {
-                    cost: 30,
-                    description: 'Food detection radius +75%',
-                    apply: () => { upgradeMultipliers.detectionRadius *= 1.75; }
-                }
-            },
+            // ============================================
+            // LEFT COLUMN: ANT TYPES - Spawning & Colony
+            // ============================================
             {
                 id: 'free_worker',
-                name: 'Spontaneous Birth',
-                description: 'Instantly spawn 3 free workers',
+                name: 'Worker Swarm',
+                description: 'Instantly spawn 5 free workers',
                 emoji: '🐜',
+                category: 'ants',
                 apply: () => {
-                    for (let i = 0; i < 3; i++) {
+                    for (let i = 0; i < 5; i++) {
                         if (ants.length < CONFIG.maxAnts) {
                             const angle = Math.random() * Math.PI * 2;
                             const dist = 30 + Math.random() * 20;
@@ -2117,10 +2750,10 @@
                 },
                 maxStacks: 99,
                 premium: {
-                    cost: 15,
-                    description: 'Instantly spawn 8 free workers',
+                    cost: 25,
+                    description: 'Instantly spawn 12 free workers',
                     apply: () => {
-                        for (let i = 0; i < 8; i++) {
+                        for (let i = 0; i < 12; i++) {
                             if (ants.length < CONFIG.maxAnts) {
                                 const angle = Math.random() * Math.PI * 2;
                                 const dist = 30 + Math.random() * 20;
@@ -2138,11 +2771,12 @@
             },
             {
                 id: 'free_soldier',
-                name: 'Call to Arms',
-                description: 'Instantly spawn 2 free soldiers',
+                name: 'Reinforcements',
+                description: 'Instantly spawn 3 free soldiers',
                 emoji: '⚔️',
+                category: 'ants',
                 apply: () => {
-                    for (let i = 0; i < 2; i++) {
+                    for (let i = 0; i < 3; i++) {
                         if (ants.length < CONFIG.maxAnts) {
                             const angle = Math.random() * Math.PI * 2;
                             const dist = 30 + Math.random() * 20;
@@ -2158,10 +2792,10 @@
                 },
                 maxStacks: 99,
                 premium: {
-                    cost: 25,
-                    description: 'Instantly spawn 5 free soldiers',
+                    cost: 40,
+                    description: 'Instantly spawn 8 free soldiers',
                     apply: () => {
-                        for (let i = 0; i < 5; i++) {
+                        for (let i = 0; i < 8; i++) {
                             if (ants.length < CONFIG.maxAnts) {
                                 const angle = Math.random() * Math.PI * 2;
                                 const dist = 30 + Math.random() * 20;
@@ -2178,74 +2812,275 @@
                 }
             },
             {
-                id: 'atk_boost',
-                name: 'Combat Training',
-                description: 'All ants gain +2 ATK',
-                emoji: '🗡️',
-                apply: () => { upgradeMultipliers.atkBonus += 2; },
+                id: 'max_ants',
+                name: 'Colony Expansion',
+                description: 'Max colony size +30 ants',
+                emoji: '🏠',
+                category: 'ants',
+                apply: () => {
+                    upgradeMultipliers.maxAnts += 30;
+                    CONFIG.maxAnts += 30;
+                },
                 maxStacks: 5,
                 premium: {
-                    cost: 40,
-                    description: 'All ants gain +6 ATK',
-                    apply: () => { upgradeMultipliers.atkBonus += 6; }
-                }
-            },
-            {
-                id: 'def_boost',
-                name: 'Hardened Carapace',
-                description: 'All ants gain +2 DEF',
-                emoji: '🛡️',
-                apply: () => { upgradeMultipliers.defBonus += 2; },
-                maxStacks: 5,
-                premium: {
-                    cost: 40,
-                    description: 'All ants gain +6 DEF',
-                    apply: () => { upgradeMultipliers.defBonus += 6; }
-                }
-            },
-            {
-                id: 'hp_boost',
-                name: 'Vitality',
-                description: 'All ants gain +5 max HP',
-                emoji: '❤️',
-                apply: () => { upgradeMultipliers.hpBonus += 5; },
-                maxStacks: 5,
-                premium: {
-                    cost: 35,
-                    description: 'All ants gain +15 max HP',
-                    apply: () => { upgradeMultipliers.hpBonus += 15; }
+                    cost: 65,
+                    description: 'Max colony size +100 ants',
+                    apply: () => {
+                        upgradeMultipliers.maxAnts += 100;
+                        CONFIG.maxAnts += 100;
+                    }
                 }
             },
             {
                 id: 'queen_boost',
                 name: 'Royal Fertility',
-                description: 'Queens spawn workers 25% faster',
+                description: 'Queens spawn ants 30% faster',
                 emoji: '👑',
-                apply: () => { upgradeMultipliers.queenSpawnRate *= 0.75; },
+                category: 'ants',
+                apply: () => { upgradeMultipliers.queenSpawnRate *= 0.70; },
                 maxStacks: 3,
                 premium: {
+                    cost: 80,
+                    description: 'Queens spawn ants 55% faster',
+                    apply: () => { upgradeMultipliers.queenSpawnRate *= 0.45; }
+                }
+            },
+            // ============================================
+            // MIDDLE COLUMN: ECONOMY - Gold & Resources
+            // ============================================
+            {
+                id: 'food_value',
+                name: 'Nutrient Rich',
+                description: 'Food deliveries give +30% gold',
+                emoji: '🍯',
+                category: 'economy',
+                apply: () => { upgradeMultipliers.foodValue *= 1.30; },
+                maxStacks: 4,
+                premium: {
+                    cost: 45,
+                    description: 'Food deliveries give +75% gold',
+                    apply: () => { upgradeMultipliers.foodValue *= 1.75; }
+                }
+            },
+            {
+                id: 'coin_bonus',
+                name: 'Golden Harvest',
+                description: '+3 bonus gold per delivery',
+                emoji: '💰',
+                category: 'economy',
+                apply: () => { upgradeMultipliers.coinBonus += 3; },
+                maxStacks: 5,
+                premium: {
+                    cost: 35,
+                    description: '+8 bonus gold per delivery',
+                    apply: () => { upgradeMultipliers.coinBonus += 8; }
+                }
+            },
+            {
+                id: 'cheap_spawns',
+                name: 'Efficient Breeding',
+                description: 'Ant spawn costs reduced by 20%',
+                emoji: '🥚',
+                category: 'economy',
+                apply: () => { upgradeMultipliers.spawnCostReduction *= 0.80; },
+                maxStacks: 4,
+                premium: {
+                    cost: 50,
+                    description: 'Ant spawn costs reduced by 45%',
+                    apply: () => { upgradeMultipliers.spawnCostReduction *= 0.55; }
+                }
+            },
+            {
+                id: 'gold_rush',
+                name: 'Gold Rush',
+                description: 'Double gold income for 90 seconds',
+                emoji: '🌟',
+                category: 'economy',
+                apply: () => {
+                    upgradeMultipliers.goldRushActive = true;
+                    upgradeMultipliers.goldRushMultiplier = 2;
+                    upgradeMultipliers.goldRushEndTime = Date.now() + 90000;
+                },
+                maxStacks: 99,
+                premium: {
                     cost: 60,
-                    description: 'Queens spawn workers 50% faster',
-                    apply: () => { upgradeMultipliers.queenSpawnRate *= 0.5; }
+                    description: 'Triple gold income for 120 seconds',
+                    apply: () => {
+                        upgradeMultipliers.goldRushActive = true;
+                        upgradeMultipliers.goldRushMultiplier = 3;
+                        upgradeMultipliers.goldRushEndTime = Date.now() + 120000;
+                    }
                 }
             },
             {
                 id: 'coin_burst',
                 name: 'Treasure Found',
-                description: 'Instantly gain 50 coins',
-                emoji: '✨',
+                description: 'Instantly gain 75 gold',
+                emoji: '💎',
+                category: 'economy',
                 apply: () => {
-                    coins += 50;
-                    totalCoinsEarned += 50;
+                    coins += 75;
+                    totalCoinsEarned += 75;
                 },
                 maxStacks: 99,
                 premium: {
-                    cost: 10,
-                    description: 'Instantly gain 150 coins',
+                    cost: 40,
+                    description: 'Instantly gain 200 gold',
                     apply: () => {
-                        coins += 150;
-                        totalCoinsEarned += 150;
+                        coins += 200;
+                        totalCoinsEarned += 200;
                     }
+                }
+            },
+            // ============================================
+            // RIGHT COLUMN: OTHER - Combat & Foraging
+            // ============================================
+            {
+                id: 'atk_boost',
+                name: 'Combat Training',
+                description: 'All ants gain +3 ATK',
+                emoji: '🗡️',
+                category: 'other',
+                apply: () => { upgradeMultipliers.atkBonus += 3; },
+                maxStacks: 5,
+                premium: {
+                    cost: 55,
+                    description: 'All ants gain +8 ATK',
+                    apply: () => { upgradeMultipliers.atkBonus += 8; }
+                }
+            },
+            {
+                id: 'def_boost',
+                name: 'Hardened Carapace',
+                description: 'All ants gain +3 DEF',
+                emoji: '🛡️',
+                category: 'other',
+                apply: () => { upgradeMultipliers.defBonus += 3; },
+                maxStacks: 5,
+                premium: {
+                    cost: 55,
+                    description: 'All ants gain +8 DEF',
+                    apply: () => { upgradeMultipliers.defBonus += 8; }
+                }
+            },
+            {
+                id: 'hp_boost',
+                name: 'Vitality',
+                description: 'All ants gain +8 max HP',
+                emoji: '❤️',
+                category: 'other',
+                apply: () => { upgradeMultipliers.hpBonus += 8; },
+                maxStacks: 5,
+                premium: {
+                    cost: 50,
+                    description: 'All ants gain +20 max HP',
+                    apply: () => { upgradeMultipliers.hpBonus += 20; }
+                }
+            },
+            {
+                id: 'nest_defense',
+                name: 'Fortified Nest',
+                description: 'Ants near nest gain +5 DEF',
+                emoji: '🏰',
+                category: 'other',
+                apply: () => { upgradeMultipliers.nestDefenseBonus += 5; },
+                maxStacks: 3,
+                premium: {
+                    cost: 70,
+                    description: 'Ants near nest gain +12 DEF',
+                    apply: () => { upgradeMultipliers.nestDefenseBonus += 12; }
+                }
+            },
+            {
+                id: 'predator_weakness',
+                name: 'Predator Bane',
+                description: 'Predators have -15% max HP',
+                emoji: '☠️',
+                category: 'other',
+                apply: () => {
+                    upgradeMultipliers.predatorHpMultiplier *= 0.85;
+                    // Apply to existing predators
+                    if (typeof spider !== 'undefined' && spider) {
+                        spider.hp = Math.max(1, Math.floor(spider.hp * 0.85));
+                        spider.maxHp = Math.max(1, Math.floor(spider.maxHp * 0.85));
+                    }
+                    for (const beetle of beetlePredators) {
+                        beetle.hp = Math.max(1, Math.floor(beetle.hp * 0.85));
+                        beetle.maxHp = Math.max(1, Math.floor(beetle.maxHp * 0.85));
+                    }
+                },
+                maxStacks: 3,
+                premium: {
+                    cost: 100,
+                    description: 'Predators have -35% max HP',
+                    apply: () => {
+                        upgradeMultipliers.predatorHpMultiplier *= 0.65;
+                        // Apply to existing predators
+                        if (typeof spider !== 'undefined' && spider) {
+                            spider.hp = Math.max(1, Math.floor(spider.hp * 0.65));
+                            spider.maxHp = Math.max(1, Math.floor(spider.maxHp * 0.65));
+                        }
+                        for (const beetle of beetlePredators) {
+                            beetle.hp = Math.max(1, Math.floor(beetle.hp * 0.65));
+                            beetle.maxHp = Math.max(1, Math.floor(beetle.maxHp * 0.65));
+                        }
+                    }
+                }
+            },
+            {
+                id: 'detection',
+                name: 'Keen Senses',
+                description: 'Food detection radius +40%',
+                emoji: '👁️',
+                category: 'other',
+                apply: () => { upgradeMultipliers.detectionRadius *= 1.4; },
+                maxStacks: 3,
+                premium: {
+                    cost: 40,
+                    description: 'Food detection radius +100%',
+                    apply: () => { upgradeMultipliers.detectionRadius *= 2.0; }
+                }
+            },
+            {
+                id: 'carry_boost',
+                name: 'Strong Mandibles',
+                description: 'Carry capacity +1 for all ants',
+                emoji: '💪',
+                category: 'other',
+                apply: () => { upgradeMultipliers.carryCapacity += 1; },
+                maxStacks: 4,
+                premium: {
+                    cost: 45,
+                    description: 'Carry capacity +3 for all ants',
+                    apply: () => { upgradeMultipliers.carryCapacity += 3; }
+                }
+            },
+            {
+                id: 'pheromone_boost',
+                name: 'Scent Markers',
+                description: 'Pheromone trails are 50% stronger',
+                emoji: '👃',
+                category: 'other',
+                apply: () => { upgradeMultipliers.pheromoneStrength *= 1.5; },
+                maxStacks: 3,
+                premium: {
+                    cost: 50,
+                    description: 'Pheromone trails are 2x stronger',
+                    apply: () => { upgradeMultipliers.pheromoneStrength *= 2.0; }
+                }
+            },
+            {
+                id: 'speed_boost',
+                name: 'Swift Legs',
+                description: 'All ants move 25% faster',
+                emoji: '⚡',
+                category: 'other',
+                apply: () => { upgradeMultipliers.antSpeed *= 1.25; },
+                maxStacks: 4,
+                premium: {
+                    cost: 60,
+                    description: 'All ants move 50% faster',
+                    apply: () => { upgradeMultipliers.antSpeed *= 1.50; }
                 }
             }
         ];
@@ -2258,15 +3093,43 @@
             // Filter out maxed upgrades
             const available = UPGRADE_POOL.filter(u => getUpgradeStacks(u.id) < u.maxStacks);
 
-            // Shuffle and pick
-            const shuffled = [...available].sort(() => Math.random() - 0.5);
-            return shuffled.slice(0, Math.min(count, shuffled.length));
+            // Organize by category: ants (left), economy (middle), other (right)
+            const categories = {
+                ants: available.filter(u => u.category === 'ants'),
+                economy: available.filter(u => u.category === 'economy'),
+                other: available.filter(u => u.category === 'other')
+            };
+
+            // Pick one random upgrade from each category
+            const result = [];
+            const order = ['ants', 'economy', 'other'];
+            for (const cat of order) {
+                if (categories[cat].length > 0) {
+                    const shuffled = categories[cat].sort(() => Math.random() - 0.5);
+                    result.push(shuffled[0]);
+                }
+            }
+
+            // If we don't have 3, fill from any available
+            if (result.length < 3) {
+                const remaining = available.filter(u => !result.includes(u));
+                const shuffled = remaining.sort(() => Math.random() - 0.5);
+                while (result.length < 3 && shuffled.length > 0) {
+                    result.push(shuffled.shift());
+                }
+            }
+
+            return result;
         }
 
         let currentUpgradeChoices = [];  // Track current upgrade options for auto-select
 
         function showUpgradeSelection() {
             upgradesPaused = true;
+            // Start pausing the survival timer
+            if (pauseStartTime === null) {
+                pauseStartTime = Date.now();
+            }
             const upgrades = getRandomUpgrades(3);
             currentUpgradeChoices = upgrades;  // Store for auto-select
             upgradeChoiceStartTime = Date.now();  // Start countdown
@@ -2274,14 +3137,23 @@
             const container = document.getElementById('upgrade-options');
             container.innerHTML = '';
 
+            // Category labels and colors
+            const categoryInfo = {
+                ants: { label: 'COLONY', color: '#7bed9f' },
+                economy: { label: 'ECONOMY', color: '#ffd700' },
+                other: { label: 'POWER', color: '#ff6b6b' }
+            };
+
             upgrades.forEach(upgrade => {
                 const stacks = getUpgradeStacks(upgrade.id);
                 const hasPremium = upgrade.premium && upgrade.premium.cost;
                 const canAffordPremium = hasPremium && coins >= upgrade.premium.cost;
+                const catInfo = categoryInfo[upgrade.category] || { label: 'OTHER', color: '#888' };
 
                 const card = document.createElement('div');
                 card.className = 'upgrade-card-wrapper';
                 card.innerHTML = `
+                    <div class="upgrade-category" style="color: ${catInfo.color}; border-color: ${catInfo.color}">${catInfo.label}</div>
                     <div class="upgrade-card" data-upgrade-id="${upgrade.id}">
                         <div class="upgrade-emoji">${upgrade.emoji}</div>
                         <div class="upgrade-info">
@@ -2323,9 +3195,19 @@
             upgrade.apply();
             activeUpgrades.push(upgrade.id);
 
+            // Recalculate stats for all existing ants so upgrade bonuses apply immediately
+            for (const ant of ants) {
+                ant.recalculateStats();
+            }
+
             document.getElementById('upgrade-modal').classList.remove('visible');
             document.getElementById('upgrade-modal').classList.remove('minimized');
             upgradesPaused = false;
+            // End the survival timer pause
+            if (pauseStartTime !== null) {
+                pausedTime += Date.now() - pauseStartTime;
+                pauseStartTime = null;
+            }
             lastUpgradeTime = getElapsedSeconds();
             currentUpgradeChoices = [];  // Clear choices
         }
@@ -2342,9 +3224,19 @@
             upgrade.premium.apply();
             activeUpgrades.push(upgrade.id);
 
+            // Recalculate stats for all existing ants so upgrade bonuses apply immediately
+            for (const ant of ants) {
+                ant.recalculateStats();
+            }
+
             document.getElementById('upgrade-modal').classList.remove('visible');
             document.getElementById('upgrade-modal').classList.remove('minimized');
             upgradesPaused = false;
+            // End the survival timer pause
+            if (pauseStartTime !== null) {
+                pausedTime += Date.now() - pauseStartTime;
+                pauseStartTime = null;
+            }
             lastUpgradeTime = getElapsedSeconds();
             currentUpgradeChoices = [];  // Clear choices
         }
@@ -2382,6 +3274,7 @@
 
         // Set up hide button event listener
         document.getElementById('upgrade-hide-btn').addEventListener('click', toggleUpgradePanel);
+        document.getElementById('upgrade-expand-btn').addEventListener('click', toggleUpgradePanel);
 
         function checkUpgradeTime() {
             if (gameOver || upgradesPaused) return;
@@ -2398,7 +3291,7 @@
             activeUpgrades = [];
             upgradeMultipliers = {
                 antSpeed: 1,
-                carryCapacity: 1,
+                carryCapacity: 0,          // Reset to 0 (flat bonus)
                 spawnCostReduction: 1,
                 foodValue: 1,
                 coinBonus: 0,
@@ -2407,7 +3300,14 @@
                 atkBonus: 0,
                 defBonus: 0,
                 hpBonus: 0,
-                queenSpawnRate: 1
+                queenSpawnRate: 1,
+                nestDefenseRadius: 80,
+                nestDefenseBonus: 0,
+                pheromoneStrength: 1,
+                predatorHpMultiplier: 1,
+                goldRushActive: false,
+                goldRushEndTime: 0,
+                goldRushMultiplier: 1
             };
             lastUpgradeTime = 0;
             CONFIG.maxAnts = 300;  // Reset to default
@@ -2422,16 +3322,19 @@
             resetUpgrades();
             upgradesPaused = false;
 
-            // Reset game state
+            // Reset game state - go back to hive placement mode
             gameOver = false;
-            gameStartTime = Date.now();
+            gameStarted = false;  // Require hive placement again
+            gameStartTime = null;
+            pausedTime = 0;
+            pauseStartTime = null;
             lastUpdateTime = Date.now();
             lastPredatorSpawnTime = 0;
             coins = 50;
             totalAntsSpawned = 0;
             totalCoinsEarned = 0;
 
-            // Clear entities
+            // Clear entities - ants will spawn when hive is placed
             ants.length = 0;
             foodItems.length = 0;
             foodCollected = 0;
@@ -2458,9 +3361,14 @@
             spiderPredators = [];
             beetlePredators = [];
 
-            // Reinitialize
-            initAnts();
-            totalAntsSpawned = ants.length;
+            // Don't spawn ants yet - wait for hive placement
+            // Show the hive placement overlay again
+            document.getElementById('hive-placement-overlay').classList.remove('hidden');
+
+            // Reset preview state for hive placement
+            isPreviewingHivePlacement = false;
+            previewMultipliers.clear();
+
             resize();
             updateUI();
         }
@@ -2495,14 +3403,9 @@
         }
 
         function getDangerZoneMultiplier(x, y) {
-            // Give bonus gold for killing predators near their den
-            let maxMultiplier = 1;
-            for (const spot of predatorSpots) {
-                if (Math.hypot(x - spot.x, y - spot.y) < spot.radius * 2) {
-                    maxMultiplier = Math.max(maxMultiplier, 2);  // 2x gold near predator dens
-                }
-            }
-            return maxMultiplier;
+            // Removed hidden danger zone multiplier - zone multiplier (x1, x2, x3)
+            // already accounts for distance/risk and is visible to the player
+            return 1;
         }
 
         function isNearBeetle(x, y) {
@@ -2809,7 +3712,9 @@
             const idx = getPheromoneIndex(x, y);
             if (idx === -1) return;
             const grid = type === 'food' ? pheromoneGrid.food : pheromoneGrid.home;
-            grid[idx] = Math.min(grid[idx] + amount, CONFIG.pheromoneMax);
+            // Apply pheromone strength upgrade multiplier
+            const effectiveAmount = amount * upgradeMultipliers.pheromoneStrength;
+            grid[idx] = Math.min(grid[idx] + effectiveAmount, CONFIG.pheromoneMax);
         }
 
         function getPheromone(x, y, type) {
@@ -2861,14 +3766,13 @@
             // Get predator's attack power
             const attackPower = predator.atk || 10;
 
-            // All ants can fight back now (deal damage to predator)
-            ant.attemptFight(predator);
-
-            // Ant takes damage
-            const survived = ant.takeDamage(attackPower);
+            // Ant takes damage and automatically retaliates (fights back)
+            const survived = ant.takeDamage(attackPower, predator);
 
             if (!survived) {
-                // Ant is killed
+                // Ant is killed - spawn death effect
+                spawnDeathEffect(ant.x, ant.y, 'ant', ant.color);
+
                 const idx = ants.indexOf(ant);
                 if (idx !== -1) {
                     ants.splice(idx, 1);
@@ -2903,24 +3807,40 @@
             }
         }
 
-        // Active combat: All ants attack nearby predators
+        // Active combat: All ants attack nearby predators (1 attack per second)
         function checkAntPredatorCombat() {
             const COMBAT_RANGE = 20;  // How close an ant needs to be to attack
+            const ATTACK_COOLDOWN = 60;  // 60 frames = 1 second at 60fps
+            const FIGHTING_DURATION = 60;  // 1 second - refreshes on each hit so they stay still while fighting
 
             // Combine all predators into one array
             const allPredators = [...spiderPredators, ...beetlePredators];
 
             for (const ant of ants) {
+                // Skip ants that are in the hive resting
+                if (ant.hiveRestTimer > 0) continue;
+
                 // Skip ants that are busy or panicking
                 if (ant.panicTimer > 0) continue;
 
+                // Check attack cooldown (1 attack per second)
+                if (time - ant.lastAttackTime < ATTACK_COOLDOWN) continue;
+
                 for (const predator of allPredators) {
-                    // Skip stunned predators
-                    if (predator.state === 'stunned') continue;
+                    // Skip stunned or dead predators
+                    if (predator.state === 'stunned' || predator.state === 'dead') continue;
 
                     const dist = Math.hypot(ant.x - predator.x, ant.y - predator.y);
 
                     if (dist < COMBAT_RANGE) {
+                        // Both ant and predator stop to fight
+                        ant.fightingTimer = FIGHTING_DURATION;
+                        predator.fightingTimer = FIGHTING_DURATION;
+
+                        // Face each other
+                        ant.angle = Math.atan2(predator.y - ant.y, predator.x - ant.x);
+                        predator.angle = Math.atan2(ant.y - predator.y, ant.x - predator.x);
+
                         // Ant is in combat range - deal damage!
                         const antAtk = ant.getEffectiveAtk();
 
@@ -2928,16 +3848,67 @@
                             const damageDealt = Math.max(1, antAtk - (predator.def || 0));
                             predator.currentHp -= damageDealt;
 
-                            // Visual feedback - ant did damage
-                            ant.panicTimer = 10;  // Brief pause after attacking
+                            // Record attack time for cooldown
+                            ant.lastAttackTime = time;
 
-                            // Check if predator is killed
-                            if (predator.currentHp <= 0) {
-                                predator.stun(300);  // Long stun before respawn
+                            // Predator counter-attacks! (if not on its own cooldown)
+                            let predatorDamage = 0;
+                            if (time - (predator.lastAttackTime || 0) >= 60) {
+                                predator.lastAttackTime = time;
+                                const predatorAtk = predator.atk || 10;
+                                const antDef = ant.getEffectiveDef();
+                                predatorDamage = Math.max(1, predatorAtk - antDef);
+                                ant.currentHp -= predatorDamage;
+
+                                // Check if ant died from counter-attack
+                                if (ant.currentHp <= 0) {
+                                    spawnDeathEffect(ant.x, ant.y, 'ant', ant.color);
+                                    const idx = ants.indexOf(ant);
+                                    if (idx !== -1) {
+                                        ants.splice(idx, 1);
+                                        CONFIG.recentDeaths++;
+                                        CONFIG.deathDecayTimer = 600;
+                                    }
+                                }
                             }
+
+                            // Spawn combat effect
+                            const midX = (ant.x + predator.x) / 2;
+                            const midY = (ant.y + predator.y) / 2;
+                            spawnCombatEffect(midX, midY, Math.max(0, ant.currentHp), ant.maxHp, Math.max(0, predator.currentHp), predator.maxHp);
+                            spawnFloatingText(predator.x, predator.y - 15, `-${damageDealt}`, '#00ff88', 11);
+                            if (predatorDamage > 0) {
+                                spawnFloatingText(ant.x, ant.y - 15, `-${predatorDamage}`, '#ff4444', 11);
+                            }
+
+                            // Check if predator is killed - remove from game permanently
+                            if (predator.currentHp <= 0) {
+                                removePredator(predator);
+                            }
+
+                            // Only attack one predator per cooldown
+                            break;
                         }
                     }
                 }
+            }
+        }
+
+        // Remove a predator from the game permanently
+        function removePredator(predator) {
+            // Spawn death effect before removing
+            const predatorColor = predator.color || { r: 100, g: 80, b: 60 };
+            spawnDeathEffect(predator.x, predator.y, 'predator', predatorColor);
+
+            predator.state = 'dead';
+            const spiderIdx = spiderPredators.indexOf(predator);
+            if (spiderIdx !== -1) {
+                spiderPredators.splice(spiderIdx, 1);
+                return;
+            }
+            const beetleIdx = beetlePredators.indexOf(predator);
+            if (beetleIdx !== -1) {
+                beetlePredators.splice(beetleIdx, 1);
             }
         }
 
@@ -3028,6 +3999,8 @@
                 this.state = 'hunting';
                 this.eatTimer = 0;
                 this.stunTimer = 0;
+                this.lastAttackTime = 0;  // For 1 attack per second cooldown
+                this.fightingTimer = 0;   // Timer for standing still during combat
 
                 // Pokemon-style stats
                 this.maxHp = cfg.hp;
@@ -3039,17 +4012,17 @@
             stun(duration) {
                 this.stunTimer = duration;
                 this.state = 'stunned';
-
-                // Respawn with full HP if killed (HP <= 0)
-                if (this.currentHp <= 0) {
-                    const cfg = CONFIG.predators.spider;
-                    this.currentHp = cfg.hp;
-                    this.x = cfg.x;
-                    this.y = cfg.y;
-                }
+                // Note: No more respawn on death - predators are removed permanently
             }
 
             update() {
+                // If fighting, decrement timer and skip movement
+                if (this.fightingTimer > 0) {
+                    this.fightingTimer--;
+                    this.legPhase += 0.3;  // Still animate legs
+                    return;
+                }
+
                 const cfg = CONFIG.predators.spider;
                 this.legPhase += 0.2;
 
@@ -3081,15 +4054,18 @@
                     this.targetX = nearestAnt.x;
                     this.targetY = nearestAnt.y;
 
-                    if (nearestDist < cfg.killRadius) {
+                    // Check attack cooldown (1 attack per second = 60 frames)
+                    if (nearestDist < cfg.killRadius && time - this.lastAttackTime >= 60) {
+                        this.lastAttackTime = time;
                         if (killAnt(nearestAnt, this)) {
                             this.state = 'eating';
                             this.eatTimer = 60;
                         }
                     }
                 } else {
-                    // Wander freely across the entire map
-                    if (Math.random() < 0.03) {
+                    // Wander freely across the entire map - pick new target frequently
+                    const distToTarget = Math.hypot(this.targetX - this.x, this.targetY - this.y);
+                    if (Math.random() < 0.02 || distToTarget < 30) {
                         const margin = 50;
                         this.targetX = margin + Math.random() * (width - margin * 2);
                         this.targetY = margin + Math.random() * (height - margin * 2);
@@ -3108,11 +4084,8 @@
                 newX = Math.max(margin, Math.min(width - margin, newX));
                 newY = Math.max(margin, Math.min(height - margin, newY));
 
-                const dist = Math.hypot(this.targetX - this.x, this.targetY - this.y);
-                if (dist > 5) {
-                    this.x = newX;
-                    this.y = newY;
-                }
+                this.x = newX;
+                this.y = newY;
             }
 
             draw() {
@@ -3231,6 +4204,8 @@
                 this.state = 'patrolling';
                 this.stunTimer = 0;
                 this.wanderTimer = 0;
+                this.lastAttackTime = 0;  // For 1 attack per second cooldown
+                this.fightingTimer = 0;   // Timer for standing still during combat
 
                 // Pokemon-style stats
                 this.maxHp = cfg.hp;
@@ -3242,17 +4217,17 @@
             stun(duration) {
                 this.stunTimer = duration;
                 this.state = 'stunned';
-
-                // Respawn with full HP if killed (HP <= 0)
-                if (this.currentHp <= 0) {
-                    const cfg = CONFIG.predators.beetle;
-                    this.currentHp = cfg.hp;
-                    this.x = cfg.x;
-                    this.y = cfg.y;
-                }
+                // Note: No more respawn on death - predators are removed permanently
             }
 
             update() {
+                // If fighting, decrement timer and skip movement
+                if (this.fightingTimer > 0) {
+                    this.fightingTimer--;
+                    this.legPhase += 0.15;  // Still animate legs
+                    return;
+                }
+
                 const cfg = CONFIG.predators.beetle;
                 this.legPhase += 0.12;
 
@@ -3262,14 +4237,32 @@
                     return;
                 }
 
-                // Random wandering patrol across the entire map
-                this.wanderTimer--;
-                if (this.wanderTimer <= 0) {
-                    // Pick a new random target anywhere on the map
-                    const margin = 50;
-                    this.targetX = margin + Math.random() * (width - margin * 2);
-                    this.targetY = margin + Math.random() * (height - margin * 2);
-                    this.wanderTimer = 60 + Math.random() * 120;  // New target every 1-3 seconds
+                // Find nearest ant to chase
+                let nearestAnt = null;
+                let nearestDist = cfg.huntRadius || 300;
+                for (const ant of ants) {
+                    const dist = Math.hypot(ant.x - this.x, ant.y - this.y);
+                    if (dist < nearestDist) {
+                        nearestDist = dist;
+                        nearestAnt = ant;
+                    }
+                }
+
+                if (nearestAnt) {
+                    // Chase the ant
+                    this.targetX = nearestAnt.x;
+                    this.targetY = nearestAnt.y;
+                } else {
+                    // Random wandering patrol across the entire map
+                    this.wanderTimer--;
+                    const distToTarget = Math.hypot(this.targetX - this.x, this.targetY - this.y);
+                    if (this.wanderTimer <= 0 || distToTarget < 30) {
+                        // Pick a new random target anywhere on the map
+                        const margin = 50;
+                        this.targetX = margin + Math.random() * (width - margin * 2);
+                        this.targetY = margin + Math.random() * (height - margin * 2);
+                        this.wanderTimer = 60 + Math.random() * 120;  // New target every 1-3 seconds
+                    }
                 }
 
                 // Move toward target
@@ -3284,11 +4277,15 @@
                 this.x = Math.max(margin, Math.min(width - margin, newX));
                 this.y = Math.max(margin, Math.min(height - margin, newY));
 
-                // Kill ants in radius
-                for (let i = ants.length - 1; i >= 0; i--) {
-                    const ant = ants[i];
-                    if (Math.hypot(ant.x - this.x, ant.y - this.y) < cfg.killRadius) {
-                        killAnt(ant, this);
+                // Kill ants in radius (1 attack per second)
+                if (time - this.lastAttackTime >= 60) {
+                    for (let i = ants.length - 1; i >= 0; i--) {
+                        const ant = ants[i];
+                        if (Math.hypot(ant.x - this.x, ant.y - this.y) < cfg.killRadius) {
+                            this.lastAttackTime = time;
+                            killAnt(ant, this);
+                            break;  // Only attack one ant per cooldown
+                        }
                     }
                 }
             }
@@ -3475,6 +4472,7 @@
                 this.emoji = config.emoji;
                 this.carriers = [];
                 this.inDangerZone = isInDangerZone(x, y);
+                this.zoneMultiplier = getFoodZoneMultiplier(x, y);  // Distance-based multiplier (x1, x2, x3)
                 this.spawnTime = Date.now();  // Real timestamp when food was created
                 this.spoiled = false;
             }
@@ -3496,9 +4494,10 @@
             }
 
             getValue() {
-                // Value per unit times danger zone multiplier
-                const multiplier = getDangerZoneMultiplier(this.x, this.y);
-                return this.valuePerUnit * multiplier;
+                // Value per unit times food zone distance multiplier (x1, x2, x3)
+                // Also apply danger zone multiplier for extra risk/reward
+                const dangerMultiplier = getDangerZoneMultiplier(this.x, this.y);
+                return this.valuePerUnit * this.zoneMultiplier * dangerMultiplier;
             }
 
             // Single ant can always carry 1 unit
@@ -3529,8 +4528,19 @@
                 const r = this.getRadius();
                 if (r < 3) return;  // Too small to draw
 
+                const timeLeft = this.getTimeRemaining();
+                const foodConfig = CONFIG.foodTypes[this.type];
+                const isRare = foodConfig.isRare || false;
+
+                // Calculate freshness for visual dimming (1.0 = fresh, 0.5 = stale)
+                const freshnessPercent = timeLeft / FOOD_LIFETIME_SECONDS;
+                const freshness = Math.max(0.5, freshnessPercent);
+
                 ctx.save();
                 ctx.translate(this.x, this.y);
+
+                // Apply freshness dimming to the whole food rendering
+                ctx.globalAlpha = freshness;
 
                 // Shadow (offset more so it doesn't darken the emoji)
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
@@ -3538,9 +4548,16 @@
                 ctx.ellipse(3, 5, r * 0.9, r * 0.4, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Zone-based glow behind emoji
+                // Zone-based glow behind emoji (or special glow for rare food)
                 const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.2);
-                if (this.inDangerZone) {
+                if (isRare) {
+                    // Golden sparkle glow for rare food
+                    const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
+                    const gc = foodConfig.glowColor;
+                    glowGrad.addColorStop(0, `rgba(${gc.r}, ${gc.g}, ${gc.b}, ${0.8 * pulse})`);
+                    glowGrad.addColorStop(0.5, `rgba(${gc.r}, ${gc.g}, ${gc.b}, ${0.4 * pulse})`);
+                    glowGrad.addColorStop(1, 'transparent');
+                } else if (this.inDangerZone) {
                     // Golden/amber glow for danger zone food
                     glowGrad.addColorStop(0, 'rgba(255, 200, 80, 0.5)');
                     glowGrad.addColorStop(0.5, 'rgba(255, 180, 50, 0.2)');
@@ -3556,12 +4573,38 @@
                 ctx.arc(0, 0, r * 1.2, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Sparkle effect for rare food
+                if (isRare) {
+                    ctx.globalAlpha = 1;  // Sparkles at full brightness
+                    const sparkleCount = 4;
+                    for (let i = 0; i < sparkleCount; i++) {
+                        const angle = (Date.now() / 500 + i * Math.PI * 2 / sparkleCount) % (Math.PI * 2);
+                        const sparkleR = r * 1.3;
+                        const sx = Math.cos(angle) * sparkleR;
+                        const sy = Math.sin(angle) * sparkleR;
+                        const sparkleSize = 3 + Math.sin(Date.now() / 150 + i) * 1.5;
+                        ctx.fillStyle = '#ffd700';
+                        ctx.beginPath();
+                        ctx.arc(sx, sy, sparkleSize, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.globalAlpha = freshness;
+                }
+
                 // Draw emoji scaled to size
                 const fontSize = Math.max(14, r * 2);
                 ctx.font = `${fontSize}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+
+                // Apply grayscale filter for very stale food
+                if (freshnessPercent < 0.3) {
+                    ctx.filter = `grayscale(${(0.3 - freshnessPercent) * 200}%)`;
+                }
                 ctx.fillText(this.emoji, 0, 0);
+                ctx.filter = 'none';
+
+                ctx.globalAlpha = 1;  // Reset for UI elements
 
                 // Size indicator
                 if (this.size > 1) {
@@ -3575,13 +4618,19 @@
                 }
 
                 // Timer indicator - shows seconds remaining
-                const timeLeft = this.getTimeRemaining();
                 const timerColor = timeLeft <= 10 ? 'rgba(255, 80, 80, 0.9)' :
                                    timeLeft <= 20 ? 'rgba(255, 180, 80, 0.9)' :
                                    'rgba(255, 255, 255, 0.7)';
                 ctx.fillStyle = timerColor;
                 ctx.font = 'bold 9px "DM Mono", monospace';
                 ctx.fillText(`${timeLeft}s`, 0, r + 12);
+
+                // Effect indicator for food with special effects
+                if (foodConfig.effect && foodConfig.effectDesc) {
+                    ctx.fillStyle = foodConfig.effectColor || '#fff';
+                    ctx.font = 'bold 8px "DM Mono", monospace';
+                    ctx.fillText(foodConfig.effectDesc, 0, r + 22);
+                }
 
                 // Spoiling warning flash
                 if (timeLeft <= 10 && Math.floor(time / 15) % 2 === 0) {
@@ -3590,6 +4639,14 @@
                     ctx.beginPath();
                     ctx.arc(0, 0, r + 6, 0, Math.PI * 2);
                     ctx.stroke();
+                }
+
+                // "RARE!" indicator for rare food
+                if (isRare) {
+                    const bounce = Math.sin(Date.now() / 300) * 3;
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 10px "DM Mono", monospace';
+                    ctx.fillText('RARE!', 0, -r - 8 + bounce);
                 }
 
                 ctx.restore();
@@ -3622,6 +4679,8 @@
         let ants = [];
         let antIdCounter = 0;
         let selectedAnt = null;  // Currently selected ant for character card
+        let selectedPredator = null;  // Currently selected predator for character card
+        let selectedPredatorKey = null;  // Key for the selected predator (spider/beetle)
 
         // Ant name generator - normal human names
         const ANT_NAMES = [
@@ -3735,6 +4794,9 @@
                 this.legPhase = Math.random() * Math.PI * 2;
                 this.colorOffset = Math.floor(Math.random() * 15) - 7;
                 this.panicTimer = 0;
+                this.lastAttackTime = 0;  // Frame counter for 1 attack per second
+                this.fightingTimer = 0;   // Timer for standing still during combat
+                this.hiveRestTimer = 0;   // Timer for resting in hive after delivery
 
                 // Soldier-specific properties
                 this.targetPredator = null;
@@ -3755,6 +4817,76 @@
 
                 // Position history for glowing trail (level 3+)
                 this.positionHistory = [];
+
+                // Active buffs from food delivery effects
+                // Each buff: { type, value, endTime, color }
+                this.activeBuffs = [];
+            }
+
+            // Apply a food delivery buff to this ant
+            applyFoodBuff(foodType) {
+                const foodConfig = CONFIG.foodTypes[foodType];
+                if (!foodConfig || !foodConfig.effect) return { xpBonus: 0, goldMultiplier: 1, rewardText: null };
+
+                const effect = foodConfig.effect;
+                let xpBonus = 0;
+                let goldMultiplier = 1;
+                let rewardText = null;
+
+                switch (effect.type) {
+                    case 'permAtkBoost':
+                        // Permanent ATK boost
+                        this.permAtkBonus = (this.permAtkBonus || 0) + effect.value;
+                        rewardText = { text: `+${effect.value} ATK`, color: foodConfig.effectColor };
+                        break;
+
+                    case 'permDefBoost':
+                        // Permanent DEF boost
+                        this.permDefBonus = (this.permDefBonus || 0) + effect.value;
+                        rewardText = { text: `+${effect.value} DEF`, color: foodConfig.effectColor };
+                        break;
+
+                    case 'permHpBoost':
+                        // Permanent max HP boost
+                        this.permHpBonus = (this.permHpBonus || 0) + effect.value;
+                        this.maxHp += effect.value;
+                        this.currentHp += effect.value; // Also heal the added HP
+                        rewardText = { text: `+${effect.value} HP`, color: foodConfig.effectColor };
+                        break;
+
+                    case 'heal':
+                        // Heal 1 HP if not at max
+                        if (this.currentHp < this.maxHp) {
+                            this.currentHp = Math.min(this.maxHp, this.currentHp + effect.value);
+                            rewardText = { text: `+${effect.value} HEAL`, color: foodConfig.effectColor };
+                        }
+                        break;
+
+                    case 'xpBoost':
+                        // Return XP multiplier for this delivery
+                        xpBonus = effect.value;
+                        rewardText = { text: `+${Math.round(effect.value * 100)}% XP`, color: foodConfig.effectColor };
+                        break;
+
+                    case 'goldenBonus':
+                        // Return gold multiplier for this delivery
+                        goldMultiplier = effect.goldMultiplier;
+                        rewardText = { text: `${goldMultiplier}x GOLD`, color: foodConfig.effectColor };
+                        break;
+                }
+
+                return { xpBonus, goldMultiplier, rewardText };
+            }
+
+            // Update and clean up expired buffs
+            updateBuffs() {
+                const now = Date.now();
+                this.activeBuffs = this.activeBuffs.filter(buff => buff.endTime > now);
+            }
+
+            // Check if ant has any active buffs
+            hasActiveBuffs() {
+                return this.activeBuffs.length > 0;
             }
 
             // Calculate current level from XP
@@ -3897,10 +5029,54 @@
             }
 
             // Take damage from a predator attack
-            takeDamage(attackPower) {
+            takeDamage(attackPower, predator = null) {
+                // Calculate effective defense including permanent bonuses and nest defense bonus
+                let effectiveDef = this.getEffectiveDef();
+
+                // Apply Fortified Nest bonus if near the nest
+                if (upgradeMultipliers.nestDefenseBonus > 0) {
+                    const distToNest = Math.hypot(this.x - CONFIG.nestX, this.y - CONFIG.nestY);
+                    if (distToNest <= upgradeMultipliers.nestDefenseRadius) {
+                        effectiveDef += upgradeMultipliers.nestDefenseBonus;
+                    }
+                }
+
                 // Calculate damage: attacker's ATK minus defender's DEF (min 1 damage)
-                const damage = Math.max(1, attackPower - this.def);
+                const damage = Math.max(1, attackPower - effectiveDef);
                 this.currentHp -= damage;
+
+                // Both ant and predator stand still during combat - refresh timer on each hit
+                if (predator) {
+                    this.fightingTimer = 60;  // 1 second
+                    predator.fightingTimer = 60;
+
+                    // Face each other
+                    this.angle = Math.atan2(predator.y - this.y, predator.x - this.x);
+                    predator.angle = Math.atan2(this.y - predator.y, this.x - predator.x);
+                }
+
+                // Retaliation attack - ants always fight back when attacked (bypasses cooldown)
+                if (predator && predator.currentHp !== undefined && this.currentHp > 0) {
+                    const antAtk = this.getEffectiveAtk();
+                    if (antAtk > 0) {
+                        const retaliateDamage = Math.max(1, antAtk - (predator.def || 0));
+                        predator.currentHp -= retaliateDamage;
+
+                        // Spawn combat effect with health indicators
+                        const midX = (this.x + predator.x) / 2;
+                        const midY = (this.y + predator.y) / 2;
+                        spawnCombatEffect(midX, midY, this.currentHp, this.maxHp, Math.max(0, predator.currentHp), predator.maxHp);
+
+                        // Spawn damage numbers
+                        spawnFloatingText(this.x, this.y - 15, `-${damage}`, '#ff4444', 11);
+                        spawnFloatingText(predator.x, predator.y - 15, `-${retaliateDamage}`, '#00ff88', 11);
+
+                        // Check if predator is killed by retaliation
+                        if (predator.currentHp <= 0) {
+                            removePredator(predator);
+                        }
+                    }
+                }
 
                 // Return true if ant survives
                 return this.currentHp > 0;
@@ -3916,20 +5092,35 @@
                 return (this.currentHp / this.maxHp) * 100;
             }
 
-            // Get effective ATK (including Berserker skill)
+            // Get effective ATK (including Berserker skill and permanent food bonuses)
             getEffectiveAtk() {
-                let atk = this.atk;
+                let atk = this.atk + (this.permAtkBonus || 0);
 
                 // Berserker skill: doubles ATK when colony has recent deaths
                 if (this.hasSkill && this.type === 'soldier' && CONFIG.recentDeaths > 0) {
                     atk *= 2;
                 }
 
+                // Apply temporary ATK buffs (if any still exist)
+                for (const buff of this.activeBuffs) {
+                    if (buff.type === 'atkBoost') {
+                        atk *= (1 + buff.value);
+                    }
+                }
+
                 return atk;
             }
 
-            // Combat with predator - uses Pokemon-style stats
+            // Get effective DEF (including permanent food bonuses)
+            getEffectiveDef() {
+                return this.def + (this.permDefBonus || 0);
+            }
+
+            // Combat with predator - uses Pokemon-style stats (1 attack per second)
             attemptFight(predator) {
+                // Check attack cooldown (1 attack per second = 60 frames)
+                if (time - this.lastAttackTime < 60) return 'cooldown';
+
                 // All ants can now take damage, but only soldiers fight back effectively
                 const antAtk = this.getEffectiveAtk();
 
@@ -3938,9 +5129,12 @@
                     const damageDealt = Math.max(1, antAtk - (predator.def || 0));
                     predator.currentHp -= damageDealt;
 
-                    // Check if predator is killed
+                    // Record attack time for cooldown
+                    this.lastAttackTime = time;
+
+                    // Check if predator is killed - remove permanently
                     if (predator.currentHp <= 0) {
-                        predator.stun(300); // Long stun before respawn
+                        removePredator(predator);
                         return 'win';
                     }
                 }
@@ -4001,6 +5195,18 @@
                 this.positionHistory.push({ x: this.x, y: this.y });
                 if (this.positionHistory.length > 20) {
                     this.positionHistory.shift();
+                }
+
+                // If resting in hive, decrement timer and stay put
+                if (this.hiveRestTimer > 0) {
+                    this.hiveRestTimer--;
+                    return;
+                }
+
+                // If fighting, stand still and decrement timer
+                if (this.fightingTimer > 0) {
+                    this.fightingTimer--;
+                    return;
                 }
 
                 // Flee from nearby predators if in danger zone and not carrying
@@ -4150,10 +5356,12 @@
                         this.state = 'exploring';
                     } else if (result === 'mutual') {
                         // Both affected - soldier dies
+                        spawnDeathEffect(this.x, this.y, 'ant', this.color);
                         const idx = ants.indexOf(this);
                         if (idx !== -1) ants.splice(idx, 1);
                     } else {
                         // Soldier lost - dies
+                        spawnDeathEffect(this.x, this.y, 'ant', this.color);
                         const idx = ants.indexOf(this);
                         if (idx !== -1) ants.splice(idx, 1);
                     }
@@ -4290,7 +5498,7 @@
                 // Detection radius is how far the ant can SEE food
                 // Detection trait gives up to 20% bonus, plus upgrade bonus
                 const detectionBonus = 1 + (this.traitRolls.detection - 0.5) * 0.4;  // 0.8x to 1.2x
-                const effectiveDetectionRange = this.foodDetectRadius * detectionBonus * upgradeMultipliers.detectionRadius;
+                const baseDetectionRange = this.foodDetectRadius * detectionBonus * upgradeMultipliers.detectionRadius;
 
                 // Pickup radius is small - ant must actually reach the food
                 const pickupRadius = 8;
@@ -4298,6 +5506,12 @@
                 for (const food of foodItems) {
                     const dist = Math.hypot(this.x - food.x, this.y - food.y);
                     const foodRadius = food.getRadius();
+
+                    // Check for food attraction effect (feast food has 2x detection range)
+                    const foodConfig = CONFIG.foodTypes[food.type];
+                    const attractMultiplier = (foodConfig.effect && foodConfig.effect.type === 'attract')
+                        ? foodConfig.effect.detectMultiplier : 1;
+                    const effectiveDetectionRange = baseDetectionRange * attractMultiplier;
 
                     // Close enough to pick up?
                     if (dist < pickupRadius + foodRadius) {
@@ -4325,7 +5539,8 @@
 
             pickUpFoodUnit(food) {
                 // Capacity determines how many units ant can carry at once (1 = 1 unit, 2 = 2 units, etc)
-                const capacity = Math.max(1, Math.floor(this.carryCapacity));
+                // Include upgrade bonus for carry capacity
+                const capacity = Math.max(1, Math.floor(this.carryCapacity + upgradeMultipliers.carryCapacity));
                 const unitsToTake = Math.min(capacity, Math.floor(food.size));
 
                 // Take units from the food
@@ -4392,29 +5607,63 @@
                 if (distToNest < getColonySize()) {
                     // Count units delivered for XP (each unit = 1 delivery)
                     const unitsDelivered = this.carriedFoodPiece.units || 1;
+                    const deliveredFoodType = this.carriedFoodPiece.type;
+
+                    // Apply food buff effects and get any bonuses
+                    const buffResult = this.applyFoodBuff(deliveredFoodType);
+                    const foodXpBonus = buffResult.xpBonus || 0;
+                    const foodGoldMultiplier = buffResult.goldMultiplier || 1;
 
                     // Record experience - each unit counts as a delivery
+                    // Apply XP bonus from nectar if applicable
                     for (let i = 0; i < unitsDelivered; i++) {
-                        this.recordDelivery(this.carriedFoodValue / unitsDelivered, this.carriedFoodPiece.fromDangerZone);
+                        const xpValue = (this.carriedFoodValue / unitsDelivered) * (1 + foodXpBonus);
+                        this.recordDelivery(xpValue, this.carriedFoodPiece.fromDangerZone);
                     }
 
-                    // Gold bonus: innate trait that gives 0-100% extra gold per delivery
-                    const goldMultiplier = 1 + this.traitRolls.goldBonus;  // 1.0x to 2.0x
+                    // Gold bonus: only applies if ant has Midas trait (goldBonus >= 0.95)
+                    const goldMultiplier = this.traitRolls.goldBonus >= 0.95 ? 2.0 : 1.0;
                     // Apply upgrade multipliers for food value and coin bonus
-                    let coinValue = Math.ceil(this.carriedFoodValue * goldMultiplier * upgradeMultipliers.foodValue);
+                    // Also apply food-specific gold multiplier (golden apple = 3x)
+                    let coinValue = Math.ceil(this.carriedFoodValue * goldMultiplier * upgradeMultipliers.foodValue * foodGoldMultiplier);
                     coinValue += upgradeMultipliers.coinBonus;  // Flat bonus from upgrades
+
+                    // Apply Gold Rush multiplier if active
+                    if (upgradeMultipliers.goldRushActive && Date.now() < upgradeMultipliers.goldRushEndTime) {
+                        coinValue = Math.ceil(coinValue * upgradeMultipliers.goldRushMultiplier);
+                    } else if (upgradeMultipliers.goldRushActive) {
+                        // Gold rush expired, reset it
+                        upgradeMultipliers.goldRushActive = false;
+                    }
 
                     // Earn coins (no ant spawning - that's separate now)
                     earnCoins(coinValue);
                     foodCollected += Math.ceil(unitsDelivered * upgradeMultipliers.foodValue);
 
+                    // Spawn reward floating text at nest
+                    spawnFloatingText(CONFIG.nestX + (Math.random() - 0.5) * 30, CONFIG.nestY - 20, `+${coinValue} GOLD`, '#ffd700', 14);
+
+                    // Spawn food effect reward text if applicable
+                    if (buffResult.rewardText) {
+                        spawnFloatingText(CONFIG.nestX + (Math.random() - 0.5) * 30, CONFIG.nestY - 40, buffResult.rewardText.text, buffResult.rewardText.color, 12);
+                    }
+
                     // Reset state
                     this.carriedFoodPiece = null;
                     this.carriedFoodValue = 0;
                     this.targetFood = null;
-                    this.state = 'exploring';
                     this.foundFoodRecently = true;
-                    this.angle += Math.PI + (Math.random() - 0.5) * 1.2;
+
+                    // Ant rests in hive for 5 seconds after delivering food
+                    this.hiveRestTimer = 300;  // 5 seconds at 60fps
+                    this.state = 'exploring';
+
+                    // Move ant to center of nest while resting
+                    const restAngle = Math.random() * Math.PI * 2;
+                    const restDist = Math.random() * 15;
+                    this.x = CONFIG.nestX + Math.cos(restAngle) * restDist;
+                    this.y = CONFIG.nestY + Math.sin(restAngle) * restDist;
+                    this.angle = Math.random() * Math.PI * 2;
                 }
             }
 
@@ -4699,6 +5948,60 @@
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('👑', 0, -size * 0.7);
+                    ctx.restore();
+                }
+
+                // Food buff indicator - show active buff icons above ant
+                if (this.activeBuffs && this.activeBuffs.length > 0) {
+                    ctx.save();
+                    ctx.rotate(-this.angle);
+
+                    const buffStartY = -size * 1.5;
+                    let buffIndex = 0;
+
+                    for (const buff of this.activeBuffs) {
+                        // Calculate time remaining for the buff
+                        const timeRemaining = buff.endTime - Date.now();
+                        const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
+
+                        // Position buffs in a row above the ant
+                        const buffX = (buffIndex - (this.activeBuffs.length - 1) / 2) * size * 0.8;
+                        const buffY = buffStartY;
+
+                        // Draw colored glow behind buff
+                        const glowGrad = ctx.createRadialGradient(buffX, buffY, 0, buffX, buffY, size * 0.5);
+                        glowGrad.addColorStop(0, buff.color || 'rgba(255, 200, 100, 0.6)');
+                        glowGrad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = glowGrad;
+                        ctx.globalAlpha = pulse;
+                        ctx.beginPath();
+                        ctx.arc(buffX, buffY, size * 0.5, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Draw buff emoji
+                        ctx.globalAlpha = 1;
+                        ctx.font = `${size * 0.5}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(buff.emoji || '⚡', buffX, buffY);
+
+                        // Draw time remaining indicator bar below
+                        const barWidth = size * 0.6;
+                        const barHeight = 2;
+                        const barY = buffY + size * 0.35;
+                        const remainingPercent = Math.max(0, timeRemaining / (buff.endTime - (buff.endTime - 30000)));
+
+                        // Background bar
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                        ctx.fillRect(buffX - barWidth / 2, barY, barWidth, barHeight);
+
+                        // Progress bar
+                        ctx.fillStyle = buff.color || '#ffd700';
+                        ctx.fillRect(buffX - barWidth / 2, barY, barWidth * Math.min(1, timeRemaining / 30000), barHeight);
+
+                        buffIndex++;
+                    }
+
                     ctx.restore();
                 }
 
@@ -4995,9 +6298,92 @@
         let selectedFoodType = null;
         let isPlacing = false;
         let lastPlaceTime = 0;
-        let showHint = true;
+        let showHint = false;  // Disabled - no longer showing "click to drop food" hint
         let foodPlacementActive = false;
         let foodPlacementTimeout = null;
+
+        // Food cooldown tracking - stores end timestamps for each food type
+        const foodCooldowns = {
+            sugar: 0,
+            protein: 0,
+            fruit: 0,
+            feast: 0,
+            nectar: 0
+        };
+        const FOOD_COOLDOWN_DURATION = 30000; // 30 seconds in milliseconds
+
+        // Initialize cooldown overlays on food buttons
+        function initFoodCooldownOverlays() {
+            document.querySelectorAll('.food-btn').forEach(btn => {
+                // Add position relative for overlay positioning
+                btn.style.position = 'relative';
+
+                // Create cooldown overlay element
+                const overlay = document.createElement('div');
+                overlay.className = 'cooldown-overlay';
+                overlay.innerHTML = '<span class="cooldown-timer">30</span>';
+                btn.appendChild(overlay);
+
+                // Create progress bar
+                const progress = document.createElement('div');
+                progress.className = 'cooldown-progress';
+                progress.style.width = '0%';
+                btn.appendChild(progress);
+            });
+        }
+
+        // Start cooldown for a specific food type
+        function startFoodCooldown(foodType) {
+            const endTime = Date.now() + FOOD_COOLDOWN_DURATION;
+            foodCooldowns[foodType] = endTime;
+
+            const btn = document.querySelector(`.food-btn[data-food="${foodType}"]`);
+            if (btn) {
+                btn.classList.add('on-cooldown');
+            }
+        }
+
+        // Check if a food type is on cooldown
+        function isFoodOnCooldown(foodType) {
+            return Date.now() < foodCooldowns[foodType];
+        }
+
+        // Update all food cooldown timers
+        function updateFoodCooldowns() {
+            const now = Date.now();
+
+            for (const foodType of Object.keys(foodCooldowns)) {
+                const btn = document.querySelector(`.food-btn[data-food="${foodType}"]`);
+                if (!btn) continue;
+
+                const endTime = foodCooldowns[foodType];
+                const remaining = endTime - now;
+
+                if (remaining > 0) {
+                    // Still on cooldown
+                    const seconds = Math.ceil(remaining / 1000);
+                    const timerEl = btn.querySelector('.cooldown-timer');
+                    const progressEl = btn.querySelector('.cooldown-progress');
+
+                    if (timerEl) {
+                        timerEl.textContent = seconds;
+                    }
+                    if (progressEl) {
+                        const progressPercent = (remaining / FOOD_COOLDOWN_DURATION) * 100;
+                        progressEl.style.width = progressPercent + '%';
+                    }
+
+                    btn.classList.add('on-cooldown');
+                } else {
+                    // Cooldown finished
+                    btn.classList.remove('on-cooldown');
+                    const progressEl = btn.querySelector('.cooldown-progress');
+                    if (progressEl) {
+                        progressEl.style.width = '0%';
+                    }
+                }
+            }
+        }
 
         // Drag selection state
         let isDragging = false;
@@ -5011,6 +6397,11 @@
             // Clear any existing timeout
             if (foodPlacementTimeout) {
                 clearTimeout(foodPlacementTimeout);
+            }
+
+            // Don't activate if this food type is on cooldown
+            if (isFoodOnCooldown(foodType)) {
+                return;
             }
 
             selectedFoodType = foodType;
@@ -5040,6 +6431,12 @@
                 e.stopPropagation();
                 if (btn.classList.contains('disabled')) return;
                 const foodType = btn.dataset.food;
+
+                // Don't allow selection if on cooldown
+                if (isFoodOnCooldown(foodType)) {
+                    return;
+                }
+
                 // Toggle: if same food clicked again, deactivate
                 if (selectedFoodType === foodType && foodPlacementActive) {
                     deactivateFoodPlacement();
@@ -5153,15 +6550,15 @@
                 icon: '🕷️',
                 title: 'Spider',
                 subtitle: 'Ambush Predator',
-                description: 'A deadly hunter with high ATK but lower HP. Soldiers can take it down with sustained damage!',
+                description: 'A fast hunter with moderate ATK and low HP. Soldiers can take it down with sustained damage!',
                 stats: [
                     { name: 'HP', value: '50', class: 'neutral' },
-                    { name: 'ATK', value: '15', class: 'bad' },
+                    { name: 'ATK', value: '8', class: 'neutral' },
                     { name: 'DEF', value: '3', class: '' },
-                    { name: 'SPD', value: 'Fast', class: 'bad' }
+                    { name: 'SPD', value: '1.8', class: 'bad' }
                 ],
                 traits: [
-                    { text: 'High Damage', class: 'negative' },
+                    { text: 'Fast', class: 'negative' },
                     { text: 'Can Be Killed', class: 'positive' },
                     { text: 'Respawns', class: 'negative' }
                 ]
@@ -5175,7 +6572,7 @@
                     { name: 'HP', value: '80', class: 'bad' },
                     { name: 'ATK', value: '10', class: 'neutral' },
                     { name: 'DEF', value: '8', class: 'bad' },
-                    { name: 'SPD', value: 'Slow', class: 'good' }
+                    { name: 'SPD', value: '0.5', class: 'good' }
                 ],
                 traits: [
                     { text: 'Armored', class: 'negative' },
@@ -5215,37 +6612,67 @@
             // HP class based on current health
             const hpClass = hpPercent >= 75 ? 'good' : hpPercent >= 40 ? '' : hpPercent >= 20 ? 'weak' : 'bad';
 
+            // Calculate effective ATK and DEF including permanent food bonuses
+            const permAtkBonus = ant.permAtkBonus || 0;
+            const permDefBonus = ant.permDefBonus || 0;
+            const effectiveAtk = atk + permAtkBonus;
+
+            // Calculate effective DEF including nest defense bonus
+            let effectiveDef = def + permDefBonus;
+            let hasNestBonus = false;
+            if (upgradeMultipliers.nestDefenseBonus > 0) {
+                const distToNest = Math.hypot(ant.x - CONFIG.nestX, ant.y - CONFIG.nestY);
+                if (distToNest <= upgradeMultipliers.nestDefenseRadius) {
+                    effectiveDef += upgradeMultipliers.nestDefenseBonus;
+                    hasNestBonus = true;
+                }
+            }
+
+            // Build ATK display string
+            let atkDisplay = Math.round(effectiveAtk);
+            if (permAtkBonus > 0) {
+                atkDisplay = `${Math.round(effectiveAtk)} (+${permAtkBonus})`;
+            }
+
+            // Build DEF display string
+            let defDisplay = Math.round(effectiveDef);
+            const totalDefBonus = permDefBonus + (hasNestBonus ? upgradeMultipliers.nestDefenseBonus : 0);
+            if (totalDefBonus > 0) {
+                defDisplay = `${Math.round(effectiveDef)} (+${totalDefBonus})`;
+            }
+
             // Build dynamic stats with Pokemon-style format
             const stats = [
                 {
                     name: 'HP',
                     value: `${currentHp}/${maxHp}`,
-                    class: hpClass
+                    class: hpClass,
+                    hpData: { current: currentHp, max: maxHp }
                 },
                 {
                     name: 'ATK',
-                    value: Math.round(atk),
-                    class: atk >= 6 ? 'good' : atk >= 3 ? '' : 'weak'
+                    value: atkDisplay,
+                    class: effectiveAtk >= 6 ? 'good' : effectiveAtk >= 3 ? '' : 'weak'
                 },
                 {
                     name: 'DEF',
-                    value: Math.round(def),
-                    class: def >= 5 ? 'good' : def >= 3 ? '' : 'weak'
+                    value: defDisplay,
+                    class: effectiveDef >= 5 ? 'good' : effectiveDef >= 3 ? '' : 'weak'
                 },
                 {
                     name: 'SPD',
-                    value: ant.speed.toFixed(2),
-                    class: ant.speed >= 0.6 ? 'good' : ant.speed >= 0.4 ? '' : 'weak'
+                    value: (ant.speed * upgradeMultipliers.antSpeed).toFixed(2),
+                    class: (ant.speed * upgradeMultipliers.antSpeed) >= 0.6 ? 'good' : (ant.speed * upgradeMultipliers.antSpeed) >= 0.4 ? '' : 'weak'
                 },
                 {
                     name: 'DET',
-                    value: Math.round(ant.detectionRadius),
-                    class: ant.detectionRadius >= 20 ? 'good' : ant.detectionRadius >= 12 ? '' : 'weak'
+                    value: Math.round(ant.foodDetectRadius * upgradeMultipliers.detectionRadius),
+                    class: (ant.foodDetectRadius * upgradeMultipliers.detectionRadius) >= 20 ? 'good' : (ant.foodDetectRadius * upgradeMultipliers.detectionRadius) >= 12 ? '' : 'weak'
                 },
                 {
                     name: 'CAP',
-                    value: Math.round(ant.carryCapacity),
-                    class: ant.carryCapacity >= 3 ? 'good' : ant.carryCapacity >= 2 ? '' : 'weak'
+                    value: Math.round(ant.carryCapacity + upgradeMultipliers.carryCapacity),
+                    class: (ant.carryCapacity + upgradeMultipliers.carryCapacity) >= 3 ? 'good' : (ant.carryCapacity + upgradeMultipliers.carryCapacity) >= 2 ? '' : 'weak'
                 },
                 {
                     name: 'PHER',
@@ -5333,19 +6760,84 @@
             };
         }
 
+        // Generate dynamic card data for a predator (spider or beetle)
+        function generatePredatorCardData(predator, key) {
+            const baseData = PREDATOR_CARD_DATA[key];
+            const cfg = CONFIG.predators[key];
+
+            // Calculate HP percentage for class
+            const hpPercent = Math.round((predator.currentHp / predator.maxHp) * 100);
+            const hpClass = hpPercent >= 75 ? 'bad' : hpPercent >= 40 ? 'neutral' : hpPercent >= 20 ? 'good' : 'weak';
+
+            // Get speed value from predator or config
+            const speedValue = predator.speed || cfg.speed || cfg.patrolSpeed || 1.0;
+            const speedClass = speedValue >= 1.5 ? 'bad' : speedValue >= 1.0 ? 'neutral' : 'good';
+
+            // Build dynamic stats
+            const stats = [
+                {
+                    name: 'HP',
+                    value: `${Math.round(predator.currentHp)}/${predator.maxHp}`,
+                    class: hpClass
+                },
+                {
+                    name: 'ATK',
+                    value: Math.round(predator.atk),
+                    class: predator.atk >= 12 ? 'bad' : predator.atk >= 8 ? 'neutral' : 'good'
+                },
+                {
+                    name: 'DEF',
+                    value: Math.round(predator.def),
+                    class: predator.def >= 6 ? 'bad' : predator.def >= 3 ? 'neutral' : 'good'
+                },
+                {
+                    name: 'SPD',
+                    value: speedValue.toFixed(1),
+                    class: speedClass
+                }
+            ];
+
+            // Build dynamic traits based on current state
+            const traits = [...baseData.traits];
+
+            // Add health-based trait
+            if (hpPercent <= 25) {
+                traits.unshift({ text: 'Near Death', class: 'good' });
+            } else if (hpPercent <= 50) {
+                traits.unshift({ text: 'Wounded', class: 'positive' });
+            }
+
+            // Add state-based trait
+            if (predator.state === 'stunned') {
+                traits.unshift({ text: 'Stunned', class: 'positive' });
+            } else if (predator.state === 'eating') {
+                traits.unshift({ text: 'Feeding', class: 'negative' });
+            } else if (predator.state === 'hunting') {
+                traits.unshift({ text: 'Hunting', class: 'negative' });
+            }
+
+            return {
+                icon: baseData.icon,
+                title: baseData.title,
+                subtitle: baseData.subtitle,
+                description: baseData.description,
+                stats: stats,
+                traits: traits
+            };
+        }
+
         // Track update interval for real-time character card updates
         let cardUpdateInterval = null;
 
         // Stat tooltips explaining what each stat does
         const STAT_TOOLTIPS = {
-            'Speed': 'Movement speed while exploring. Improves with level. Queen aura grants +25% bonus.',
-            'Capacity': 'Units of food carried per trip. Higher capacity = more food delivered at once.',
-            'Detection': 'Radius for detecting food sources. Higher = spots food from further away.',
-            'Combat': 'Fight chance / Survival rate. Shows attack success and survival after winning.',
-            'Trail': 'Pheromone trail strength. Scouts leave stronger trails for others to follow.',
-            'Spawn': 'Time between spawning new workers. Queens spawn faster at higher levels.',
-            'Haul': 'Speed retained when carrying. Carriers with Beast of Burden move at 100%.',
-            'Gold': 'Innate gold bonus applied to every delivery. Ranges from +0% to +100% extra coins.'
+            'HP': 'Health points. When HP reaches 0, the ant dies. Regenerates slowly over time.',
+            'ATK': 'Attack power. Higher ATK deals more damage to predators in combat.',
+            'DEF': 'Defense rating. Reduces damage taken from predator attacks.',
+            'SPD': 'Movement speed while exploring. Improves with level and upgrades. Queen aura grants +25% bonus.',
+            'DET': 'Detection radius for spotting food sources. Higher = spots food from further away.',
+            'CAP': 'Carry capacity. Units of food carried per trip. Higher = more food delivered at once.',
+            'PHER': 'Pheromone trail strength. Scouts leave stronger trails for others to follow.'
         };
 
         // Trait tooltips explaining what each trait means
@@ -5405,8 +6897,39 @@
             'Slow Moving': 'Easy to outrun'
         };
 
+        // Stat ranges for bar percentage calculation
+        // Each stat has a min and max defining the expected range
+        // Bar fills based on where the value falls in this range
+        const STAT_RANGES = {
+            'HP': { min: 0, max: 50 },      // 10 is typical worker, 50 is high
+            'ATK': { min: 0, max: 15 },     // 2 is typical, 10+ is high
+            'DEF': { min: 0, max: 10 },     // 2 is typical, 8+ is high
+            'SPD': { min: 0.2, max: 1.0 },  // 0.5 is typical, 0.8+ is fast
+            'DET': { min: 5, max: 40 },     // 15 is typical, 30+ is high
+            'CAP': { min: 1, max: 10 },     // 1-2 is typical, 5+ is high
+            'PHER': { min: 0.3, max: 2.0 }  // 0.8 is typical, 1.5+ is high
+        };
+
         // Calculate bar percentage for a stat
         function getStatBarPercent(statName, value, antType) {
+            // Check if we have a defined range for this stat
+            const range = STAT_RANGES[statName];
+            if (range) {
+                // Parse the value - for HP, extract first number from "x/y" format
+                let numValue;
+                if (statName === 'HP' && typeof value === 'string' && value.includes('/')) {
+                    // For HP bar, use max HP (second value) to show the stat quality
+                    numValue = parseFloat(value.split('/')[1]) || 0;
+                } else {
+                    numValue = parseFloat(value) || 0;
+                }
+
+                // Calculate percentage: ((value - min) / (max - min)) * 100, clamped to 0-100
+                const percent = ((numValue - range.min) / (range.max - range.min)) * 100;
+                return Math.max(0, Math.min(100, percent));
+            }
+
+            // Fallback for legacy stat names (for compatibility)
             const typeConfig = CONFIG.antTypes[antType] || CONFIG.antTypes.worker;
             const levelBonuses = typeConfig.levelBonuses || {};
             let baseline, max;
@@ -5414,7 +6937,7 @@
             switch(statName) {
                 case 'Speed':
                     baseline = typeConfig.speed;
-                    max = baseline + (levelBonuses.speed || 0) * 4 * 1.4;  // Max level 5 with legendary trait
+                    max = baseline + (levelBonuses.speed || 0) * 4 * 1.4;
                     return Math.min(100, (parseFloat(value) / max) * 100);
                 case 'Capacity':
                     baseline = typeConfig.carryCapacity;
@@ -5425,25 +6948,51 @@
                     max = baseline + (levelBonuses.foodDetectRadius || 0) * 4 * 1.4;
                     return Math.min(100, (parseFloat(value) / max) * 100);
                 case 'Combat':
-                    // Format is "fight/survive" - parse first number
                     const fightChance = parseInt(value.split('/')[0]) || 0;
-                    return Math.min(100, fightChance * 1.25);  // Max ~80%
+                    return Math.min(100, fightChance * 1.25);
                 case 'Trail':
-                    return Math.min(100, parseFloat(value) / 2.3);  // Max ~230 at level 5
+                    return Math.min(100, parseFloat(value) / 2.3);
                 case 'Spawn':
                     const secs = parseInt(value) || 15;
-                    return Math.min(100, (20 - secs) * 10);  // Faster = higher bar
+                    return Math.min(100, (20 - secs) * 10);
                 case 'Haul':
-                    return Math.min(100, parseFloat(value));  // Already %
+                    return Math.min(100, parseFloat(value));
                 case 'Gold':
-                    return parseFloat(value.replace(/[+%]/g, ''));  // Extract number from "+75%"
+                    return parseFloat(value.replace(/[+%]/g, ''));
                 default:
                     return 50;
             }
         }
 
-        function showCharacterCard(data, ant = null) {
+        // Generate dynamic HP tooltip showing current/max HP
+        function getHpTooltip(currentHp, maxHp) {
+            const hpPercent = Math.round((currentHp / maxHp) * 100);
+            let status, statusClass;
+
+            if (hpPercent >= 90) {
+                status = 'Healthy';
+                statusClass = 'good';
+            } else if (hpPercent >= 75) {
+                status = 'Minor wounds';
+                statusClass = 'good';
+            } else if (hpPercent >= 50) {
+                status = 'Injured';
+                statusClass = '';
+            } else if (hpPercent >= 25) {
+                status = 'Badly hurt';
+                statusClass = 'weak';
+            } else {
+                status = 'Critical!';
+                statusClass = 'bad';
+            }
+
+            return `<span class="hp-current">${currentHp}</span>/<span class="hp-max">${maxHp}</span> HP (${hpPercent}%)<br><span class="hp-status ${statusClass}">${status}</span><br><small>Regenerates slowly over time</small>`;
+        }
+
+        function showCharacterCard(data, ant = null, predator = null, predatorKey = null) {
             selectedAnt = ant;
+            selectedPredator = predator;
+            selectedPredatorKey = predatorKey;
             const card = document.getElementById('character-card');
 
             // Update basic info
@@ -5504,7 +7053,13 @@
             // Build stats HTML with bars, tooltips, and starting markers
             let statsHtml = '';
             for (const stat of data.stats) {
-                const tooltip = STAT_TOOLTIPS[stat.name] || '';
+                // Use dynamic HP tooltip if available, otherwise use static tooltip
+                let tooltip;
+                if (stat.name === 'HP' && stat.hpData) {
+                    tooltip = getHpTooltip(stat.hpData.current, stat.hpData.max);
+                } else {
+                    tooltip = STAT_TOOLTIPS[stat.name] || '';
+                }
                 const barPercent = ant ? getStatBarPercent(stat.name, stat.value, ant.type) : 50;
                 const barClass = stat.class || 'default';
 
@@ -5518,7 +7073,7 @@
                     }
                 }
 
-                statsHtml += `<div class="stat-item">
+                statsHtml += `<div class="stat-item" data-stat="${stat.name}">
                     <div class="stat-header">
                         <span class="stat-name">${stat.name}</span>
                         <span class="stat-val ${stat.class}">${stat.value}</span>
@@ -5544,15 +7099,17 @@
             card.classList.remove('hidden');
             characterCardOpen = true;
 
-            // Start real-time updates for ants
-            if (ant) {
-                if (cardUpdateInterval) clearInterval(cardUpdateInterval);
-                cardUpdateInterval = setInterval(() => {
-                    if (selectedAnt && characterCardOpen) {
+            // Start real-time updates for ants or predators
+            if (cardUpdateInterval) clearInterval(cardUpdateInterval);
+            cardUpdateInterval = setInterval(() => {
+                if (characterCardOpen) {
+                    if (selectedAnt) {
                         updateCardRealTime();
+                    } else if (selectedPredator) {
+                        updatePredatorCardRealTime();
                     }
-                }, 500);
-            }
+                }
+            }, 200);  // Faster updates for smoother HP display
         }
 
         // Real-time update function for the card
@@ -5610,6 +7167,7 @@
                 if (statItems[index]) {
                     const valEl = statItems[index].querySelector('.stat-val');
                     const barEl = statItems[index].querySelector('.stat-bar');
+                    const tooltipEl = statItems[index].querySelector('.stat-tooltip');
 
                     if (valEl) {
                         valEl.textContent = stat.value;
@@ -5619,6 +7177,10 @@
                         const barPercent = getStatBarPercent(stat.name, stat.value, ant.type);
                         barEl.style.width = `${barPercent}%`;
                         barEl.className = `stat-bar ${stat.class || 'default'}`;
+                    }
+                    // Update HP tooltip dynamically
+                    if (stat.name === 'HP' && stat.hpData && tooltipEl) {
+                        tooltipEl.innerHTML = getHpTooltip(stat.hpData.current, stat.hpData.max);
                     }
                 }
             });
@@ -5640,10 +7202,81 @@
             document.getElementById('character-card').classList.add('hidden');
             characterCardOpen = false;
             selectedAnt = null;
+            selectedPredator = null;
+            selectedPredatorKey = null;
             if (cardUpdateInterval) {
                 clearInterval(cardUpdateInterval);
                 cardUpdateInterval = null;
             }
+        }
+
+        // Real-time update function for predator cards
+        function updatePredatorCardRealTime() {
+            if (!selectedPredator || !selectedPredatorKey || !characterCardOpen) return;
+
+            // Check if predator still exists
+            const predatorArray = predators[selectedPredatorKey];
+            if (!predatorArray || !predatorArray.includes(selectedPredator)) {
+                closeCharacterCard();
+                return;
+            }
+
+            const predator = selectedPredator;
+            const cardData = generatePredatorCardData(predator, selectedPredatorKey);
+
+            // Update stat values and bars without rebuilding
+            const statItems = document.querySelectorAll('.stat-item');
+            cardData.stats.forEach((stat, index) => {
+                if (statItems[index]) {
+                    const valEl = statItems[index].querySelector('.stat-val');
+                    const barEl = statItems[index].querySelector('.stat-bar');
+
+                    if (valEl) {
+                        valEl.textContent = stat.value;
+                        valEl.className = `stat-val ${stat.class || ''}`;
+                    }
+                    if (barEl) {
+                        const barPercent = getPredatorStatBarPercent(stat.name, stat.value, selectedPredatorKey);
+                        barEl.style.width = `${barPercent}%`;
+                        barEl.className = `stat-bar ${stat.class || 'default'}`;
+                    }
+                }
+            });
+
+            // Update traits if they changed
+            const currentTraitCount = document.querySelectorAll('.trait-tag').length;
+            if (currentTraitCount !== cardData.traits.length) {
+                let traitsHtml = '';
+                for (const trait of cardData.traits) {
+                    const tooltip = TRAIT_TOOLTIPS[trait.text] || '';
+                    const tooltipHtml = tooltip ? `<span class="trait-tooltip">${tooltip}</span>` : '';
+                    traitsHtml += `<span class="trait-tag ${trait.class}">${trait.text}${tooltipHtml}</span>`;
+                }
+                document.getElementById('card-traits').innerHTML = traitsHtml;
+            }
+        }
+
+        // Helper to get predator stat bar percentage
+        function getPredatorStatBarPercent(statName, value, predatorKey) {
+            const cfg = CONFIG.predators[predatorKey];
+            switch (statName) {
+                case 'HP':
+                    const [current, max] = String(value).split('/').map(Number);
+                    return (current / max) * 100;
+                case 'ATK':
+                    return Math.min((parseFloat(value) / 20) * 100, 100);
+                case 'DEF':
+                    return Math.min((parseFloat(value) / 10) * 100, 100);
+                case 'SPD':
+                    return Math.min((parseFloat(value) / 3) * 100, 100);
+                default:
+                    return 50;
+            }
+        }
+
+        function toggleInfoPanel() {
+            const panel = document.getElementById('info-panel');
+            panel.classList.toggle('collapsed');
         }
 
         function findClickedEntity(x, y) {
@@ -5651,7 +7284,7 @@
             for (const { predator, key } of getAllPredatorsWithKeys()) {
                 const dist = Math.hypot(predator.x - x, predator.y - y);
                 if (dist < 30) {
-                    return { type: 'predator', key: key };
+                    return { type: 'predator', key: key, predator: predator };
                 }
             }
 
@@ -5680,6 +7313,32 @@
                 }
             }
             return foundAnts;
+        }
+
+        function findEntitiesInRect(x1, y1, x2, y2) {
+            // Normalize rectangle coordinates
+            const left = Math.min(x1, x2);
+            const right = Math.max(x1, x2);
+            const top = Math.min(y1, y2);
+            const bottom = Math.max(y1, y2);
+
+            const entities = [];
+
+            // Check predators
+            for (const { predator, key } of getAllPredatorsWithKeys()) {
+                if (predator.x >= left && predator.x <= right && predator.y >= top && predator.y <= bottom) {
+                    entities.push({ type: 'predator', key: key, predator: predator });
+                }
+            }
+
+            // Check ants
+            for (const ant of ants) {
+                if (ant.x >= left && ant.x <= right && ant.y >= top && ant.y <= bottom) {
+                    entities.push({ type: 'ant', ant: ant });
+                }
+            }
+
+            return entities;
         }
 
         function drawSelectionRect() {
@@ -5743,13 +7402,25 @@
             ctx.lineTo(right, bottom - cornerSize);
             ctx.stroke();
 
-            // Show count of ants in selection
-            const antsInRect = findAntsInRect(dragStartX, dragStartY, dragCurrentX, dragCurrentY);
-            if (antsInRect.length > 0) {
+            // Show count of entities in selection
+            const entitiesInRect = findEntitiesInRect(dragStartX, dragStartY, dragCurrentX, dragCurrentY);
+            if (entitiesInRect.length > 0) {
+                const antCount = entitiesInRect.filter(e => e.type === 'ant').length;
+                const predatorCount = entitiesInRect.filter(e => e.type === 'predator').length;
+
                 ctx.shadowBlur = 12;
-                ctx.fillStyle = 'rgba(0, 20, 10, 0.9)';
                 ctx.font = 'bold 14px "Orbitron", monospace';
-                const text = `${antsInRect.length} ANT${antsInRect.length > 1 ? 'S' : ''}`;
+
+                // Build text based on what's selected
+                let text = '';
+                if (antCount > 0 && predatorCount > 0) {
+                    text = `${antCount} ANT${antCount > 1 ? 'S' : ''} + ${predatorCount} PREDATOR${predatorCount > 1 ? 'S' : ''}`;
+                } else if (antCount > 0) {
+                    text = `${antCount} ANT${antCount > 1 ? 'S' : ''}`;
+                } else if (predatorCount > 0) {
+                    text = `${predatorCount} PREDATOR${predatorCount > 1 ? 'S' : ''}`;
+                }
+
                 const metrics = ctx.measureText(text);
                 const padding = 8;
                 const boxWidth = metrics.width + padding * 2;
@@ -5760,12 +7431,12 @@
                 // Background
                 ctx.fillStyle = 'rgba(0, 20, 10, 0.95)';
                 ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-                ctx.strokeStyle = '#00ff88';
+                ctx.strokeStyle = predatorCount > 0 ? '#ff6666' : '#00ff88';
                 ctx.lineWidth = 1;
                 ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
 
                 // Text
-                ctx.fillStyle = '#00ff88';
+                ctx.fillStyle = predatorCount > 0 ? '#ff6666' : '#00ff88';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(text, left + w / 2, boxY + boxHeight / 2);
@@ -5795,13 +7466,14 @@
 
             if (addFood(x, y, selectedFoodType)) {
                 showHint = false;
-                // Reset the timeout when food is placed
-                if (foodPlacementTimeout) {
-                    clearTimeout(foodPlacementTimeout);
-                    foodPlacementTimeout = setTimeout(() => {
-                        deactivateFoodPlacement();
-                    }, 10000);
-                }
+
+                // Start cooldown for this food type
+                const placedFoodType = selectedFoodType;
+                startFoodCooldown(placedFoodType);
+
+                // Deactivate placement mode since food is now on cooldown
+                deactivateFoodPlacement();
+
                 return true;
             }
             return false;
@@ -5809,8 +7481,155 @@
 
         let wasDragging = false; // Track if we just finished a drag
 
+        // Assign food zone multipliers based on distance from hive
+        // Nearest = x1, Middle = x2, Furthest = x3
+        function assignFoodZoneMultipliers() {
+            if (foodSpots.length === 0) return;
+
+            // Calculate distance from each food spot to the nest
+            const spotsWithDistance = foodSpots.map((spot, index) => ({
+                spot: spot,
+                index: index,
+                distance: Math.hypot(spot.x - CONFIG.nestX, spot.y - CONFIG.nestY)
+            }));
+
+            // Sort by distance (nearest first)
+            spotsWithDistance.sort((a, b) => a.distance - b.distance);
+
+            // Assign multipliers: x1 for nearest, x2 for middle, x3 for furthest
+            const multipliers = [1, 2, 3];
+            spotsWithDistance.forEach((item, i) => {
+                item.spot.multiplier = multipliers[Math.min(i, multipliers.length - 1)];
+            });
+        }
+
+        // Get the food zone multiplier for a given position
+        function getFoodZoneMultiplier(x, y) {
+            for (const spot of foodSpots) {
+                if (Math.hypot(x - spot.x, y - spot.y) < spot.radius) {
+                    return spot.multiplier || 1;
+                }
+            }
+            return 1; // Default multiplier outside food zones
+        }
+
+        // Preview multipliers during hive placement (temporary, not saved to spots)
+        let previewMultipliers = new Map();
+        let isPreviewingHivePlacement = false;
+
+        // Calculate preview multipliers based on hypothetical hive position
+        function calculatePreviewMultipliers(hiveX, hiveY) {
+            if (foodSpots.length === 0) return;
+
+            // Calculate distance from each food spot to the hypothetical hive position
+            const spotsWithDistance = foodSpots.map((spot, index) => ({
+                spot: spot,
+                index: index,
+                distance: Math.hypot(spot.x - hiveX, spot.y - hiveY)
+            }));
+
+            // Sort by distance (nearest first)
+            spotsWithDistance.sort((a, b) => a.distance - b.distance);
+
+            // Assign preview multipliers: x1 for nearest, x2 for middle, x3 for furthest
+            const multipliers = [1, 2, 3];
+            previewMultipliers.clear();
+            spotsWithDistance.forEach((item, i) => {
+                previewMultipliers.set(item.spot, multipliers[Math.min(i, multipliers.length - 1)]);
+            });
+        }
+
+        // Get the multiplier to display (preview during placement, actual otherwise)
+        function getDisplayMultiplier(spot) {
+            if (isPreviewingHivePlacement && previewMultipliers.has(spot)) {
+                return previewMultipliers.get(spot);
+            }
+            return spot.multiplier || 1;
+        }
+
+        // Hive placement function - called when player clicks to place hive at game start
+        function placeHive(x, y) {
+            if (gameStarted) return;
+
+            // Set the nest position to where the player clicked
+            CONFIG.nestX = x;
+            CONFIG.nestY = y;
+
+            // Assign food zone multipliers based on distance from hive
+            // Sort food spots by distance and assign x1, x2, x3 multipliers
+            assignFoodZoneMultipliers();
+
+            // Initialize ants at the new hive location
+            ants = [];
+            for (let i = 0; i < CONFIG.initialAnts; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * CONFIG.nestRadius * 0.7;
+                ants.push(new Ant(CONFIG.nestX + Math.cos(angle) * dist, CONFIG.nestY + Math.sin(angle) * dist, 'worker'));
+            }
+            totalAntsSpawned = ants.length;
+
+            // Start the game
+            gameStarted = true;
+            gameStartTime = Date.now();
+            pausedTime = 0;
+            pauseStartTime = null;
+
+            // Hide the placement overlay and hive cursor
+            document.getElementById('hive-placement-overlay').classList.add('hidden');
+            document.getElementById('hive-cursor').classList.add('hidden');
+            isPreviewingHivePlacement = false;
+            previewMultipliers.clear();
+        }
+
+        // Add click handler to hive placement overlay
+        document.getElementById('hive-placement-overlay').addEventListener('click', (e) => {
+            placeHive(e.clientX, e.clientY);
+        });
+
+        // Add touch handler to hive placement overlay
+        document.getElementById('hive-placement-overlay').addEventListener('touchend', (e) => {
+            if (e.changedTouches.length > 0) {
+                const touch = e.changedTouches[0];
+                placeHive(touch.clientX, touch.clientY);
+            }
+        });
+
+        // Add mousemove handler for hive cursor and multiplier preview
+        document.getElementById('hive-placement-overlay').addEventListener('mousemove', (e) => {
+            const hiveCursor = document.getElementById('hive-cursor');
+
+            // Update hive cursor position
+            hiveCursor.style.left = e.clientX + 'px';
+            hiveCursor.style.top = e.clientY + 'px';
+            hiveCursor.classList.remove('hidden');
+
+            // Calculate and update preview multipliers
+            isPreviewingHivePlacement = true;
+            calculatePreviewMultipliers(e.clientX, e.clientY);
+        });
+
+        // Show hive cursor when mouse enters overlay
+        document.getElementById('hive-placement-overlay').addEventListener('mouseenter', (e) => {
+            const hiveCursor = document.getElementById('hive-cursor');
+            hiveCursor.classList.remove('hidden');
+            isPreviewingHivePlacement = true;
+        });
+
+        // Hide hive cursor when mouse leaves overlay
+        document.getElementById('hive-placement-overlay').addEventListener('mouseleave', (e) => {
+            const hiveCursor = document.getElementById('hive-cursor');
+            hiveCursor.classList.add('hidden');
+            isPreviewingHivePlacement = false;
+        });
+
         canvas.addEventListener('mousedown', (e) => {
             e.preventDefault();
+
+            // Handle hive placement at game start
+            if (!gameStarted) {
+                placeHive(e.clientX, e.clientY);
+                return;
+            }
 
             // If card is open, close it and don't start drag
             if (characterCardOpen) {
@@ -5867,12 +7686,16 @@
                 const wasDragSelection = Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold;
 
                 if (wasDragSelection) {
-                    // Find ants in selection rectangle
-                    const selectedAnts = findAntsInRect(dragStartX, dragStartY, dragCurrentX, dragCurrentY);
-                    if (selectedAnts.length > 0) {
-                        // Select a random ant from the selection (more interesting than always first)
-                        const randomAnt = selectedAnts[Math.floor(Math.random() * selectedAnts.length)];
-                        showCharacterCard(generateAntCardData(randomAnt), randomAnt);
+                    // Find all entities (ants and predators) in selection rectangle
+                    const selectedEntities = findEntitiesInRect(dragStartX, dragStartY, dragCurrentX, dragCurrentY);
+                    if (selectedEntities.length > 0) {
+                        // Select a random entity from the selection
+                        const randomEntity = selectedEntities[Math.floor(Math.random() * selectedEntities.length)];
+                        if (randomEntity.type === 'ant') {
+                            showCharacterCard(generateAntCardData(randomEntity.ant), randomEntity.ant);
+                        } else if (randomEntity.type === 'predator') {
+                            showCharacterCard(generatePredatorCardData(randomEntity.predator, randomEntity.key), null, randomEntity.predator, randomEntity.key);
+                        }
                     }
                     wasDragging = false;
                     return;
@@ -5886,7 +7709,7 @@
                     if (entity.type === 'ant') {
                         showCharacterCard(generateAntCardData(entity.ant), entity.ant);
                     } else if (entity.type === 'predator') {
-                        showCharacterCard(PREDATOR_CARD_DATA[entity.key], null);
+                        showCharacterCard(generatePredatorCardData(entity.predator, entity.key), null, entity.predator, entity.key);
                     }
                 }
             }
@@ -5902,14 +7725,20 @@
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
 
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+
+            // Handle hive placement at game start
+            if (!gameStarted) {
+                placeHive(touchX, touchY);
+                return;
+            }
+
             // If card is open, close it on any touch
             if (characterCardOpen) {
                 closeCharacterCard();
                 return;
             }
-
-            const touchX = e.touches[0].clientX;
-            const touchY = e.touches[0].clientY;
 
             // If food placement is active, place food
             if (foodPlacementActive) {
@@ -5924,7 +7753,7 @@
                 if (entity.type === 'ant') {
                     showCharacterCard(generateAntCardData(entity.ant), entity.ant);
                 } else if (entity.type === 'predator') {
-                    showCharacterCard(PREDATOR_CARD_DATA[entity.key], null);
+                    showCharacterCard(generatePredatorCardData(entity.predator, entity.key), null, entity.predator, entity.key);
                 }
                 return;
             }
@@ -5942,7 +7771,8 @@
         // ===========================================
 
         function update() {
-            if (gameOver || upgradesPaused) return;
+            // Don't update if game hasn't started (waiting for hive placement)
+            if (!gameStarted || gameOver || upgradesPaused) return;
 
             time++;
 
@@ -5952,7 +7782,13 @@
             // Check if we should spawn more predators (every minute)
             checkPredatorSpawn();
 
-            for (const ant of ants) ant.update();
+            // Check for rare food spawns (golden apples)
+            checkRareFoodSpawn();
+
+            for (const ant of ants) {
+                ant.update();
+                ant.updateBuffs();  // Clean up expired food buffs
+            }
 
             // Update all predators from arrays
             for (const spider of spiderPredators) spider.update();
@@ -5961,10 +7797,14 @@
             decayPheromones();
             updateAmbientParticles();
             updateSpawnNotifications();
+            updateRareFoodNotifications();  // Golden apple notifications
             updateFoodTimers();
             updateDeathCounter();  // For Berserker skill
             updateTrailblazerBeacons();  // For Scout skill
             checkAntPredatorCombat();  // All ants fight nearby predators
+            updateFloatingTexts();  // Reward and damage floating text
+            updateCombatEffects();  // Combat clash animations
+            updateDeathEffects();   // Death particle animations
 
             // Check for game over
             checkGameOver();
@@ -6037,6 +7877,10 @@
             for (const beetle of beetlePredators) beetle.draw();
             drawAmbientParticles();
             drawSpawnNotifications();
+            drawRareFoodNotifications();  // Golden apple spawn notifications
+            drawCombatEffects();  // Combat clash animations
+            drawDeathEffects();   // Death particle animations
+            drawFloatingTexts();  // Reward and damage floating text
             drawHint();
             drawSelectionRect(); // Draw selection rectangle on top
         }
@@ -6123,11 +7967,16 @@
 
         // Initialize
         resize();
-        initAnts();
+        // Don't call initAnts() here - ants will be spawned when player places the hive
+        ants = [];  // Start with empty ant array
         initPredators();
 
-        // Track initial ants as spawned
-        totalAntsSpawned = ants.length;
+        // Track initial ants as spawned (will be updated when hive is placed)
+        totalAntsSpawned = 0;
+
+        // Initialize food cooldown system
+        initFoodCooldownOverlays();
+        setInterval(updateFoodCooldowns, 100);
 
         gameLoop();
 
