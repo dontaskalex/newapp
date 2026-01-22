@@ -1697,6 +1697,291 @@
             opacity: 0.9;
             text-align: center;
         }
+
+        /* Food Level Display */
+        .food-level {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: var(--accent);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .food-btn .food-level.max-level {
+            color: var(--gold);
+            text-shadow: 0 0 6px rgba(244, 208, 63, 0.6);
+        }
+
+        /* Cycle Timer Display */
+        .cycle-timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+        }
+
+        .cycle-label {
+            color: var(--text-muted);
+        }
+
+        .cycle-countdown {
+            color: var(--accent);
+            font-weight: 500;
+            min-width: 30px;
+        }
+
+        .cycle-bar {
+            width: 60px;
+            height: 4px;
+            background: rgba(184, 212, 104, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .cycle-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 100%;
+            transition: width 0.5s linear;
+        }
+
+        /* Next Ant Preview */
+        .next-ant-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 6px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+        }
+
+        .preview-title {
+            color: rgba(0, 255, 136, 0.7);
+        }
+
+        .preview-stats {
+            color: #00ff88;
+        }
+
+        /* Harvest Summary Modal */
+        .harvest-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: linear-gradient(180deg, rgba(12, 18, 14, 0.98) 0%, rgba(8, 12, 10, 0.99) 100%);
+            border: 2px solid rgba(0, 255, 136, 0.4);
+            border-radius: 16px;
+            padding: 28px 36px;
+            z-index: 3000;
+            min-width: 400px;
+            max-width: 500px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow:
+                0 0 60px rgba(0, 0, 0, 0.8),
+                0 0 30px rgba(0, 255, 136, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .harvest-modal.visible {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .harvest-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .harvest-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .harvest-subtitle {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: rgba(0, 255, 136, 0.6);
+        }
+
+        .harvest-body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 136, 0.15);
+        }
+
+        .harvest-deliveries {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 180px;
+        }
+
+        .harvest-food-icon {
+            font-size: 28px;
+            filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.4));
+            animation: harvestBounce 0.5s ease-out;
+        }
+
+        @keyframes harvestBounce {
+            0% { transform: scale(0) rotate(-20deg); }
+            60% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .harvest-arrow {
+            font-size: 32px;
+            color: var(--gold);
+            animation: arrowPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes arrowPulse {
+            0%, 100% { opacity: 0.6; transform: translateX(0); }
+            50% { opacity: 1; transform: translateX(5px); }
+        }
+
+        .harvest-ant {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .harvest-ant-icon {
+            font-size: 48px;
+            filter: drop-shadow(0 0 12px rgba(0, 255, 136, 0.6));
+            animation: antHatch 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes antHatch {
+            0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+            50% { transform: scale(1.3) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .harvest-ant-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            color: #00ff88;
+            letter-spacing: 1px;
+        }
+
+        .harvest-stats {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .harvest-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 16px;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            min-width: 60px;
+        }
+
+        .harvest-stat-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            color: rgba(0, 255, 136, 0.7);
+            letter-spacing: 1px;
+        }
+
+        .harvest-stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            color: #00ff88;
+            font-weight: 700;
+        }
+
+        .harvest-stat-value.has-bonus {
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(244, 208, 63, 0.5);
+        }
+
+        .harvest-abilities {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .harvest-ability {
+            padding: 8px 14px;
+            background: linear-gradient(165deg, rgba(244, 208, 63, 0.15) 0%, rgba(244, 180, 63, 0.1) 100%);
+            border: 1px solid rgba(244, 208, 63, 0.4);
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            color: var(--gold);
+            letter-spacing: 1px;
+            animation: abilityGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes abilityGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(244, 208, 63, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(244, 208, 63, 0.4); }
+        }
+
+        .harvest-continue-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(180deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 200, 100, 0.15) 100%);
+            border: 2px solid rgba(0, 255, 136, 0.5);
+            border-radius: 10px;
+            color: #00ff88;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .harvest-continue-btn:hover {
+            background: linear-gradient(180deg, rgba(0, 255, 136, 0.3) 0%, rgba(0, 200, 100, 0.25) 100%);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* No deliveries state */
+        .harvest-no-deliveries {
+            text-align: center;
+            color: var(--text-muted);
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -1718,7 +2003,7 @@
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Coins</span>
-                    <span class="stat-value coins" id="coins">50</span>
+                    <span class="stat-value coins" id="coins">10</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Population</span>
@@ -1773,26 +2058,39 @@
     <div class="bottom-ui">
         <div class="food-selector">
             <span class="food-label">drop</span>
-            <button class="food-btn active" data-food="sugar" data-cost="1" title="Sugar (1g) - Basic food, no special effect">
+            <button class="food-btn" data-food="sugar" title="Sugar - +HP per unit. Lv.10: Gold Hunter">
                 <span class="emoji">🍬</span>
-                <span class="cost">1</span>
+                <span class="food-level" id="sugar-level">Lv.1</span>
             </button>
-            <button class="food-btn" data-food="protein" data-cost="5" title="Protein (5g) - Delivering ant gets +1 ATK permanently!">
+            <button class="food-btn" data-food="protein" title="Protein - +ATK per unit. Lv.10: Lifesteal">
                 <span class="emoji">🍖</span>
-                <span class="cost">5</span>
+                <span class="food-level" id="protein-level">Lv.1</span>
             </button>
-            <button class="food-btn" data-food="fruit" data-cost="15" title="Fruit (15g) - Heals delivering ant by 1 HP!">
+            <button class="food-btn" data-food="fruit" title="Fruit - +Carry per unit. Lv.10: Fresh Keeper">
                 <span class="emoji">🍇</span>
-                <span class="cost">15</span>
+                <span class="food-level" id="fruit-level">Lv.1</span>
             </button>
-            <button class="food-btn" data-food="feast" data-cost="40" title="Feast (40g) - Delivering ant gets +1 DEF permanently!">
+            <button class="food-btn" data-food="feast" title="Feast - +DEF per unit. Lv.10: Thorns">
                 <span class="emoji">🍯</span>
-                <span class="cost">40</span>
+                <span class="food-level" id="feast-level">Lv.1</span>
             </button>
-            <button class="food-btn" data-food="nectar" data-cost="100" title="Nectar (100g) - Delivering ant gets +3 Max HP permanently!">
+            <button class="food-btn" data-food="nectar" title="Nectar - +HP per unit. Lv.10: Regeneration">
                 <span class="emoji">🌸</span>
-                <span class="cost">100</span>
+                <span class="food-level" id="nectar-level">Lv.1</span>
             </button>
+        </div>
+        <!-- Cycle Timer Display -->
+        <div class="cycle-timer" id="cycle-timer">
+            <span class="cycle-label">Next Ant:</span>
+            <span class="cycle-countdown" id="cycle-countdown">60s</span>
+            <div class="cycle-bar">
+                <div class="cycle-bar-fill" id="cycle-bar-fill"></div>
+            </div>
+        </div>
+        <!-- Next Ant Preview -->
+        <div class="next-ant-preview" id="next-ant-preview">
+            <span class="preview-title">Bonuses:</span>
+            <span class="preview-stats" id="preview-stats">--</span>
         </div>
     </div>
 
@@ -1828,6 +2126,46 @@
             </div>
             <button class="restart-btn" onclick="restartGame()">RESTART</button>
         </div>
+    </div>
+
+    <!-- Harvest Summary Modal -->
+    <div id="harvest-modal" class="harvest-modal">
+        <div class="harvest-header">
+            <span class="harvest-title">HARVEST COMPLETE</span>
+            <span class="harvest-subtitle">New ant is hatching...</span>
+        </div>
+        <div class="harvest-body">
+            <div class="harvest-deliveries" id="harvest-deliveries">
+                <!-- Food icons delivered this cycle -->
+            </div>
+            <div class="harvest-arrow">→</div>
+            <div class="harvest-ant">
+                <span class="harvest-ant-icon">🐜</span>
+                <span class="harvest-ant-label">New Ant</span>
+            </div>
+        </div>
+        <div class="harvest-stats" id="harvest-stats">
+            <div class="harvest-stat">
+                <span class="harvest-stat-label">HP</span>
+                <span class="harvest-stat-value" id="harvest-hp">+0</span>
+            </div>
+            <div class="harvest-stat">
+                <span class="harvest-stat-label">ATK</span>
+                <span class="harvest-stat-value" id="harvest-atk">+0</span>
+            </div>
+            <div class="harvest-stat">
+                <span class="harvest-stat-label">DEF</span>
+                <span class="harvest-stat-value" id="harvest-def">+0</span>
+            </div>
+            <div class="harvest-stat">
+                <span class="harvest-stat-label">CARRY</span>
+                <span class="harvest-stat-value" id="harvest-carry">+0</span>
+            </div>
+        </div>
+        <div class="harvest-abilities" id="harvest-abilities">
+            <!-- Abilities earned this cycle -->
+        </div>
+        <button class="harvest-continue-btn" id="harvest-continue-btn">SPAWN ANT</button>
     </div>
 
     <!-- Upgrade Selection Panel -->
@@ -2168,8 +2506,12 @@
 
         function drawSpots() {
             // Draw food spots with distance-based multipliers
-            for (const spot of foodSpots) {
+            for (let i = 0; i < foodSpots.length; i++) {
+                const spot = foodSpots[i];
                 ctx.save();
+
+                // Check if zone is occupied
+                const isOccupied = zoneOccupied.has(i);
 
                 // Color varies based on multiplier (x1=green, x2=yellow, x3=gold)
                 // Use getDisplayMultiplier to show preview during hive placement
@@ -2186,35 +2528,42 @@
                     labelColor = 'rgba(184, 212, 104, 0.7)';
                 }
 
+                // Dim occupied zones
+                const alphaMultiplier = isOccupied ? 0.3 : 1.0;
+
                 // Glowing circle for food spot
                 const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
-                gradient.addColorStop(0, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.15)`);
-                gradient.addColorStop(0.7, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.08)`);
+                gradient.addColorStop(0, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.15 * alphaMultiplier})`);
+                gradient.addColorStop(0.7, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.08 * alphaMultiplier})`);
                 gradient.addColorStop(1, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0)`);
                 ctx.fillStyle = gradient;
                 ctx.beginPath();
                 ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Dashed border
-                ctx.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.4)`;
+                // Dashed border (solid when occupied)
+                ctx.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.4 * alphaMultiplier})`;
                 ctx.lineWidth = 2;
-                ctx.setLineDash([6, 6]);
+                if (!isOccupied) {
+                    ctx.setLineDash([6, 6]);
+                }
                 ctx.beginPath();
                 ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Label with multiplier
+                // Label - show "OCCUPIED" if zone has food
                 ctx.fillStyle = labelColor;
+                ctx.globalAlpha = isOccupied ? 0.4 : 1.0;
                 ctx.font = 'bold 10px "DM Mono", monospace';
                 ctx.textAlign = 'center';
-                ctx.fillText('FOOD ZONE', spot.x, spot.y - spot.radius - 8);
+                ctx.fillText(isOccupied ? 'OCCUPIED' : 'FOOD ZONE', spot.x, spot.y - spot.radius - 8);
+                ctx.globalAlpha = 1.0;
 
                 // Multiplier badge
                 const badgeX = spot.x + spot.radius * 0.7;
                 const badgeY = spot.y - spot.radius * 0.5;
-                ctx.fillStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.9)`;
+                ctx.fillStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.9 * alphaMultiplier})`;
                 ctx.beginPath();
                 ctx.arc(badgeX, badgeY, 14, 0, Math.PI * 2);
                 ctx.fill();
@@ -2290,37 +2639,39 @@
             pheromoneMax: 255,
             pheromoneFollowStrength: 0.35,
 
-            // Food types with costs and rewards (no ant spawning - ants are bought separately)
+            // Food types - size is now based on food level (units = level)
+            // No costs - food is free to place
             foodTypes: {
                 sugar: {
-                    size: 1, baseRadius: 12, value: 1, cost: 1, name: 'sugar', emoji: '🍬',
-                    effect: null, effectDesc: 'Basic food - no special effect'
+                    baseRadius: 14, value: 0, cost: 0, name: 'sugar', emoji: '🍬',
+                    bonusStat: 'hp', bonusPerUnit: 1, effectColor: '#ff6b81',
+                    effectDesc: '+HP', abilityName: 'Gold Hunter'
                 },
                 protein: {
-                    size: 5, baseRadius: 16, value: 1, cost: 5, name: 'protein', emoji: '🍖',
-                    effect: { type: 'permAtkBoost', value: 1 },
-                    effectDesc: '+1 ATK permanent', effectColor: '#ff6b6b'
+                    baseRadius: 16, value: 0, cost: 0, name: 'protein', emoji: '🍖',
+                    bonusStat: 'atk', bonusPerUnit: 1, effectColor: '#ff6b6b',
+                    effectDesc: '+ATK', abilityName: 'Lifesteal'
                 },
                 fruit: {
-                    size: 15, baseRadius: 20, value: 1, cost: 15, name: 'fruit', emoji: '🍇',
-                    effect: { type: 'heal', value: 1 },
-                    effectDesc: 'Heals 1 HP', effectColor: '#7bed9f'
+                    baseRadius: 18, value: 0, cost: 0, name: 'fruit', emoji: '🍇',
+                    bonusStat: 'carry', bonusPerUnit: 1, effectColor: '#7bed9f',
+                    effectDesc: '+Carry', abilityName: 'Fresh Keeper'
                 },
                 feast: {
-                    size: 40, baseRadius: 26, value: 1, cost: 40, name: 'feast', emoji: '🍯',
-                    effect: { type: 'permDefBoost', value: 1 },
-                    effectDesc: '+1 DEF permanent', effectColor: '#ffa502'
+                    baseRadius: 20, value: 0, cost: 0, name: 'feast', emoji: '🍯',
+                    bonusStat: 'def', bonusPerUnit: 1, effectColor: '#ffa502',
+                    effectDesc: '+DEF', abilityName: 'Thorns'
                 },
                 nectar: {
-                    size: 100, baseRadius: 32, value: 1, cost: 100, name: 'nectar', emoji: '🌸',
-                    effect: { type: 'permHpBoost', value: 3 },
-                    effectDesc: '+3 Max HP permanent', effectColor: '#ff6b81'
+                    baseRadius: 22, value: 0, cost: 0, name: 'nectar', emoji: '🌸',
+                    bonusStat: 'hp', bonusPerUnit: 1, effectColor: '#ff6b81',
+                    effectDesc: '+HP', abilityName: 'Regeneration'
                 },
                 goldenApple: {
-                    size: 3, baseRadius: 18, value: 5, cost: 0, name: 'golden apple', emoji: '🍎',
-                    effect: { type: 'goldenBonus', goldMultiplier: 3.0 },
-                    effectDesc: '3x gold value!', isRare: true,
-                    glowColor: { r: 255, g: 215, b: 0 }, effectColor: '#ffd700'
+                    baseRadius: 24, value: 0, cost: 0, name: 'golden apple', emoji: '🍎',
+                    bonusStat: 'all', bonusPerUnit: 1, effectColor: '#ffd700',
+                    effectDesc: '+ALL', abilityName: 'Champion', isRare: true,
+                    glowColor: { r: 255, g: 215, b: 0 }
                 }
             },
 
@@ -2489,9 +2840,9 @@
                     killRadius: 12,
                     speed: 1.8,
                     // Pokemon-style stats
-                    hp: 50,                  // Lower HP, but deadly
-                    atk: 5,                  // Lowered for early game balance - ants can survive and fight back
-                    def: 3                   // Low defense
+                    hp: 40,                  // Lower HP - glass cannon
+                    atk: 4,                  // Moderate attack
+                    def: 1                   // Very low defense - easy to damage
                 },
                 beetle: {
                     x: 0, y: 0, radius: 90,
@@ -2503,9 +2854,9 @@
                     killRadius: 20,
                     blockRadius: 35,
                     // Pokemon-style stats
-                    hp: 80,                  // Tanky
-                    atk: 6,                  // Lowered for early game balance
-                    def: 8                   // High defense - hard to damage
+                    hp: 60,                  // Tanky
+                    atk: 1,                  // Very low attack
+                    def: 4                   // High defense - hard to damage
                 }
             }
         };
@@ -2514,7 +2865,7 @@
         // CURRENCY SYSTEM
         // ===========================================
 
-        let coins = 50;
+        let coins = 10;  // Starting gold for first upgrade (gold mainly comes from enemy kills now)
 
         // ===========================================
         // SURVIVAL MODE STATE
@@ -3901,14 +4252,32 @@
             spawnDeathEffect(predator.x, predator.y, 'predator', predatorColor);
 
             predator.state = 'dead';
+
+            // GOLD FROM ENEMY KILLS - determine gold drop based on predator type
+            let goldDrop = 0;
             const spiderIdx = spiderPredators.indexOf(predator);
             if (spiderIdx !== -1) {
+                // Spider drops 3-5 gold
+                goldDrop = 3 + Math.floor(Math.random() * 3);
                 spiderPredators.splice(spiderIdx, 1);
-                return;
+            } else {
+                const beetleIdx = beetlePredators.indexOf(predator);
+                if (beetleIdx !== -1) {
+                    // Beetle drops 5-8 gold
+                    goldDrop = 5 + Math.floor(Math.random() * 4);
+                    beetlePredators.splice(beetleIdx, 1);
+                }
             }
-            const beetleIdx = beetlePredators.indexOf(predator);
-            if (beetleIdx !== -1) {
-                beetlePredators.splice(beetleIdx, 1);
+
+            // Award gold and show floating text
+            if (goldDrop > 0) {
+                // Check for Gold Hunter ability on any ant
+                const hasGoldHunter = ants.some(ant => ant.harvestAbilities && ant.harvestAbilities.includes('goldHunter'));
+                if (hasGoldHunter) {
+                    goldDrop += 2;  // Gold Hunter bonus
+                }
+                earnCoins(goldDrop);
+                spawnFloatingText(predator.x, predator.y - 20, `+${goldDrop}g`, '#ffd700', 14);
             }
         }
 
@@ -4413,6 +4782,50 @@
         let foodItems = [];
         let foodCollected = 0;
 
+        // ===========================================
+        // FOOD REWORK - LEVELING & CYCLE SYSTEM
+        // ===========================================
+
+        // Food levels persist between placements (Lv.1 to Lv.10)
+        const foodLevels = {
+            sugar: 1,
+            protein: 1,
+            fruit: 1,
+            feast: 1,
+            nectar: 1,
+            goldenApple: 1
+        };
+
+        // Accumulated bonuses during current cycle (reset each minute)
+        const accumulatedBonuses = {
+            hp: 0,
+            atk: 0,
+            def: 0,
+            carry: 0,
+            abilities: []  // Lv.10 abilities earned this cycle
+        };
+
+        // Food types and their bonuses
+        const FOOD_BONUSES = {
+            sugar: { stat: 'hp', perUnit: 1, ability: 'goldHunter', abilityName: 'Gold Hunter', abilityDesc: '+2g per kill' },
+            protein: { stat: 'atk', perUnit: 1, ability: 'lifesteal', abilityName: 'Lifesteal', abilityDesc: 'Heal on hit' },
+            fruit: { stat: 'carry', perUnit: 1, ability: 'freshKeeper', abilityName: 'Fresh Keeper', abilityDesc: 'Food timer pauses while carrying' },
+            feast: { stat: 'def', perUnit: 1, ability: 'thorns', abilityName: 'Thorns', abilityDesc: 'Reflect damage' },
+            nectar: { stat: 'hp', perUnit: 1, ability: 'regeneration', abilityName: 'Regeneration', abilityDesc: '1 HP/5sec' },
+            goldenApple: { stat: 'all', perUnit: 1, ability: 'champion', abilityName: 'Champion', abilityDesc: 'All abilities' }
+        };
+
+        // Track food delivered this cycle for harvest summary
+        let cycleDeliveries = [];  // { foodType, units, zoneMultiplier }
+
+        // Cycle timer (60 seconds = spawn new ant)
+        const CYCLE_DURATION = 60000;  // 60 seconds in ms
+        let cycleStartTime = null;
+        let lastCycleTime = null;
+
+        // Track which zone is occupied by food
+        const zoneOccupied = new Map();  // Map<spotIndex, foodItem>
+
         // Track ant spawn counts for scaling costs
         let antSpawnCounts = { worker: 0, soldier: 0, scout: 0, carrier: 0, queen: 0 };
 
@@ -4458,46 +4871,115 @@
         const FOOD_LIFETIME_SECONDS = 60;  // 60 seconds until food spoils
 
         class FoodItem {
-            constructor(x, y, type) {
+            constructor(x, y, type, zoneSpot = null) {
                 this.x = x;
                 this.y = y;
                 this.type = type;
                 this.id = Math.random().toString(36).substr(2, 9);  // Unique ID for tracking
                 const config = CONFIG.foodTypes[type];
-                this.size = config.size;  // Current size (units of food remaining)
-                this.maxSize = config.size;  // Original size
+
+                // Size is based on the food's current level (units = level)
+                const foodLevel = foodLevels[type] || 1;
+                this.size = foodLevel;  // Current size (units of food remaining)
+                this.maxSize = foodLevel;  // Original size = level
+                this.level = foodLevel;  // Store the level for reference
                 this.baseRadius = config.baseRadius;
-                this.valuePerUnit = config.value;  // Gold per unit of food
+                this.valuePerUnit = 0;  // No gold value - gold comes from kills
                 this.name = config.name;
                 this.emoji = config.emoji;
                 this.carriers = [];
                 this.inDangerZone = isInDangerZone(x, y);
                 this.zoneMultiplier = getFoodZoneMultiplier(x, y);  // Distance-based multiplier (x1, x2, x3)
+                this.zoneSpot = zoneSpot;  // Reference to the zone spot this food is in
                 this.spawnTime = Date.now();  // Real timestamp when food was created
                 this.spoiled = false;
+                this.unitsDelivered = 0;  // Track how many units have been successfully delivered
+                this.pausedDuration = 0;  // Track paused time from Fresh Keeper ability (in ms)
+                this.lastUpdateTime = Date.now();  // For tracking Fresh Keeper pause time
             }
 
             update() {
+                const now = Date.now();
+                const deltaTime = now - this.lastUpdateTime;
+                this.lastUpdateTime = now;
+
+                // FRESH KEEPER ABILITY: Check if any ant carrying from this food has the ability
+                let hasFreshKeeper = false;
+                for (const ant of ants) {
+                    if (ant.carriedFoodPiece && ant.carriedFoodPiece.sourceFood === this) {
+                        if (ant.hasHarvestAbility && ant.hasHarvestAbility('freshKeeper')) {
+                            hasFreshKeeper = true;
+                            break;
+                        }
+                    }
+                }
+
+                // If Fresh Keeper is active, pause the timer
+                if (hasFreshKeeper) {
+                    this.pausedDuration += deltaTime;
+                }
+
                 if (this.getTimeRemaining() <= 0 && !this.spoiled) {
                     this.spoiled = true;
+                    // On spoil, food level goes down by 1 (min 1)
+                    this.onSpoilOrFail();
                 }
             }
 
             getTimeRemaining() {
-                const elapsed = (Date.now() - this.spawnTime) / 1000;  // Seconds elapsed
+                // Account for paused time from Fresh Keeper
+                const elapsed = (Date.now() - this.spawnTime - this.pausedDuration) / 1000;  // Seconds elapsed
                 return Math.max(0, Math.ceil(FOOD_LIFETIME_SECONDS - elapsed));
             }
 
             getRadius() {
-                // Radius scales with sqrt of remaining size
-                return this.baseRadius * Math.sqrt(this.size / this.maxSize);
+                // Radius scales with sqrt of remaining size, with min size
+                const ratio = Math.max(0.3, this.size / this.maxSize);
+                return this.baseRadius * Math.sqrt(ratio);
             }
 
             getValue() {
-                // Value per unit times food zone distance multiplier (x1, x2, x3)
-                // Also apply danger zone multiplier for extra risk/reward
-                const dangerMultiplier = getDangerZoneMultiplier(this.x, this.y);
-                return this.valuePerUnit * this.zoneMultiplier * dangerMultiplier;
+                // No gold value in new system - gold comes from kills only
+                return 0;
+            }
+
+            // Called when food spoils or fails (not fully delivered)
+            onSpoilOrFail() {
+                if (this.unitsDelivered < this.maxSize) {
+                    // Not fully delivered - level down
+                    foodLevels[this.type] = Math.max(1, foodLevels[this.type] - 1);
+                    spawnFloatingText(this.x, this.y - 20, `${this.emoji} Lv.DOWN!`, '#ff4444', 12);
+                }
+                // Clear zone occupation
+                if (this.zoneSpot !== null) {
+                    zoneOccupied.delete(this.zoneSpot);
+                }
+            }
+
+            // Called when food is fully delivered
+            onFullyDelivered() {
+                // Level up based on zone multiplier (x1 = +1, x2 = +2, x3 = +3)
+                const levelGain = this.zoneMultiplier;
+                const oldLevel = foodLevels[this.type];
+                foodLevels[this.type] = Math.min(10, foodLevels[this.type] + levelGain);
+                const newLevel = foodLevels[this.type];
+
+                if (newLevel > oldLevel) {
+                    spawnFloatingText(CONFIG.nestX, CONFIG.nestY - 30, `${this.emoji} Lv.${newLevel}!`, '#00ff88', 14);
+                }
+
+                // Check for Lv.10 ability unlock
+                if (newLevel >= 10 && oldLevel < 10) {
+                    const bonus = FOOD_BONUSES[this.type];
+                    if (bonus && bonus.ability) {
+                        spawnFloatingText(CONFIG.nestX, CONFIG.nestY - 50, `ABILITY: ${bonus.abilityName}!`, '#ffd700', 16);
+                    }
+                }
+
+                // Clear zone occupation
+                if (this.zoneSpot !== null) {
+                    zoneOccupied.delete(this.zoneSpot);
+                }
             }
 
             // Single ant can always carry 1 unit
@@ -4655,21 +5137,53 @@
 
         // Food piece that an ant carries - tracks source food for spoilage and zone
         class CarriedFoodPiece {
-            constructor(type, sourceFoodId, fromDangerZone) {
+            constructor(type, sourceFoodId, fromDangerZone, zoneMultiplier = 1, sourceFood = null) {
                 this.type = type;
                 this.emoji = CONFIG.foodTypes[type].emoji;
                 this.sourceFoodId = sourceFoodId;  // Track which food this came from
                 this.fromDangerZone = fromDangerZone;  // Track zone for glow color
+                this.zoneMultiplier = zoneMultiplier;  // Zone multiplier (x1, x2, x3)
+                this.sourceFood = sourceFood;  // Reference to source FoodItem for delivery tracking
             }
         }
 
         function addFood(x, y, type) {
-            const cost = CONFIG.foodTypes[type].cost;
-            if (spendCoins(cost)) {
-                foodItems.push(new FoodItem(x, y, type));
-                return true;
+            // Find the nearest food zone
+            let nearestSpot = null;
+            let nearestDist = Infinity;
+            let spotIndex = -1;
+
+            for (let i = 0; i < foodSpots.length; i++) {
+                const spot = foodSpots[i];
+                const dist = Math.hypot(x - spot.x, y - spot.y);
+                if (dist < spot.radius && dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestSpot = spot;
+                    spotIndex = i;
+                }
             }
-            return false;
+
+            // Must be in a food zone
+            if (!nearestSpot) return false;
+
+            // Check if zone is already occupied
+            if (zoneOccupied.has(spotIndex)) {
+                spawnFloatingText(x, y, 'Zone occupied!', '#ff6b6b', 10);
+                return false;
+            }
+
+            // Snap food to zone center (FREE - no cost!)
+            const food = new FoodItem(nearestSpot.x, nearestSpot.y, type, spotIndex);
+            foodItems.push(food);
+
+            // Mark zone as occupied
+            zoneOccupied.set(spotIndex, food);
+
+            // Show level indicator
+            const level = foodLevels[type] || 1;
+            spawnFloatingText(nearestSpot.x, nearestSpot.y - 30, `Lv.${level}`, '#00ff88', 12);
+
+            return true;
         }
 
         // ===========================================
@@ -5028,6 +5542,13 @@
                 }
             }
 
+            // Check if ant has a harvest ability
+            hasHarvestAbility(ability) {
+                if (!this.harvestAbilities) return false;
+                if (this.harvestAbilities.includes('champion')) return true;  // Champion has all abilities
+                return this.harvestAbilities.includes(ability);
+            }
+
             // Take damage from a predator attack
             takeDamage(attackPower, predator = null) {
                 // Calculate effective defense including permanent bonuses and nest defense bonus
@@ -5045,6 +5566,16 @@
                 const damage = Math.max(1, attackPower - effectiveDef);
                 this.currentHp -= damage;
 
+                // THORNS ABILITY: Reflect damage when hit
+                if (predator && predator.currentHp !== undefined && this.hasHarvestAbility('thorns')) {
+                    const thornsDamage = Math.ceil(damage * 0.3);  // Reflect 30% of damage taken
+                    predator.currentHp -= thornsDamage;
+                    spawnFloatingText(predator.x, predator.y - 25, `THORNS -${thornsDamage}`, '#ffa502', 10);
+                    if (predator.currentHp <= 0) {
+                        removePredator(predator);
+                    }
+                }
+
                 // Both ant and predator stand still during combat - refresh timer on each hit
                 if (predator) {
                     this.fightingTimer = 60;  // 1 second
@@ -5061,6 +5592,13 @@
                     if (antAtk > 0) {
                         const retaliateDamage = Math.max(1, antAtk - (predator.def || 0));
                         predator.currentHp -= retaliateDamage;
+
+                        // LIFESTEAL ABILITY: Heal when dealing damage
+                        if (this.hasHarvestAbility('lifesteal')) {
+                            const healAmount = Math.ceil(retaliateDamage * 0.25);  // Heal 25% of damage dealt
+                            this.currentHp = Math.min(this.maxHp, this.currentHp + healAmount);
+                            spawnFloatingText(this.x, this.y - 25, `+${healAmount} HP`, '#7bed9f', 10);
+                        }
 
                         // Spawn combat effect with health indicators
                         const midX = (this.x + predator.x) / 2;
@@ -5195,6 +5733,16 @@
                 this.positionHistory.push({ x: this.x, y: this.y });
                 if (this.positionHistory.length > 20) {
                     this.positionHistory.shift();
+                }
+
+                // REGENERATION ABILITY: Heal 1 HP every 5 seconds (300 frames)
+                if (this.hasHarvestAbility && this.hasHarvestAbility('regeneration')) {
+                    this.regenTimer = (this.regenTimer || 0) + 1;
+                    if (this.regenTimer >= 300 && this.currentHp < this.maxHp) {
+                        this.currentHp = Math.min(this.maxHp, this.currentHp + 1);
+                        this.regenTimer = 0;
+                        spawnFloatingText(this.x, this.y - 15, '+1 REGEN', '#ff6b81', 9);
+                    }
                 }
 
                 // If resting in hive, decrement timer and stay put
@@ -5562,9 +6110,9 @@
                         addTrailblazerBeacon(food.x, food.y, food);
                     }
 
-                    this.carriedFoodPiece = new CarriedFoodPiece(food.type, food.id, food.inDangerZone);
+                    this.carriedFoodPiece = new CarriedFoodPiece(food.type, food.id, food.inDangerZone, food.zoneMultiplier, food);
                     this.carriedFoodPiece.units = unitsTaken;  // Track how many units carried
-                    this.carriedFoodValue = food.getValue() * unitsTaken;  // Value multiplied by units
+                    this.carriedFoodValue = 0;  // No gold value in new system
                     this.targetFood = food;
                     this.state = 'carrying';
                     this.angle = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
@@ -5605,48 +6153,66 @@
                 // Check if reached nest
                 const distToNest = this.distanceToNest();
                 if (distToNest < getColonySize()) {
-                    // Count units delivered for XP (each unit = 1 delivery)
+                    // Count units delivered
                     const unitsDelivered = this.carriedFoodPiece.units || 1;
                     const deliveredFoodType = this.carriedFoodPiece.type;
+                    const zoneMultiplier = this.carriedFoodPiece.zoneMultiplier || 1;
+                    const foodConfig = CONFIG.foodTypes[deliveredFoodType];
 
-                    // Apply food buff effects and get any bonuses
-                    const buffResult = this.applyFoodBuff(deliveredFoodType);
-                    const foodXpBonus = buffResult.xpBonus || 0;
-                    const foodGoldMultiplier = buffResult.goldMultiplier || 1;
-
-                    // Record experience - each unit counts as a delivery
-                    // Apply XP bonus from nectar if applicable
+                    // Record experience for the delivering ant
                     for (let i = 0; i < unitsDelivered; i++) {
-                        const xpValue = (this.carriedFoodValue / unitsDelivered) * (1 + foodXpBonus);
-                        this.recordDelivery(xpValue, this.carriedFoodPiece.fromDangerZone);
+                        this.recordDelivery(1, this.carriedFoodPiece.fromDangerZone);
                     }
 
-                    // Gold bonus: only applies if ant has Midas trait (goldBonus >= 0.95)
-                    const goldMultiplier = this.traitRolls.goldBonus >= 0.95 ? 2.0 : 1.0;
-                    // Apply upgrade multipliers for food value and coin bonus
-                    // Also apply food-specific gold multiplier (golden apple = 3x)
-                    let coinValue = Math.ceil(this.carriedFoodValue * goldMultiplier * upgradeMultipliers.foodValue * foodGoldMultiplier);
-                    coinValue += upgradeMultipliers.coinBonus;  // Flat bonus from upgrades
+                    // FOOD REWORK: Accumulate bonuses for next ant spawn
+                    const bonus = FOOD_BONUSES[deliveredFoodType];
+                    if (bonus) {
+                        const totalBonus = unitsDelivered * bonus.perUnit * zoneMultiplier;
 
-                    // Apply Gold Rush multiplier if active
-                    if (upgradeMultipliers.goldRushActive && Date.now() < upgradeMultipliers.goldRushEndTime) {
-                        coinValue = Math.ceil(coinValue * upgradeMultipliers.goldRushMultiplier);
-                    } else if (upgradeMultipliers.goldRushActive) {
-                        // Gold rush expired, reset it
-                        upgradeMultipliers.goldRushActive = false;
+                        if (bonus.stat === 'all') {
+                            // Golden Apple gives +1 to ALL stats per unit
+                            accumulatedBonuses.hp += totalBonus;
+                            accumulatedBonuses.atk += totalBonus;
+                            accumulatedBonuses.def += totalBonus;
+                            accumulatedBonuses.carry += totalBonus;
+                        } else {
+                            accumulatedBonuses[bonus.stat] += totalBonus;
+                        }
+
+                        // Check if this food type is Lv.10 for ability
+                        if (foodLevels[deliveredFoodType] >= 10) {
+                            if (!accumulatedBonuses.abilities.includes(bonus.ability)) {
+                                accumulatedBonuses.abilities.push(bonus.ability);
+                            }
+                        }
                     }
 
-                    // Earn coins (no ant spawning - that's separate now)
-                    earnCoins(coinValue);
-                    foodCollected += Math.ceil(unitsDelivered * upgradeMultipliers.foodValue);
+                    // Track delivery for harvest summary
+                    cycleDeliveries.push({
+                        foodType: deliveredFoodType,
+                        units: unitsDelivered,
+                        zoneMultiplier: zoneMultiplier,
+                        emoji: foodConfig.emoji
+                    });
 
-                    // Spawn reward floating text at nest
-                    spawnFloatingText(CONFIG.nestX + (Math.random() - 0.5) * 30, CONFIG.nestY - 20, `+${coinValue} GOLD`, '#ffd700', 14);
+                    // Update food item's delivered count
+                    if (this.carriedFoodPiece.sourceFood) {
+                        this.carriedFoodPiece.sourceFood.unitsDelivered += unitsDelivered;
 
-                    // Spawn food effect reward text if applicable
-                    if (buffResult.rewardText) {
-                        spawnFloatingText(CONFIG.nestX + (Math.random() - 0.5) * 30, CONFIG.nestY - 40, buffResult.rewardText.text, buffResult.rewardText.color, 12);
+                        // Check if food is fully delivered
+                        if (this.carriedFoodPiece.sourceFood.unitsDelivered >= this.carriedFoodPiece.sourceFood.maxSize) {
+                            this.carriedFoodPiece.sourceFood.onFullyDelivered();
+                        }
                     }
+
+                    foodCollected += unitsDelivered;
+
+                    // Show bonus gained floating text
+                    const bonusText = bonus ?
+                        (bonus.stat === 'all' ? `+${unitsDelivered * zoneMultiplier} ALL` :
+                        `+${unitsDelivered * bonus.perUnit * zoneMultiplier} ${bonus.stat.toUpperCase()}`) :
+                        '+Food';
+                    spawnFloatingText(CONFIG.nestX + (Math.random() - 0.5) * 30, CONFIG.nestY - 20, bonusText, foodConfig.effectColor || '#00ff88', 12);
 
                     // Reset state
                     this.carriedFoodPiece = null;
@@ -5654,8 +6220,8 @@
                     this.targetFood = null;
                     this.foundFoodRecently = true;
 
-                    // Ant rests in hive for 5 seconds after delivering food
-                    this.hiveRestTimer = 300;  // 5 seconds at 60fps
+                    // Ant rests in hive briefly after delivering food
+                    this.hiveRestTimer = 120;  // 2 seconds at 60fps
                     this.state = 'exploring';
 
                     // Move ant to center of nest while resting
@@ -6180,6 +6746,44 @@
             const cy = CONFIG.nestY;
             const antCount = ants.length;
 
+            // Draw defense radius if Fortified Nest is active
+            if (upgradeMultipliers.nestDefenseBonus > 0) {
+                const defRadius = upgradeMultipliers.nestDefenseRadius;
+                const pulse = Math.sin(Date.now() / 600) * 0.15 + 0.85;
+
+                // Outer glow
+                const glowGrad = ctx.createRadialGradient(cx, cy, defRadius * 0.7, cx, cy, defRadius * 1.1);
+                glowGrad.addColorStop(0, 'transparent');
+                glowGrad.addColorStop(0.5, `rgba(100, 180, 255, ${0.08 * pulse})`);
+                glowGrad.addColorStop(0.8, `rgba(100, 180, 255, ${0.15 * pulse})`);
+                glowGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = glowGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, defRadius * 1.1, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Defense circle border
+                ctx.strokeStyle = `rgba(100, 180, 255, ${0.4 * pulse})`;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.arc(cx, cy, defRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Shield icon at top of circle
+                ctx.save();
+                ctx.translate(cx, cy - defRadius - 10);
+                ctx.font = '14px serif';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = `rgba(100, 180, 255, ${0.8 * pulse})`;
+                ctx.fillText('🛡️', 0, 0);
+                ctx.font = 'bold 10px Arial';
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.9 * pulse})`;
+                ctx.fillText(`+${upgradeMultipliers.nestDefenseBonus}`, 0, 14);
+                ctx.restore();
+            }
+
             // Excavated dirt
             ctx.fillStyle = '#4a4030';
             const dirtPiles = 20 + Math.min(antCount, 100) * 0.3;
@@ -6214,15 +6818,20 @@
             ctx.ellipse(cx, cy, currentRadius, currentRadius * 0.6, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Texture
+            // Texture (using deterministic positions based on index to avoid flickering)
             const textureDots = 25 + Math.min(antCount, 100) * 0.4;
             for (let i = 0; i < textureDots; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = Math.random() * currentRadius * 0.9;
-                const brightness = 40 + Math.random() * 25;
+                // Use deterministic pseudo-random based on index
+                const seed1 = Math.sin(i * 12.9898) * 43758.5453;
+                const seed2 = Math.sin(i * 78.233) * 43758.5453;
+                const seed3 = Math.sin(i * 45.164) * 43758.5453;
+                const angle = (seed1 - Math.floor(seed1)) * Math.PI * 2;
+                const dist = (seed2 - Math.floor(seed2)) * currentRadius * 0.9;
+                const brightness = 40 + (seed3 - Math.floor(seed3)) * 25;
                 ctx.fillStyle = `rgb(${brightness + 25}, ${brightness + 15}, ${brightness})`;
+                const dotSize = 1 + (Math.sin(i * 23.14) * 0.5 + 0.5) * 2;
                 ctx.beginPath();
-                ctx.arc(cx + Math.cos(angle) * dist, cy + Math.sin(angle) * dist * 0.55, 1 + Math.random() * 2, 0, Math.PI * 2);
+                ctx.arc(cx + Math.cos(angle) * dist, cy + Math.sin(angle) * dist * 0.55, dotSize, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -6274,11 +6883,8 @@
             document.getElementById('carrier-count').textContent = carrierCount;
             document.getElementById('queen-count').textContent = queenCount;
 
-            // Update food button states based on affordability
-            document.querySelectorAll('.food-btn').forEach(btn => {
-                const cost = parseInt(btn.dataset.cost);
-                btn.classList.toggle('disabled', coins < cost);
-            });
+            // Food buttons are always available (food is free in new system)
+            // Disabled state is only set by cooldown system
 
             // Update ant button states and costs
             document.querySelectorAll('.ant-btn').forEach(btn => {
@@ -6549,34 +7155,34 @@
             spider: {
                 icon: '🕷️',
                 title: 'Spider',
-                subtitle: 'Ambush Predator',
-                description: 'A fast hunter with moderate ATK and low HP. Soldiers can take it down with sustained damage!',
+                subtitle: 'Glass Cannon',
+                description: 'A fast but fragile hunter. Low defense makes it easy to kill, but watch out for its speed!',
                 stats: [
-                    { name: 'HP', value: '50', class: 'neutral' },
-                    { name: 'ATK', value: '8', class: 'neutral' },
-                    { name: 'DEF', value: '3', class: '' },
+                    { name: 'HP', value: '40', class: 'neutral' },
+                    { name: 'ATK', value: '4', class: 'neutral' },
+                    { name: 'DEF', value: '1', class: 'good' },
                     { name: 'SPD', value: '1.8', class: 'bad' }
                 ],
                 traits: [
                     { text: 'Fast', class: 'negative' },
-                    { text: 'Can Be Killed', class: 'positive' },
+                    { text: 'Fragile', class: 'positive' },
                     { text: 'Respawns', class: 'negative' }
                 ]
             },
             beetle: {
                 icon: '🪲',
                 title: 'Beetle',
-                subtitle: 'Armored Threat',
-                description: 'A tanky predator with high HP and DEF. Hard to kill but deals less damage per hit.',
+                subtitle: 'Armored Tank',
+                description: 'A tanky predator with high HP and DEF but very low damage. Hard to kill but not very threatening.',
                 stats: [
-                    { name: 'HP', value: '80', class: 'bad' },
-                    { name: 'ATK', value: '10', class: 'neutral' },
-                    { name: 'DEF', value: '8', class: 'bad' },
+                    { name: 'HP', value: '60', class: 'bad' },
+                    { name: 'ATK', value: '1', class: 'good' },
+                    { name: 'DEF', value: '4', class: 'bad' },
                     { name: 'SPD', value: '0.5', class: 'good' }
                 ],
                 traits: [
                     { text: 'Armored', class: 'negative' },
-                    { text: 'High HP', class: 'negative' },
+                    { text: 'Weak Attack', class: 'positive' },
                     { text: 'Slow Patrol', class: 'positive' }
                 ]
             }
@@ -7215,8 +7821,8 @@
             if (!selectedPredator || !selectedPredatorKey || !characterCardOpen) return;
 
             // Check if predator still exists
-            const predatorArray = predators[selectedPredatorKey];
-            if (!predatorArray || !predatorArray.includes(selectedPredator)) {
+            const predatorArray = selectedPredatorKey === 'spider' ? spiderPredators : beetlePredators;
+            if (!predatorArray.includes(selectedPredator)) {
                 closeCharacterCard();
                 return;
             }
@@ -7574,6 +8180,9 @@
             pausedTime = 0;
             pauseStartTime = null;
 
+            // Initialize cycle timer for food rework
+            initCycleTimer();
+
             // Hide the placement overlay and hive cursor
             document.getElementById('hive-placement-overlay').classList.add('hidden');
             document.getElementById('hive-cursor').classList.add('hidden');
@@ -7767,6 +8376,197 @@
         canvas.addEventListener('touchend', () => isPlacing = false);
 
         // ===========================================
+        // HARVEST CYCLE SYSTEM
+        // ===========================================
+
+        let harvestModalOpen = false;
+
+        // Initialize cycle timer when game starts
+        function initCycleTimer() {
+            cycleStartTime = Date.now();
+            lastCycleTime = Date.now();
+        }
+
+        // Update cycle timer and trigger harvest when ready
+        function updateCycleTimer() {
+            if (!cycleStartTime || harvestModalOpen) return;
+
+            const now = Date.now();
+            const elapsed = now - cycleStartTime;
+            const remaining = Math.max(0, CYCLE_DURATION - elapsed);
+            const seconds = Math.ceil(remaining / 1000);
+
+            // Update UI
+            const countdownEl = document.getElementById('cycle-countdown');
+            const barFillEl = document.getElementById('cycle-bar-fill');
+            if (countdownEl) countdownEl.textContent = seconds + 's';
+            if (barFillEl) barFillEl.style.width = (remaining / CYCLE_DURATION * 100) + '%';
+
+            // Update preview stats
+            updatePreviewStats();
+
+            // Update food level displays
+            updateFoodLevelDisplays();
+
+            // Check if cycle is complete
+            if (elapsed >= CYCLE_DURATION) {
+                triggerHarvestSummary();
+            }
+        }
+
+        // Update the preview stats display
+        function updatePreviewStats() {
+            const previewEl = document.getElementById('preview-stats');
+            if (!previewEl) return;
+
+            const parts = [];
+            if (accumulatedBonuses.hp > 0) parts.push(`HP+${accumulatedBonuses.hp}`);
+            if (accumulatedBonuses.atk > 0) parts.push(`ATK+${accumulatedBonuses.atk}`);
+            if (accumulatedBonuses.def > 0) parts.push(`DEF+${accumulatedBonuses.def}`);
+            if (accumulatedBonuses.carry > 0) parts.push(`CARRY+${accumulatedBonuses.carry}`);
+
+            previewEl.textContent = parts.length > 0 ? parts.join(' ') : '--';
+        }
+
+        // Update food level displays in the UI
+        function updateFoodLevelDisplays() {
+            for (const foodType of Object.keys(foodLevels)) {
+                const levelEl = document.getElementById(`${foodType}-level`);
+                if (levelEl) {
+                    const level = foodLevels[foodType];
+                    levelEl.textContent = `Lv.${level}`;
+                    if (level >= 10) {
+                        levelEl.classList.add('max-level');
+                    } else {
+                        levelEl.classList.remove('max-level');
+                    }
+                }
+            }
+        }
+
+        // Trigger harvest summary modal
+        function triggerHarvestSummary() {
+            harvestModalOpen = true;
+
+            // Populate the modal
+            const deliveriesEl = document.getElementById('harvest-deliveries');
+            const hpEl = document.getElementById('harvest-hp');
+            const atkEl = document.getElementById('harvest-atk');
+            const defEl = document.getElementById('harvest-def');
+            const carryEl = document.getElementById('harvest-carry');
+            const abilitiesEl = document.getElementById('harvest-abilities');
+
+            // Show delivered food icons
+            if (deliveriesEl) {
+                if (cycleDeliveries.length > 0) {
+                    deliveriesEl.innerHTML = cycleDeliveries.map((d, i) =>
+                        `<span class="harvest-food-icon" style="animation-delay: ${i * 0.1}s">${d.emoji}</span>`
+                    ).join('');
+                } else {
+                    deliveriesEl.innerHTML = '<div class="harvest-no-deliveries">No food delivered this cycle</div>';
+                }
+            }
+
+            // Show accumulated stats
+            if (hpEl) {
+                hpEl.textContent = `+${accumulatedBonuses.hp}`;
+                hpEl.classList.toggle('has-bonus', accumulatedBonuses.hp > 0);
+            }
+            if (atkEl) {
+                atkEl.textContent = `+${accumulatedBonuses.atk}`;
+                atkEl.classList.toggle('has-bonus', accumulatedBonuses.atk > 0);
+            }
+            if (defEl) {
+                defEl.textContent = `+${accumulatedBonuses.def}`;
+                defEl.classList.toggle('has-bonus', accumulatedBonuses.def > 0);
+            }
+            if (carryEl) {
+                carryEl.textContent = `+${accumulatedBonuses.carry}`;
+                carryEl.classList.toggle('has-bonus', accumulatedBonuses.carry > 0);
+            }
+
+            // Show abilities
+            if (abilitiesEl) {
+                if (accumulatedBonuses.abilities.length > 0) {
+                    abilitiesEl.innerHTML = accumulatedBonuses.abilities.map(ability => {
+                        const bonus = Object.values(FOOD_BONUSES).find(b => b.ability === ability);
+                        const name = bonus ? bonus.abilityName : ability;
+                        return `<span class="harvest-ability">${name}</span>`;
+                    }).join('');
+                } else {
+                    abilitiesEl.innerHTML = '';
+                }
+            }
+
+            // Show modal
+            const modal = document.getElementById('harvest-modal');
+            if (modal) modal.classList.add('visible');
+        }
+
+        // Spawn ant with accumulated bonuses
+        function spawnHarvestAnt() {
+            if (gameOver) return;
+
+            // Only spawn if there are any bonuses accumulated or we have deliveries
+            const hasAnyBonus = accumulatedBonuses.hp > 0 || accumulatedBonuses.atk > 0 ||
+                               accumulatedBonuses.def > 0 || accumulatedBonuses.carry > 0 ||
+                               cycleDeliveries.length > 0;
+
+            if (hasAnyBonus && ants.length < CONFIG.maxAnts) {
+                // Create new ant at hive
+                const angle = Math.random() * Math.PI * 2;
+                const spawnDist = getColonySize() * 0.3;
+                const newAnt = new Ant(
+                    CONFIG.nestX + Math.cos(angle) * spawnDist,
+                    CONFIG.nestY + Math.sin(angle) * spawnDist,
+                    'worker'
+                );
+
+                // Apply accumulated bonuses
+                newAnt.permHpBonus = (newAnt.permHpBonus || 0) + accumulatedBonuses.hp;
+                newAnt.maxHp += accumulatedBonuses.hp;
+                newAnt.currentHp = newAnt.maxHp;
+                newAnt.permAtkBonus = (newAnt.permAtkBonus || 0) + accumulatedBonuses.atk;
+                newAnt.permDefBonus = (newAnt.permDefBonus || 0) + accumulatedBonuses.def;
+                newAnt.carryCapacity += accumulatedBonuses.carry;
+
+                // Apply abilities
+                newAnt.harvestAbilities = [...accumulatedBonuses.abilities];
+
+                ants.push(newAnt);
+                totalAntsSpawned++;
+                addSpawnNotification('worker');
+
+                // Show birth effect
+                spawnFloatingText(CONFIG.nestX, CONFIG.nestY - 30, 'NEW ANT!', '#00ff88', 16);
+            }
+
+            // Reset cycle
+            resetCycle();
+        }
+
+        // Reset cycle for next harvest
+        function resetCycle() {
+            cycleStartTime = Date.now();
+            accumulatedBonuses.hp = 0;
+            accumulatedBonuses.atk = 0;
+            accumulatedBonuses.def = 0;
+            accumulatedBonuses.carry = 0;
+            accumulatedBonuses.abilities = [];
+            cycleDeliveries = [];
+            harvestModalOpen = false;
+
+            // Hide modal
+            const modal = document.getElementById('harvest-modal');
+            if (modal) modal.classList.remove('visible');
+        }
+
+        // Handle harvest continue button click
+        document.getElementById('harvest-continue-btn')?.addEventListener('click', () => {
+            spawnHarvestAnt();
+        });
+
+        // ===========================================
         // MAIN LOOP
         // ===========================================
 
@@ -7778,6 +8578,9 @@
 
             // Check if it's time to offer upgrades
             checkUpgradeTime();
+
+            // Check cycle timer for harvest/ant spawn
+            updateCycleTimer();
 
             // Check if we should spawn more predators (every minute)
             checkPredatorSpawn();
@@ -7867,7 +8670,7 @@
             drawGround();
             drawSpots();
             drawPheromones();
-            drawNest();
+            if (gameStarted) drawNest();  // Only draw nest after hive is placed
             drawFood();
             drawTrailblazerBeacons();  // Scout skill beacons
             drawRoyalAuras();          // Queen skill auras
