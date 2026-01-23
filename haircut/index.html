@@ -389,17 +389,40 @@
             trycut(x, y, radius) {
                 if (this.cut) return;
 
+                // Check line-segment to circle intersection for each segment
                 for (let i = 1; i <= this.segments; i++) {
-                    const point = this.points[i];
-                    const dx = point.x - x;
-                    const dy = point.y - y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const p1 = this.points[i - 1];
+                    const p2 = this.points[i];
+
+                    // Vector from p1 to p2
+                    const segDx = p2.x - p1.x;
+                    const segDy = p2.y - p1.y;
+                    const segLenSq = segDx * segDx + segDy * segDy;
+
+                    // Vector from p1 to cut center
+                    const toDx = x - p1.x;
+                    const toDy = y - p1.y;
+
+                    // Find closest point on segment to cut center
+                    let t = 0;
+                    if (segLenSq > 0) {
+                        t = Math.max(0, Math.min(1, (toDx * segDx + toDy * segDy) / segLenSq));
+                    }
+
+                    // Closest point on segment
+                    const closestX = p1.x + t * segDx;
+                    const closestY = p1.y + t * segDy;
+
+                    // Distance from cut center to closest point
+                    const distX = x - closestX;
+                    const distY = y - closestY;
+                    const dist = Math.sqrt(distX * distX + distY * distY);
 
                     if (dist < radius) {
-                        // Cut at this point
-                        const cutRatio = (i - 1) / this.segments;
+                        // Cut at this segment - calculate exact cut ratio
+                        const cutRatio = ((i - 1) + t) / this.segments;
                         this.length = this.maxLength * cutRatio;
-                        this.segments = Math.max(2, Math.floor(i - 1));
+                        this.segments = Math.max(2, Math.floor(i - 1 + t));
                         this.points = this.points.slice(0, this.segments + 1);
                         this.velocities = this.velocities.slice(0, this.segments + 1);
                         this.cut = true;
@@ -793,10 +816,22 @@
 
             // Cut effect
             if (mode === 'cut' && isMouseDown) {
-                const cutRadius = 15;
-                hairs.forEach(hair => {
-                    hair.trycut(mouseX, mouseY, cutRadius);
-                });
+                const cutRadius = 18;
+
+                // Interpolate between last and current mouse position for smooth cutting
+                const dx = mouseX - lastMouseX;
+                const dy = mouseY - lastMouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const steps = Math.max(1, Math.ceil(dist / 5)); // Check every 5 pixels
+
+                for (let s = 0; s <= steps; s++) {
+                    const t = s / steps;
+                    const x = lastMouseX + dx * t;
+                    const y = lastMouseY + dy * t;
+                    hairs.forEach(hair => {
+                        hair.trycut(x, y, cutRadius);
+                    });
+                }
 
                 // Draw scissors indicator
                 ctx.strokeStyle = 'rgba(200, 50, 50, 0.5)';
