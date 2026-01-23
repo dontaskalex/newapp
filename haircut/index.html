@@ -192,9 +192,11 @@
         let mode = 'cut';
         let hairColor = '#2a1810';
         let hairs = [];
+        let eyelashes = [];
         let mouseX = 0, mouseY = 0;
         let isMouseDown = false;
         let lastMouseX = 0, lastMouseY = 0;
+        let fanAngle = 0;
 
         // Hair strand class
         class Hair {
@@ -226,8 +228,8 @@
                 this.points[0].y = this.rootY;
 
                 const segmentLength = this.length / this.segments;
-                const stiffness = 0.3;
-                const damping = 0.85;
+                const stiffness = 0.08; // Low stiffness for easy molding
+                const damping = 0.9;
 
                 // Apply forces and update positions
                 for (let i = 1; i <= this.segments; i++) {
@@ -241,11 +243,11 @@
                     vel.x += wind.x * 0.1;
                     vel.y += wind.y * 0.05;
 
-                    // Hair wants to return to natural position
+                    // Hair wants to return to natural position (very weak)
                     const naturalX = this.rootX + Math.cos(this.baseAngle) * segmentLength * i;
                     const naturalY = this.rootY + Math.sin(this.baseAngle) * segmentLength * i;
-                    vel.x += (naturalX - point.x) * stiffness * 0.02;
-                    vel.y += (naturalY - point.y) * stiffness * 0.02;
+                    vel.x += (naturalX - point.x) * stiffness * 0.015;
+                    vel.y += (naturalY - point.y) * stiffness * 0.015;
 
                     // Apply velocity
                     vel.x *= damping;
@@ -288,6 +290,50 @@
                 }
             }
 
+            // Comb changes the base angle to style hair
+            applyComb(fx, fy, px, py, radius) {
+                // Check if any point is near the comb
+                for (let i = 1; i <= this.segments; i++) {
+                    const point = this.points[i];
+                    const dx = point.x - px;
+                    const dy = point.y - py;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < radius) {
+                        // Adjust base angle based on comb direction
+                        const combAngle = Math.atan2(fy, fx);
+                        const angleDiff = combAngle - this.baseAngle;
+                        // Strongly shift base angle towards comb direction
+                        this.baseAngle += angleDiff * 0.12;
+                        // Also apply force for immediate movement
+                        this.velocities[i].x += fx * 0.8;
+                        this.velocities[i].y += fy * 0.8;
+                        break;
+                    }
+                }
+            }
+
+            // Fan pushes hair and gradually changes its resting angle
+            applyFan(fx, fy, px, py, radius) {
+                for (let i = 1; i <= this.segments; i++) {
+                    const point = this.points[i];
+                    const dx = point.x - px;
+                    const dy = point.y - py;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < radius) {
+                        const strength = 1 - dist / radius;
+                        // Apply force
+                        this.velocities[i].x += fx * strength;
+                        this.velocities[i].y += fy * strength;
+                        // Gradually mold the base angle in blow direction
+                        const blowAngle = Math.atan2(fy, fx);
+                        const angleDiff = blowAngle - this.baseAngle;
+                        this.baseAngle += angleDiff * 0.02 * strength;
+                    }
+                }
+            }
+
             trycut(x, y, radius) {
                 if (this.cut) return;
 
@@ -319,34 +365,134 @@
                 ctx.beginPath();
                 ctx.moveTo(this.points[0].x, this.points[0].y);
 
-                for (let i = 1; i < this.points.length; i++) {
-                    ctx.lineTo(this.points[i].x, this.points[i].y);
+                // Use quadratic curves for smooth hair
+                if (this.points.length > 2) {
+                    for (let i = 1; i < this.points.length - 1; i++) {
+                        const xc = (this.points[i].x + this.points[i + 1].x) / 2;
+                        const yc = (this.points[i].y + this.points[i + 1].y) / 2;
+                        ctx.quadraticCurveTo(this.points[i].x, this.points[i].y, xc, yc);
+                    }
+                    // Draw to the last point
+                    const last = this.points[this.points.length - 1];
+                    ctx.lineTo(last.x, last.y);
+                } else {
+                    for (let i = 1; i < this.points.length; i++) {
+                        ctx.lineTo(this.points[i].x, this.points[i].y);
+                    }
                 }
                 ctx.stroke();
             }
         }
 
-        // Initialize hair
+        // Eyelash class (simpler than hair)
+        class Eyelash {
+            constructor(rootX, rootY, angle, length) {
+                this.rootX = rootX;
+                this.rootY = rootY;
+                this.baseAngle = angle;
+                this.length = length;
+                this.tipX = rootX + Math.cos(angle) * length;
+                this.tipY = rootY + Math.sin(angle) * length;
+                this.velX = 0;
+                this.velY = 0;
+            }
+
+            update(wind) {
+                // Apply wind force
+                this.velX += wind.x * 0.15;
+                this.velY += wind.y * 0.15;
+
+                // Spring back to natural position
+                const naturalX = this.rootX + Math.cos(this.baseAngle) * this.length;
+                const naturalY = this.rootY + Math.sin(this.baseAngle) * this.length;
+                this.velX += (naturalX - this.tipX) * 0.15;
+                this.velY += (naturalY - this.tipY) * 0.15;
+
+                // Damping
+                this.velX *= 0.8;
+                this.velY *= 0.8;
+
+                // Apply velocity
+                this.tipX += this.velX;
+                this.tipY += this.velY;
+
+                // Constrain length
+                const dx = this.tipX - this.rootX;
+                const dy = this.tipY - this.rootY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0) {
+                    this.tipX = this.rootX + (dx / dist) * this.length;
+                    this.tipY = this.rootY + (dy / dist) * this.length;
+                }
+            }
+
+            applyForce(fx, fy, px, py, radius) {
+                const dx = this.tipX - px;
+                const dy = this.tipY - py;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < radius) {
+                    const strength = (1 - dist / radius) * 2;
+                    this.velX += fx * strength;
+                    this.velY += fy * strength;
+                }
+            }
+
+            draw(ctx) {
+                ctx.strokeStyle = '#2a1a10';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(this.rootX, this.rootY);
+                ctx.lineTo(this.tipX, this.tipY);
+                ctx.stroke();
+            }
+        }
+
+        // Initialize hair and eyelashes
         function initHair() {
             hairs = [];
+            eyelashes = [];
 
-            // Create hair around the top of the head
-            const hairCount = 150;
+            // Create hair around the top of the head (symmetrically)
+            const hairCount = 500;
             for (let i = 0; i < hairCount; i++) {
-                // Angle around the head (top half only)
-                const headAngle = -Math.PI + (i / hairCount) * Math.PI;
+                // Angle around the head - symmetric from -PI to 0 (top half)
+                // Goes from left side (-PI) through top (-PI/2) to right side (0)
+                const headAngle = -Math.PI + (i / (hairCount - 1)) * Math.PI;
 
-                // Only top portion
-                if (headAngle > -Math.PI * 0.15 && headAngle < Math.PI * 0.15) continue;
+                // Skip the very bottom portions (near ears)
+                if (headAngle > -0.1 || headAngle < -Math.PI + 0.1) continue;
 
                 const rootX = headX + Math.cos(headAngle) * headRadius;
                 const rootY = headY + Math.sin(headAngle) * headRadius;
 
-                // Hair grows outward from head
-                const hairAngle = headAngle + (Math.random() - 0.5) * 0.3;
-                const hairLength = 40 + Math.random() * 60;
+                // Hair falls straight DOWN
+                const hairAngle = Math.PI / 2 + (Math.random() - 0.5) * 0.05; // Straight down with tiny variation
+
+                // All hair ends at the same Y level below the head
+                const targetY = headY + headRadius + 100; // Uniform end point below chin
+                const hairLength = Math.max(50, (targetY - rootY) / Math.sin(hairAngle)) + (Math.random() - 0.5) * 8;
 
                 hairs.push(new Hair(rootX, rootY, hairAngle, hairLength));
+            }
+
+            // Create eyelashes
+            const eyeY = headY - headRadius * 0.1;
+            const eyeSpacing = headRadius * 0.35;
+
+            // Left eye lashes
+            for (let i = 0; i < 6; i++) {
+                const lashAngle = -Math.PI * 0.85 + (i / 5) * Math.PI * 0.7;
+                const lashX = headX - eyeSpacing + Math.cos(lashAngle) * 14;
+                const lashY = eyeY + Math.sin(lashAngle) * 11;
+                eyelashes.push(new Eyelash(lashX, lashY, lashAngle, 8));
+            }
+            // Right eye lashes
+            for (let i = 0; i < 6; i++) {
+                const lashAngle = -Math.PI * 0.85 + (i / 5) * Math.PI * 0.7;
+                const lashX = headX + eyeSpacing + Math.cos(lashAngle) * 14;
+                const lashY = eyeY + Math.sin(lashAngle) * 11;
+                eyelashes.push(new Eyelash(lashX, lashY, lashAngle, 8));
             }
         }
         initHair();
@@ -462,6 +608,21 @@
             ctx.arc(headX + eyeSpacing + 2, eyeY, 6, 0, Math.PI * 2);
             ctx.fill();
 
+            // Eyebrows
+            ctx.strokeStyle = '#4a3520';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            // Left eyebrow
+            ctx.beginPath();
+            ctx.moveTo(headX - eyeSpacing - 18, eyeY - 22);
+            ctx.quadraticCurveTo(headX - eyeSpacing, eyeY - 28, headX - eyeSpacing + 18, eyeY - 20);
+            ctx.stroke();
+            // Right eyebrow
+            ctx.beginPath();
+            ctx.moveTo(headX + eyeSpacing - 18, eyeY - 20);
+            ctx.quadraticCurveTo(headX + eyeSpacing, eyeY - 28, headX + eyeSpacing + 18, eyeY - 22);
+            ctx.stroke();
+
             // Nose
             ctx.fillStyle = '#eec0a0';
             ctx.beginPath();
@@ -487,31 +648,74 @@
 
             if (mode === 'fan' && isMouseDown) {
                 // Fan blows away from mouse
-                const fanRadius = 150;
-                wind.x = (mouseX - lastMouseX) * 0.5;
-                wind.y = (mouseY - lastMouseY) * 0.5;
+                const fanRadius = 250;
+                fanAngle += 0.4; // Spin the fan
 
-                // Also add constant blow force
+                // Calculate blow direction (away from fan center)
                 hairs.forEach(hair => {
                     const dx = hair.rootX - mouseX;
                     const dy = hair.rootY - mouseY;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < fanRadius && dist > 0) {
-                        const strength = (1 - dist / fanRadius) * 3;
-                        hair.applyForce(dx / dist * strength, dy / dist * strength, mouseX, mouseY, fanRadius);
+                        const strength = (1 - dist / fanRadius) * 12;
+                        hair.applyFan(dx / dist * strength, dy / dist * strength, mouseX, mouseY, fanRadius);
                     }
                 });
 
-                // Draw fan effect
-                ctx.strokeStyle = 'rgba(100, 180, 255, 0.3)';
-                ctx.lineWidth = 2;
-                for (let i = 0; i < 8; i++) {
-                    const angle = (Date.now() / 100 + i * Math.PI / 4) % (Math.PI * 2);
+                // Apply to eyelashes too
+                eyelashes.forEach(lash => {
+                    const dx = lash.rootX - mouseX;
+                    const dy = lash.rootY - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < fanRadius && dist > 0) {
+                        const strength = (1 - dist / fanRadius) * 8;
+                        lash.applyForce(dx / dist * strength, dy / dist * strength, mouseX, mouseY, fanRadius);
+                    }
+                });
+
+                // Set wind for global effect
+                wind.x = 2;
+                wind.y = 0.5;
+
+                // Draw fan - outer ring
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 45, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Fan center
+                ctx.fillStyle = '#888';
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 12, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Fan blades (spinning)
+                ctx.fillStyle = 'rgba(100, 150, 200, 0.7)';
+                for (let i = 0; i < 5; i++) {
+                    const bladeAngle = fanAngle + (i / 5) * Math.PI * 2;
                     ctx.beginPath();
                     ctx.moveTo(mouseX, mouseY);
+                    ctx.arc(mouseX, mouseY, 40, bladeAngle, bladeAngle + 0.5);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                // Wind lines
+                ctx.strokeStyle = 'rgba(150, 200, 255, 0.4)';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 6; i++) {
+                    const lineAngle = fanAngle * 0.5 + (i / 6) * Math.PI * 2;
+                    const startR = 50;
+                    const endR = 80 + Math.sin(Date.now() / 100 + i) * 20;
+                    ctx.beginPath();
+                    ctx.moveTo(
+                        mouseX + Math.cos(lineAngle) * startR,
+                        mouseY + Math.sin(lineAngle) * startR
+                    );
                     ctx.lineTo(
-                        mouseX + Math.cos(angle) * 60,
-                        mouseY + Math.sin(angle) * 60
+                        mouseX + Math.cos(lineAngle) * endR,
+                        mouseY + Math.sin(lineAngle) * endR
                     );
                     ctx.stroke();
                 }
@@ -524,7 +728,7 @@
                 const combForceY = (mouseY - lastMouseY) * 0.8;
 
                 hairs.forEach(hair => {
-                    hair.applyForce(combForceX, combForceY, mouseX, mouseY, combRadius);
+                    hair.applyComb(combForceX, combForceY, mouseX, mouseY, combRadius);
                 });
 
                 // Draw comb indicator
@@ -559,21 +763,22 @@
             }
 
             // Update and draw hair (behind head first)
-            const gravity = 0.15;
+            const gravity = 0.4;
             hairs.forEach(hair => {
                 hair.update(gravity, wind);
             });
 
-            // Draw hair behind head
-            hairs.filter(h => h.baseAngle > -Math.PI * 0.5 && h.baseAngle < Math.PI * 0.5)
-                 .forEach(hair => hair.draw(ctx, hairColor));
-
             // Draw head
             drawHead();
 
-            // Draw hair in front of head
-            hairs.filter(h => h.baseAngle <= -Math.PI * 0.5 || h.baseAngle >= Math.PI * 0.5)
-                 .forEach(hair => hair.draw(ctx, hairColor));
+            // Update and draw eyelashes
+            eyelashes.forEach(lash => {
+                lash.update(wind);
+                lash.draw(ctx);
+            });
+
+            // Draw all hair in front of head
+            hairs.forEach(hair => hair.draw(ctx, hairColor));
 
             requestAnimationFrame(animate);
         }
