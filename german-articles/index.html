@@ -1362,22 +1362,36 @@
             updateMasteryDisplay();
             saveProgress();
 
-            // Check if word is now mastered and we're practicing mistakes
+            // Check if word is no longer a mistake (tied or better = correct >= wrong)
             const history = wordHistory[current.word];
-            const nowMastered = history && history.correct > history.wrong;
+            const noLongerMistake = history && history.correct >= history.wrong;
+
+            // If practicing mistakes and this word is no longer a mistake, check if we should exit
+            if (practicingMistakes && noLongerMistake) {
+                // Check actual remaining mistakes
+                const actualRemainingMistakes = getMistakeWords();
+                if (actualRemainingMistakes.length === 0) {
+                    // Immediately exit practice mode and return to normal list
+                    practicingMistakes = false;
+                    updateMistakesCount();
+                    setTimeout(() => {
+                        filterVocab();
+                    }, 800); // Shorter delay just to see the correct feedback
+                    return;
+                }
+            }
 
             // Auto advance after delay
             setTimeout(() => {
-                // If practicing mistakes and this word is now mastered, remove it from the list
-                if (practicingMistakes && nowMastered) {
+                // If practicing mistakes and this word is no longer a mistake, remove it from the list
+                if (practicingMistakes && noLongerMistake) {
                     shuffledVocab = shuffledVocab.filter(v => v.word !== current.word);
                     updateTotal();
 
-                    // If no more mistakes, show completion and exit practice mode
+                    // If list became empty, exit practice mode
                     if (shuffledVocab.length === 0) {
                         practicingMistakes = false;
                         updateMistakesCount();
-                        alert('Great job! You\'ve corrected all your mistakes!');
                         filterVocab();
                         return;
                     }
@@ -1500,6 +1514,8 @@
                 toggleHint();
             } else if (e.key === ' ') {
                 e.preventDefault();
+                // Don't allow manual skip in practice mode - auto-advance handles it
+                if (practicingMistakes) return;
                 const anyDisabled = [...articleBtns].some(btn => btn.disabled);
                 if (anyDisabled) {
                     currentIndex++;
