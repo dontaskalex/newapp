@@ -88,19 +88,7 @@
             color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 20px;
-        }
-
-        .song-title {
-            font-size: 22px;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-
-        .song-artist {
-            color: var(--text-muted);
-            font-size: 15px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .spotify-embed {
@@ -394,14 +382,6 @@
             .song-card {
                 padding: 32px;
             }
-
-            .song-title {
-                font-size: 26px;
-            }
-
-            .song-artist {
-                font-size: 16px;
-            }
         }
     </style>
 </head>
@@ -414,8 +394,6 @@
 
         <div class="song-card">
             <div class="day-badge" id="day-badge">Loading...</div>
-            <h1 class="song-title" id="song-title">Loading...</h1>
-            <p class="song-artist" id="song-artist"></p>
             <div class="spotify-embed" id="spotify-embed"></div>
         </div>
 
@@ -423,52 +401,51 @@
     </div>
 
     <script>
-        // Songs mapped by date (MM-DD format) - works every year!
-        // Get spotifyId from any Spotify track URL: open.spotify.com/track/[THIS_PART]
+        // Songs mapped by date (MM-DD format) - just Spotify track IDs
+        // Get ID from any Spotify track URL: open.spotify.com/track/[THIS_PART]
         const songs = {
             // JANUARY
-            "01-01": { title: "Here Comes the Sun", artist: "The Beatles", spotifyId: "6dGnYIeXmHdcikdzNNDMm2" },
-            "01-02": { title: "Dancing Queen", artist: "ABBA", spotifyId: "0GjEhVFGZW8afUYGChu3Rr" },
-            "01-03": { title: "Superstition", artist: "Stevie Wonder", spotifyId: "1h2xVEoJORqrg71HocgqXd" },
-            "01-04": { title: "Blinding Lights", artist: "The Weeknd", spotifyId: "0VjIjW4GlUZAMYd2vXMi3b" },
-            "01-05": { title: "Bohemian Rhapsody", artist: "Queen", spotifyId: "7tFiyTwD0nx5a1eklYtX2J" },
-            "01-06": { title: "Billie Jean", artist: "Michael Jackson", spotifyId: "5ChkMS8OtdzJeqyybCc9R5" },
-            "01-07": { title: "Sweet Child O' Mine", artist: "Guns N' Roses", spotifyId: "7o2CTH4ctstm8TNelqjb51" },
-            "01-08": { title: "Smells Like Teen Spirit", artist: "Nirvana", spotifyId: "5ghIJDpPoe3CfHMGu71E6T" },
-            "01-09": { title: "Hotel California", artist: "Eagles", spotifyId: "40riOy7x9W7GXjyGp4pjAv" },
-            "01-10": { title: "Stairway to Heaven", artist: "Led Zeppelin", spotifyId: "5CQ30WqJwcep0pYcV4AMNc" },
-            "01-11": { title: "Imagine", artist: "John Lennon", spotifyId: "7pKfPomDEeI4TPT6EOYjn9" },
-            "01-12": { title: "Purple Rain", artist: "Prince", spotifyId: "1uvyZBs4IZYRebHIB1747m" },
-            "01-13": { title: "Like a Rolling Stone", artist: "Bob Dylan", spotifyId: "3AhXZa8sUQht0UEdBJgpGc" },
-            "01-14": { title: "What's Going On", artist: "Marvin Gaye", spotifyId: "2dleF64m6FfqvA4e7Mtk37" },
-            "01-15": { title: "Respect", artist: "Aretha Franklin", spotifyId: "7s25THrKz86DM225dOYwnr" },
-            "01-16": { title: "Born to Run", artist: "Bruce Springsteen", spotifyId: "6hTcuIQa0sxrrByu9wTD7s" },
-            "01-17": { title: "Good Vibrations", artist: "The Beach Boys", spotifyId: "5t9KYe0Fhd5cW6UYT4qP8f" },
-            "01-18": { title: "Johnny B. Goode", artist: "Chuck Berry", spotifyId: "5JLv62qFIS1DR3zGEcApRt" },
-            "01-19": { title: "Hey Jude", artist: "The Beatles", spotifyId: "0aym2LBJBk9DAYuHHutrIl" },
-            "01-20": { title: "Waterloo Sunset", artist: "The Kinks", spotifyId: "1FZmKlwvIycuSiwuE0bQFU" },
-            "01-21": { title: "London Calling", artist: "The Clash", spotifyId: "6Vc5wAMmXdKIAM7WUoEb7N" },
-            "01-22": { title: "I Want to Hold Your Hand", artist: "The Beatles", spotifyId: "4jDmJ51x1o9NZB5Nxxc7gY" },
-            "01-23": { title: "Light My Fire", artist: "The Doors", spotifyId: "5uvosCdMlFdTXhoazkTI5R" },
-            "01-24": { title: "A Day in the Life", artist: "The Beatles", spotifyId: "0hKRSZhUGEhKU6aNSPBACZ" },
-            "01-25": { title: "God Only Knows", artist: "The Beach Boys", spotifyId: "2AOxbMh3L0rHPVoUFvGBaX" },
-            "01-26": { title: "Blinding Lights", artist: "The Weeknd", spotifyId: "0VjIjW4GlUZAMYd2vXMi3b" },
-            "01-27": { title: "One", artist: "U2", spotifyId: "2FPfYs5FhOXwlkF9ciHHks" },
-            "01-28": { title: "Thriller", artist: "Michael Jackson", spotifyId: "3S2R0EVwBSAVMd5UMgKTL0" },
-            "01-29": { title: "Watermelon Sugar", artist: "Harry Styles", spotifyId: "6UelLqGlWMcVH1E5c4H7lY" },
-            "01-30": { title: "Levitating", artist: "Dua Lipa", spotifyId: "39LLxExYz6ewLAcYrzQQyP" },
-            "01-31": { title: "drivers license", artist: "Olivia Rodrigo", spotifyId: "7lPN2DXiMsVn7XUKtOW1CS" },
-
+            "01-01": "6dGnYIeXmHdcikdzNNDMm2",
+            "01-02": "0GjEhVFGZW8afUYGChu3Rr",
+            "01-03": "1h2xVEoJORqrg71HocgqXd",
+            "01-04": "0VjIjW4GlUZAMYd2vXMi3b",
+            "01-05": "7tFiyTwD0nx5a1eklYtX2J",
+            "01-06": "5ChkMS8OtdzJeqyybCc9R5",
+            "01-07": "7o2CTH4ctstm8TNelqjb51",
+            "01-08": "5ghIJDpPoe3CfHMGu71E6T",
+            "01-09": "40riOy7x9W7GXjyGp4pjAv",
+            "01-10": "5CQ30WqJwcep0pYcV4AMNc",
+            "01-11": "7pKfPomDEeI4TPT6EOYjn9",
+            "01-12": "1uvyZBs4IZYRebHIB1747m",
+            "01-13": "3AhXZa8sUQht0UEdBJgpGc",
+            "01-14": "2dleF64m6FfqvA4e7Mtk37",
+            "01-15": "7s25THrKz86DM225dOYwnr",
+            "01-16": "6hTcuIQa0sxrrByu9wTD7s",
+            "01-17": "5t9KYe0Fhd5cW6UYT4qP8f",
+            "01-18": "5JLv62qFIS1DR3zGEcApRt",
+            "01-19": "0aym2LBJBk9DAYuHHutrIl",
+            "01-20": "1FZmKlwvIycuSiwuE0bQFU",
+            "01-21": "6Vc5wAMmXdKIAM7WUoEb7N",
+            "01-22": "4jDmJ51x1o9NZB5Nxxc7gY",
+            "01-23": "5uvosCdMlFdTXhoazkTI5R",
+            "01-24": "0hKRSZhUGEhKU6aNSPBACZ",
+            "01-25": "2AOxbMh3L0rHPVoUFvGBaX",
+            "01-26": "0VjIjW4GlUZAMYd2vXMi3b",
+            "01-27": "2FPfYs5FhOXwlkF9ciHHks",
+            "01-28": "3S2R0EVwBSAVMd5UMgKTL0",
+            "01-29": "6UelLqGlWMcVH1E5c4H7lY",
+            "01-30": "39LLxExYz6ewLAcYrzQQyP",
+            "01-31": "7lPN2DXiMsVn7XUKtOW1CS",
             // FEBRUARY
-            "02-01": { title: "bad guy", artist: "Billie Eilish", spotifyId: "2Fxmhks0bxGSBdJ92vM42m" },
-            "02-02": { title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", spotifyId: "32OlwWuMpZ6b0aN2RZOeMS" },
-            "02-03": { title: "Shape of You", artist: "Ed Sheeran", spotifyId: "7qiZfU4dY1lWllzX7mPBI3" },
-            "02-04": { title: "Rolling in the Deep", artist: "Adele", spotifyId: "6IAZHEBUIGJ6NJKxxOBIEr" },
-            "02-05": { title: "Happy", artist: "Pharrell Williams", spotifyId: "60nZcImufyMA1MKQY3dcCH" },
-            "02-06": { title: "Get Lucky", artist: "Daft Punk", spotifyId: "69kOkLUCkxIZYexIgSG8rq" },
-            "02-07": { title: "Somebody That I Used to Know", artist: "Gotye", spotifyId: "4wCmqSrbyCgxEXROQE6vtV" },
-            "02-08": { title: "Call Me Maybe", artist: "Carly Rae Jepsen", spotifyId: "20I6sIOMTCkB6w7ryavxtO" },
-            "02-09": { title: "Royals", artist: "Lorde", spotifyId: "2dLLR6qlu5UJ5gk0dKz0h3" },
+            "02-01": "2Fxmhks0bxGSBdJ92vM42m",
+            "02-02": "32OlwWuMpZ6b0aN2RZOeMS",
+            "02-03": "7qiZfU4dY1lWllzX7mPBI3",
+            "02-04": "6IAZHEBUIGJ6NJKxxOBIEr",
+            "02-05": "60nZcImufyMA1MKQY3dcCH",
+            "02-06": "69kOkLUCkxIZYexIgSG8rq",
+            "02-07": "4wCmqSrbyCgxEXROQE6vtV",
+            "02-08": "20I6sIOMTCkB6w7ryavxtO",
+            "02-09": "2dLLR6qlu5UJ5gk0dKz0h3",
             "02-10": { title: "Take Me to Church", artist: "Hozier", spotifyId: "1CS7Sd1u5tWkstBhpssyjP" },
             "02-11": { title: "Thinking Out Loud", artist: "Ed Sheeran", spotifyId: "34gCuhDGsG4bRPIf9bb02f" },
             "02-12": { title: "All of Me", artist: "John Legend", spotifyId: "3U4isOIWM3VvDubwSI3y7a" },
@@ -833,28 +810,28 @@
             return `${months[parseInt(month) - 1]} ${parseInt(day)}`;
         }
 
+        // Helper to get Spotify ID (handles both string and object formats)
+        function getSpotifyId(song) {
+            return typeof song === 'string' ? song : song?.spotifyId;
+        }
+
         // Initialize the page
         function init() {
             const todayKey = getTodayKey();
-            const song = songs[todayKey];
+            const spotifyId = getSpotifyId(songs[todayKey]);
 
-            if (!song) {
-                document.getElementById('day-badge').textContent = formatDate(todayKey);
-                document.getElementById('song-title').textContent = 'No song for today';
-                document.getElementById('song-artist').textContent = 'Check back tomorrow!';
+            document.getElementById('day-badge').textContent = formatDate(todayKey);
+
+            if (!spotifyId) {
+                document.getElementById('spotify-embed').innerHTML = '<p style="color: var(--text-muted);">No song for today. Check back tomorrow!</p>';
                 return;
             }
-
-            // Update the UI
-            document.getElementById('day-badge').textContent = formatDate(todayKey);
-            document.getElementById('song-title').textContent = song.title;
-            document.getElementById('song-artist').textContent = song.artist;
 
             // Create Spotify embed
             const embedContainer = document.getElementById('spotify-embed');
             embedContainer.innerHTML = `
                 <iframe
-                    src="https://open.spotify.com/embed/track/${song.spotifyId}?utm_source=generator&theme=0"
+                    src="https://open.spotify.com/embed/track/${spotifyId}?utm_source=generator&theme=0"
                     width="100%"
                     height="152"
                     frameBorder="0"
@@ -919,33 +896,19 @@
                     ? songEntries
                     : songEntries.filter(([date]) => date.startsWith(filterMonth));
 
-                songList.innerHTML = filtered.map(([date, song]) => {
+                songList.innerHTML = filtered.map(([date, spotifyId]) => {
                     const isToday = date === todayKey;
-                    const current = edits[date] || song;
+                    const currentId = edits[date] || spotifyId;
                     return `
                         <div class="debug-song ${isToday ? 'today' : ''}" data-date="${date}" onclick="toggleEdit('${date}')">
                             <span class="debug-date">${formatDate(date)}${isToday ? ' ★' : ''}</span>
-                            <div class="debug-info">
-                                <div class="debug-song-title">${current.title}</div>
-                                <div class="debug-artist">${current.artist}</div>
-                            </div>
-                            <span class="debug-id">${current.spotifyId}</span>
+                            <span class="debug-id" style="flex:1">${currentId}</span>
                             <button class="debug-test" onclick="event.stopPropagation()">Edit</button>
                             <div class="debug-edit-form" onclick="event.stopPropagation()">
                                 <div class="debug-edit-row">
-                                    <div class="debug-edit-field">
-                                        <label>Title</label>
-                                        <input type="text" id="edit-title-${date}" value="${current.title.replace(/"/g, '&quot;')}">
-                                    </div>
-                                    <div class="debug-edit-field">
-                                        <label>Artist</label>
-                                        <input type="text" id="edit-artist-${date}" value="${current.artist.replace(/"/g, '&quot;')}">
-                                    </div>
-                                </div>
-                                <div class="debug-edit-row">
                                     <div class="debug-edit-field spotify-id">
                                         <label>Spotify ID (or paste full link)</label>
-                                        <input type="text" id="edit-spotify-${date}" value="${current.spotifyId}" placeholder="e.g. 0VjIjW4GlUZAMYd2vXMi3b" oninput="extractSpotifyId(this)">
+                                        <input type="text" id="edit-spotify-${date}" value="${currentId}" placeholder="e.g. 0VjIjW4GlUZAMYd2vXMi3b" oninput="extractSpotifyId(this)">
                                     </div>
                                 </div>
                                 <div class="debug-edit-actions">
@@ -985,18 +948,16 @@
 
             // Test with edited values
             window.testEdited = function(date) {
-                const title = document.getElementById(`edit-title-${date}`).value;
-                const artist = document.getElementById(`edit-artist-${date}`).value;
                 const spotifyId = document.getElementById(`edit-spotify-${date}`).value;
 
                 // Save edit in memory
-                edits[date] = { title, artist, spotifyId };
+                edits[date] = spotifyId;
 
                 const preview = document.getElementById('preview');
                 const previewTitle = document.getElementById('preview-title');
                 const previewEmbed = document.getElementById('preview-embed');
 
-                previewTitle.textContent = `${title} - ${artist}`;
+                previewTitle.textContent = `${formatDate(date)}`;
                 previewEmbed.innerHTML = `
                     <iframe
                         src="https://open.spotify.com/embed/track/${spotifyId}?utm_source=generator&theme=0"
@@ -1013,11 +974,9 @@
 
             // Copy the code entry to clipboard
             window.copyEntry = function(date, btn) {
-                const title = document.getElementById(`edit-title-${date}`).value;
-                const artist = document.getElementById(`edit-artist-${date}`).value;
                 const spotifyId = document.getElementById(`edit-spotify-${date}`).value;
 
-                const code = `"${date}": { title: "${title}", artist: "${artist}", spotifyId: "${spotifyId}" },`;
+                const code = `"${date}": "${spotifyId}",`;
 
                 navigator.clipboard.writeText(code).then(() => {
                     btn.textContent = 'Copied!';
