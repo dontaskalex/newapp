@@ -6837,7 +6837,7 @@
             },
             chainLightning: {
                 name: 'Chain Lightning',
-                description: 'Lightning bounces between up to 4 enemies, dealing 3 damage each',
+                description: 'Lightning bounces between up to 4 enemies, dealing 50% ATK damage each',
                 icon: '⛈️',
                 type: 'active',
                 cooldown: 12000,
@@ -7185,7 +7185,7 @@
         const UPGRADE_INTERVAL = 300;  // Seconds between upgrade offers (5 minutes)
 
         // Auto-spawn system (separate from upgrades)
-        const AUTO_SPAWN_INTERVAL = 60;  // Seconds between auto-spawning worker ants
+        const AUTO_SPAWN_INTERVAL = 20;  // Seconds between auto-spawning worker ants
         let lastAutoSpawnTime = 0;
         const UPGRADE_CHOICE_TIMEOUT = 60;  // Seconds before auto-choosing
         let upgradeChoiceStartTime = 0;  // When the current upgrade choice was shown
@@ -9327,8 +9327,8 @@
         // Track food delivered this cycle for harvest summary
         let cycleDeliveries = [];  // { foodType, units, zoneMultiplier }
 
-        // Cycle timer (60 seconds = spawn new ant)
-        const CYCLE_DURATION = 60000;  // 60 seconds in ms
+        // Cycle timer (20 seconds = spawn new ant)
+        const CYCLE_DURATION = 20000;  // 20 seconds in ms
         let cycleStartTime = null;
         let lastCycleTime = null;
 
@@ -9406,6 +9406,8 @@
                 this.zoneSpot = zoneSpot;  // Reference to the zone spot this food is in
                 this.spawnTime = Date.now();
                 this.unitsDelivered = 0;  // Track how many units have been successfully delivered
+                this.unitsDropped = 0;    // Track how many units were dropped (ant died carrying)
+                this.isDepleted = false;  // True when all units have been picked up
             }
 
             update() {
@@ -9428,12 +9430,50 @@
                 return 0;
             }
 
-            // Called when food is fully delivered - respawns with leveled up food
-            onFullyDelivered() {
-                // Level up by +1 always (zone multiplier only affects stat bonuses, not level gain)
-                const levelGain = 1;
+            // Single ant can always carry 1 unit
+            canTakeUnit() {
+                return this.size >= 1;
+            }
+
+            takeUnit() {
+                if (this.size < 1) return 0;
+                this.size -= 1;
+                return 1;
+            }
+
+            isEmpty() {
+                return this.size < 1;
+            }
+
+            // Check if all units have been accounted for (delivered + dropped = maxSize)
+            allUnitsAccountedFor() {
+                return (this.unitsDelivered + this.unitsDropped) >= this.maxSize;
+            }
+
+            // Called when units are dropped (ant died) - may trigger respawn
+            onUnitsDropped(units) {
+                this.unitsDropped += units;
+                if (this.isDepleted && this.allUnitsAccountedFor()) {
+                    this.triggerRespawn();
+                }
+            }
+
+            // Called when units are delivered - may trigger respawn
+            onUnitsDelivered(units) {
+                this.unitsDelivered += units;
+                if (this.isDepleted && this.allUnitsAccountedFor()) {
+                    this.triggerRespawn();
+                }
+            }
+
+            // Trigger respawn for this food
+            triggerRespawn() {
+                // Level up only if all units were delivered (not just dropped)
+                const levelGain = this.unitsDelivered >= this.maxSize ? 1 : 0;
                 const oldLevel = foodLevels[this.type];
-                foodLevels[this.type] = Math.min(10, foodLevels[this.type] + levelGain);
+                if (levelGain > 0) {
+                    foodLevels[this.type] = Math.min(10, foodLevels[this.type] + 1);
+                }
                 const newLevel = foodLevels[this.type];
 
                 if (newLevel > oldLevel) {
@@ -9448,53 +9488,31 @@
                     }
                 }
 
-                // Schedule respawn of this food at the same spot
+                // Schedule respawn
                 const respawnX = this.x;
                 const respawnY = this.y;
                 const respawnType = this.type;
                 const respawnSpot = this.zoneSpot;
 
-                // Clear zone occupation temporarily
-                if (this.zoneSpot !== null) {
-                    zoneOccupied.delete(this.zoneSpot);
+                // Clear zone occupation
+                if (respawnSpot !== null) {
+                    zoneOccupied.delete(respawnSpot);
                 }
 
-                // Respawn food after cooldown
-                // - If leveled up: full cooldown
-                // - If max level (10): full cooldown (to prevent instant respawn spam)
-                // - Otherwise: quick respawn
-                const hasLeveledUp = newLevel > oldLevel;
-                const isMaxLevel = newLevel >= 10;
-                const needsCooldown = hasLeveledUp || isMaxLevel;
+                // Respawn after cooldown if leveled up, else quick respawn
+                const needsCooldown = levelGain > 0 || newLevel >= 10;
                 const respawnDelay = needsCooldown ? ZONE_COOLDOWN_DURATION : 1000;
 
-                // Track cooldown for visual display
                 if (needsCooldown && respawnSpot !== null) {
                     zoneCooldowns.set(respawnSpot, Date.now() + ZONE_COOLDOWN_DURATION);
                 }
 
                 setTimeout(() => {
-                    // Clear cooldown when respawning
                     if (respawnSpot !== null) {
                         zoneCooldowns.delete(respawnSpot);
                     }
                     respawnFoodAtZone(respawnSpot, respawnType, respawnX, respawnY);
                 }, respawnDelay);
-            }
-
-            // Single ant can always carry 1 unit
-            canTakeUnit() {
-                return this.size >= 1;
-            }
-
-            takeUnit() {
-                if (this.size < 1) return 0;
-                this.size -= 1;
-                return 1;
-            }
-
-            isEmpty() {
-                return this.size < 1;
             }
 
             addCarrier(ant) {
@@ -9653,28 +9671,21 @@
             zoneOccupied.set(zoneIndex, food);
         }
 
-        // Drop carried food when an ant dies - restores units to source or spawns dropped food
+        // Drop carried food when an ant dies - restores units to source or marks as dropped
         function dropCarriedFood(ant) {
             if (!ant.carriedFoodPiece) return;
 
             const carried = ant.carriedFoodPiece;
             const unitsCarried = carried.units || 1;
 
-            // Try to restore units to the source food if it still exists
+            // Try to restore units to the source food if it still exists in the world
             if (carried.sourceFood && foodItems.includes(carried.sourceFood)) {
                 carried.sourceFood.size += unitsCarried;
                 // Make sure size doesn't exceed maxSize
                 carried.sourceFood.size = Math.min(carried.sourceFood.size, carried.sourceFood.maxSize);
-            } else {
-                // Source food is gone (was emptied) - need to respawn food at the zone
-                const zoneSpot = carried.sourceFood?.zoneSpot;
-                if (zoneSpot !== null && zoneSpot !== undefined && !zoneOccupied.has(zoneSpot)) {
-                    // Respawn food at the zone immediately
-                    const spot = foodSpots[zoneSpot];
-                    if (spot) {
-                        respawnFoodAtZone(zoneSpot, carried.type, spot.x, spot.y);
-                    }
-                }
+            } else if (carried.sourceFood) {
+                // Source food was depleted - track dropped units for respawn logic
+                carried.sourceFood.onUnitsDropped(unitsCarried);
             }
 
             // Clear the ant's carried food
@@ -10919,9 +10930,11 @@
                             spawnChainLightningEffect(targets);
                             spawnFloatingText(this.x, this.y - 35, '⛈️ CHAIN LIGHTNING!', '#00bfff', 14, 120, this);
 
+                            // Damage scales with ATK (50% of effective ATK, minimum 3)
+                            const lightningDamage = Math.max(3, Math.round(this.getEffectiveAtk() * 0.5));
                             for (const p of hit) {
-                                p.currentHp -= 3;
-                                spawnFloatingText(p.x, p.y - 15, '3', '#00bfff', 12);
+                                p.currentHp -= lightningDamage;
+                                spawnFloatingText(p.x, p.y - 15, `${lightningDamage}`, '#00bfff', 12);
                                 if (p.currentHp <= 0) removePredator(p, this);
                             }
                         }
@@ -11303,8 +11316,14 @@
                 }
 
                 // If fighting, stand still and decrement timer
+                // But allow hunting behavior so ants continue to attack!
                 if (this.fightingTimer > 0) {
                     this.fightingTimer--;
+                    // If we have a target predator, continue hunting (attacking) instead of just standing
+                    if (this.state === 'hunting' && this.targetPredator) {
+                        this.huntPredator();
+                        return;
+                    }
                     return;
                 }
 
@@ -11411,8 +11430,8 @@
 
                 const dist = Math.hypot(predator.x - this.x, predator.y - this.y);
 
-                // If close enough, attack!
-                if (dist < 15) {
+                // If close enough, attack! (matches COMBAT_RANGE = 20)
+                if (dist < 20) {
                     const result = this.attemptFight(predator);
                     if (result === 'win') {
                         // Killed or stunned predator
@@ -11603,10 +11622,15 @@
                     this.state = 'carrying';
                     this.angle = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
 
-                    // Remove food if empty
+                    // Mark food as depleted when empty (will respawn when all units accounted for)
                     if (food.isEmpty()) {
+                        food.isDepleted = true;
                         const idx = foodItems.indexOf(food);
                         if (idx !== -1) foodItems.splice(idx, 1);
+                        // Clear zone occupation so respawn can happen when all units are delivered/dropped
+                        if (food.zoneSpot !== null && food.zoneSpot !== undefined) {
+                            zoneOccupied.delete(food.zoneSpot);
+                        }
                     }
                 }
             }
@@ -11693,14 +11717,9 @@
                         emoji: foodConfig.emoji
                     });
 
-                    // Update food item's delivered count
+                    // Update food item's delivered count (triggers respawn when all units accounted for)
                     if (this.carriedFoodPiece.sourceFood) {
-                        this.carriedFoodPiece.sourceFood.unitsDelivered += unitsDelivered;
-
-                        // Check if food is fully delivered
-                        if (this.carriedFoodPiece.sourceFood.unitsDelivered >= this.carriedFoodPiece.sourceFood.maxSize) {
-                            this.carriedFoodPiece.sourceFood.onFullyDelivered();
-                        }
+                        this.carriedFoodPiece.sourceFood.onUnitsDelivered(unitsDelivered);
                     }
 
                     foodCollected += unitsDelivered;
@@ -12776,14 +12795,31 @@
             // HP class based on current health
             const hpClass = hpPercent >= 75 ? 'good' : hpPercent >= 40 ? '' : hpPercent >= 20 ? 'weak' : 'bad';
 
-            // Calculate effective ATK and DEF including permanent food bonuses
+            // Calculate effective ATK using the ant's method (includes Last Stand, Bloodlust, etc.)
             const permAtkBonus = ant.permAtkBonus || 0;
             const permDefBonus = ant.permDefBonus || 0;
-            const effectiveAtk = atk + permAtkBonus;
+            const baseEffectiveAtk = atk + permAtkBonus;
+            const fullEffectiveAtk = ant.getEffectiveAtk();  // Includes Last Stand, Bloodlust, Rally Cry, etc.
 
-            // Calculate effective DEF including nest defense bonus
+            // Check all active combat bonuses for ATK
+            const bloodlustStacks = ant.bloodlustStacks || 0;
+            const hasLastStand = ant.hasSkill && ant.hasSkill('lastStand') && (ant.currentHp / ant.maxHp) < 0.5;
+            const hasRallyBoost = (ant.rallyBoostTimer || 0) > 0;
+            const hasShadowStep = ant.shadowStepActive && ant.shadowStepBonusDamage;
+            const hasCombatBonus = fullEffectiveAtk > baseEffectiveAtk;
+
+            // Check active SPD bonuses
+            const momentumStacks = ant.momentumStacks || 0;
+            const hasAdrenaline = ant.adrenalineActive || false;
+            const baseSpdValue = ant.speed * upgradeMultipliers.antSpeed;
+            let effectiveSpdValue = baseSpdValue;
+            if (momentumStacks > 0) effectiveSpdValue *= (1 + momentumStacks * 0.05);
+            if (hasAdrenaline) effectiveSpdValue *= 2;
+
+            // Calculate effective DEF including nest defense bonus and Iron Shell
             let effectiveDef = def + permDefBonus;
             let hasNestBonus = false;
+            const hasIronShell = ant.hasSkill && ant.hasSkill('ironShell');
             if (upgradeMultipliers.nestDefenseBonus > 0) {
                 const distToNest = Math.hypot(ant.x - CONFIG.nestX, ant.y - CONFIG.nestY);
                 if (distToNest <= upgradeMultipliers.nestDefenseRadius) {
@@ -12792,24 +12828,76 @@
                 }
             }
 
-            // Build ATK display string
-            let atkDisplay = Math.round(effectiveAtk);
-            if (permAtkBonus > 0) {
-                atkDisplay = `${Math.round(effectiveAtk)} (+${permAtkBonus})`;
+            // Build ATK display string - show full effective ATK with bonus indicator
+            let atkDisplay = Math.round(fullEffectiveAtk);
+            let atkClass = getStatRarity('ATK', fullEffectiveAtk);
+            if (hasCombatBonus) {
+                const boostSources = [];
+                if (hasLastStand) boostSources.push('💀3x');
+                if (bloodlustStacks > 0) boostSources.push(`🩸${bloodlustStacks}`);
+                if (hasRallyBoost) boostSources.push('📯+50%');
+                if (hasShadowStep) boostSources.push('🌑3x');
+                const boostIndicator = boostSources.length > 0 ? ` ${boostSources.join(' ')}` : '';
+                atkDisplay = `${Math.round(fullEffectiveAtk)}${boostIndicator}`;
+                atkClass = 'legendary';
+            } else if (permAtkBonus > 0) {
+                atkDisplay = `${Math.round(fullEffectiveAtk)} (+${permAtkBonus})`;
             }
 
             // Build DEF display string
             let defDisplay = Math.round(effectiveDef);
+            let defClass = getStatRarity('DEF', effectiveDef);
             const totalDefBonus = permDefBonus + (hasNestBonus ? upgradeMultipliers.nestDefenseBonus : 0);
-            if (totalDefBonus > 0) {
-                defDisplay = `${Math.round(effectiveDef)} (+${totalDefBonus})`;
+            const defBonuses = [];
+            if (totalDefBonus > 0) defBonuses.push(`+${totalDefBonus}`);
+            if (hasIronShell) defBonuses.push('🛡️');
+            if (defBonuses.length > 0) {
+                defDisplay = `${Math.round(effectiveDef)} (${defBonuses.join(' ')})`;
+                if (hasIronShell) defClass = 'epic';
             }
 
-            // Calculate actual stat values for rarity calculation
-            const spdValue = ant.speed * upgradeMultipliers.antSpeed;
+            // Build SPD display string
+            let spdDisplay = effectiveSpdValue.toFixed(2);
+            let spdClass = getStatRarity('SPD', effectiveSpdValue);
+            const hasSpdBonus = momentumStacks > 0 || hasAdrenaline;
+            if (hasSpdBonus) {
+                const spdBonuses = [];
+                if (momentumStacks > 0) spdBonuses.push(`⚡${momentumStacks}`);
+                if (hasAdrenaline) spdBonuses.push('💨2x');
+                spdDisplay = `${effectiveSpdValue.toFixed(2)} ${spdBonuses.join(' ')}`;
+                spdClass = 'legendary';
+            }
+
+            // Calculate other stat values
             const detValue = ant.foodDetectRadius * upgradeMultipliers.detectionRadius;
             const capValue = ant.carryCapacity + upgradeMultipliers.carryCapacity;
             const pherValue = ant.pheromoneStrength;
+
+            // Check for Pathfinder DET bonus
+            const hasPathfinder = ant.hasSkill && ant.hasSkill('pathfinder');
+            let detDisplay = Math.round(detValue);
+            let detClass = getStatRarity('DET', detValue);
+            if (hasPathfinder) {
+                const boostedDet = detValue * 1.5;
+                detDisplay = `${Math.round(boostedDet)} 🧭+50%`;
+                detClass = 'epic';
+            }
+
+            // Check for Heavy Lifter CAP bonus
+            const hasHeavyLifter = ant.hasSkill && ant.hasSkill('heavyLifter');
+            let capDisplay = Math.round(capValue);
+            let capClass = getStatRarity('CAP', capValue);
+            if (hasHeavyLifter) {
+                const boostedCap = capValue + 1;
+                capDisplay = `${Math.round(boostedCap)} 💪+1`;
+                capClass = 'epic';
+            }
+
+            // Check for Scavenger XP bonus (show as trait instead)
+            const hasScavenger = ant.hasSkill && ant.hasSkill('scavenger');
+
+            // Check for Lucky gold bonus (show as trait instead)
+            const hasLucky = ant.hasSkill && ant.hasSkill('lucky');
 
             // Build dynamic stats with WoW-style rarity colors
             const stats = [
@@ -12822,27 +12910,27 @@
                 {
                     name: 'ATK',
                     value: atkDisplay,
-                    class: getStatRarity('ATK', effectiveAtk)
+                    class: atkClass
                 },
                 {
                     name: 'DEF',
                     value: defDisplay,
-                    class: getStatRarity('DEF', effectiveDef)
+                    class: defClass
                 },
                 {
                     name: 'SPD',
-                    value: spdValue.toFixed(2),
-                    class: getStatRarity('SPD', spdValue)
+                    value: spdDisplay,
+                    class: spdClass
                 },
                 {
                     name: 'DET',
-                    value: Math.round(detValue),
-                    class: getStatRarity('DET', detValue)
+                    value: detDisplay,
+                    class: detClass
                 },
                 {
                     name: 'CAP',
-                    value: Math.round(capValue),
-                    class: getStatRarity('CAP', capValue)
+                    value: capDisplay,
+                    class: capClass
                 },
                 {
                     name: 'PHER',
@@ -12869,6 +12957,40 @@
             }
             if (ant.chosenSkill2) {
                 traits.push({ text: ant.chosenSkill2.name, class: 'skill' });
+            }
+
+            // Active effect indicators (show current buffs/stacks)
+            if (hasLastStand) {
+                traits.push({ text: '💀 Last Stand Active', class: 'legendary' });
+            }
+            if (bloodlustStacks > 0) {
+                traits.push({ text: `🩸 Bloodlust x${bloodlustStacks}`, class: 'legendary' });
+            }
+            if (momentumStacks > 0) {
+                traits.push({ text: `⚡ Momentum x${momentumStacks}`, class: 'epic' });
+            }
+            if (hasAdrenaline) {
+                traits.push({ text: '💨 Adrenaline Active', class: 'legendary' });
+            }
+            if (hasRallyBoost) {
+                traits.push({ text: '📯 Rally Boost', class: 'epic' });
+            }
+            if (hasShadowStep) {
+                traits.push({ text: '🌑 Shadow Step Ready', class: 'legendary' });
+            }
+            if (ant.spiritLinkActive) {
+                traits.push({ text: '🔗 Spirit Link Active', class: 'epic' });
+            }
+            if (hasScavenger) {
+                traits.push({ text: '🔍 +25% XP', class: 'good' });
+            }
+            if (hasLucky) {
+                traits.push({ text: '🍀 +10% Gold Chance', class: 'good' });
+            }
+            if (ant.secondWindUsed === false && ant.hasSkill && ant.hasSkill('secondWind')) {
+                traits.push({ text: '🔥 Second Wind Ready', class: 'epic' });
+            } else if (ant.secondWindUsed === true) {
+                traits.push({ text: '🔥 Second Wind Used', class: 'weak' });
             }
 
             // Add experience-based traits
