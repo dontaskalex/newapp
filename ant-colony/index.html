@@ -237,6 +237,286 @@
             color: #a08060;
         }
 
+        /* Hive Level Panel */
+        .hive-level-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 12px;
+        }
+
+        .hive-level-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .hive-icon {
+            font-size: 18px;
+        }
+
+        .hive-level-text {
+            font-family: 'Orbitron', 'DM Mono', sans-serif;
+            font-size: 14px;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .hive-xp-bar {
+            position: relative;
+            height: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 7px;
+            overflow: hidden;
+            border: 1px solid rgba(243, 156, 18, 0.2);
+        }
+
+        .hive-xp-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f39c12, #e74c3c);
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .hive-xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 9px;
+            font-family: 'DM Mono', monospace;
+            color: white;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+            white-space: nowrap;
+        }
+
+        /* Tech Tree Button */
+        .tech-tree-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #1a3a2a, #0f2518);
+            border: 2px solid #2ecc71;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Orbitron', 'DM Mono', sans-serif;
+            font-size: 12px;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+        .tech-tree-btn:hover {
+            background: linear-gradient(135deg, #245a3a, #1a3a2a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+        .tech-tree-btn.visible { display: flex; }
+        .tech-tree-icon { font-size: 18px; }
+        .skill-points-badge {
+            background: #2ecc71;
+            color: #000;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+        .skill-points-badge:empty,
+        .skill-points-badge[data-count="0"] { display: none; }
+
+        /* Tech Tree Modal */
+        /* ============================================
+           TECH TREE - Clean Grid Layout
+           ============================================ */
+        .tech-tree-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1060px;
+            max-width: 98vw;
+            max-height: 92vh;
+            background: linear-gradient(180deg, #0c1210 0%, #070a08 100%);
+            border: 1px solid rgba(70, 160, 120, 0.3);
+            border-radius: 12px;
+            display: none;
+            z-index: 1001;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8);
+            animation: techTreeAppear 0.3s ease-out;
+        }
+        @keyframes techTreeAppear {
+            from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .tech-tree-modal.visible { display: block; }
+
+        .tech-tree-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 24px;
+            background: rgba(15, 30, 22, 0.9);
+            border-bottom: 1px solid rgba(70, 150, 110, 0.2);
+        }
+        .tech-tree-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #5dc090;
+        }
+        .tech-tree-sp {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            color: #70c8a0;
+        }
+        .tech-tree-sp span { color: #90e8c0; font-weight: 700; }
+        .tech-tree-close {
+            background: none;
+            border: none;
+            color: #e07070;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 8px;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+        .tech-tree-close:hover { color: #ff9090; }
+
+        .tech-tree-content {
+            padding: 20px;
+            max-height: 75vh;
+            overflow: auto;
+        }
+        .tech-tree-content::-webkit-scrollbar { width: 8px; height: 8px; }
+        .tech-tree-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        .tech-tree-content::-webkit-scrollbar-thumb { background: rgba(80, 160, 120, 0.4); border-radius: 4px; }
+
+        .tech-tree-hint {
+            text-align: center;
+            padding: 10px;
+            font-size: 11px;
+            color: rgba(120, 150, 135, 0.5);
+            border-top: 1px solid rgba(70, 150, 110, 0.15);
+        }
+
+        /* Tech Tree Grid */
+        .tech-tree-grid { position: relative; }
+        .tech-tree-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .tech-tree-svg line {
+            stroke: rgba(50, 80, 65, 0.5);
+            stroke-width: 2;
+        }
+        .tech-tree-svg line.active {
+            stroke: #45a070;
+            stroke-width: 3;
+        }
+        .tech-tree-svg line.available {
+            stroke: #a09050;
+            stroke-width: 2;
+            stroke-dasharray: 6 4;
+            animation: linePulse 1s linear infinite;
+        }
+        @keyframes linePulse { to { stroke-dashoffset: -10; } }
+
+        /* Tech Nodes - Fixed size, no overlap */
+        .tech-node {
+            position: absolute;
+            width: 100px;
+            height: 80px;
+            background: rgba(18, 28, 23, 0.95);
+            border: 2px solid rgba(60, 100, 80, 0.4);
+            border-radius: 8px;
+            padding: 8px 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .tech-node:hover:not(.locked) {
+            transform: translateY(-2px);
+            border-color: rgba(var(--glow-rgb), 0.7);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(var(--glow-rgb), 0.25);
+        }
+
+        .tech-node.available {
+            border-color: rgba(var(--glow-rgb), 0.8);
+            box-shadow: 0 0 12px rgba(var(--glow-rgb), 0.3);
+        }
+        .tech-node.researched {
+            background: rgba(35, 70, 52, 0.6);
+            border-color: #4aa070;
+        }
+        .tech-node.researched::after {
+            content: '✓';
+            position: absolute;
+            top: 3px; right: 5px;
+            font-size: 12px;
+            color: #60d090;
+            font-weight: bold;
+        }
+        .tech-node.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(0.6);
+        }
+        .tech-node.locked:hover { transform: none; box-shadow: none; }
+        .tech-node.no-sp { opacity: 0.5; cursor: not-allowed; }
+
+        .tech-node-emoji { font-size: 22px; margin-bottom: 4px; flex-shrink: 0; }
+        .tech-node-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            font-weight: 600;
+            color: #d8f0e4;
+            margin-bottom: 2px;
+            line-height: 1.1;
+        }
+        .tech-node-desc {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: #90b8a4;
+            line-height: 1.1;
+            margin-bottom: 2px;
+        }
+        .tech-node-prereq { display: none; }  /* Hide prereq text to keep nodes clean */
+        .tech-node-cost {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: #d0a850;
+            margin-top: auto;
+        }
+        .tech-node.researched .tech-node-cost { color: #60c080; }
+        .tech-node.no-sp .tech-node-cost { color: #d06060; }
+
+        /* Branch colors via data attribute */
+        .tech-node[data-branch="defense"] { --glow-rgb: 70, 190, 190; }
+        .tech-node[data-branch="harvest"] { --glow-rgb: 200, 160, 60; }
+        .tech-node[data-branch="offense"] { --glow-rgb: 200, 80, 80; }
+        .tech-node[data-branch="root"] { --glow-rgb: 80, 180, 120; }
 
         /* Character Card Styles - Tactical Dossier Theme */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
@@ -1557,415 +1837,6 @@
             50% { box-shadow: 0 0 20px rgba(255, 60, 60, 0.6); }
         }
 
-        /* Upgrade Selection Panel - RPG Card Style (matches Ant Card aesthetic) */
-        .upgrade-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: linear-gradient(180deg, rgba(15, 18, 22, 0.97) 0%, rgba(10, 12, 16, 0.99) 100%);
-            border: 1px solid rgba(0, 255, 136, 0.25);
-            border-radius: 12px;
-            padding: 20px 28px 24px;
-            z-index: 2000;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow:
-                0 4px 40px rgba(0, 0, 0, 0.8),
-                0 0 1px rgba(0, 255, 136, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.03);
-            min-width: 680px;
-            max-width: 820px;
-            opacity: 0;
-            pointer-events: none;
-            backdrop-filter: blur(16px);
-            font-family: 'DM Mono', 'Share Tech Mono', monospace;
-        }
-
-        .upgrade-modal::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.5), transparent);
-            border-radius: 12px 12px 0 0;
-        }
-
-        .upgrade-modal.visible {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .upgrade-modal.minimized {
-            transform: translate(-50%, 0) scale(1);
-            top: 16px;
-            opacity: 1;
-            pointer-events: auto;
-            padding: 10px 16px;
-            min-width: auto;
-            max-width: none;
-            width: auto;
-            border-radius: 8px;
-        }
-
-        .upgrade-modal.minimized .upgrade-header,
-        .upgrade-modal.minimized .upgrade-subtitle,
-        .upgrade-modal.minimized .upgrade-options,
-        .upgrade-modal.minimized .upgrade-count {
-            display: none;
-        }
-
-        .upgrade-modal.minimized .upgrade-timer {
-            margin-bottom: 0;
-            padding: 4px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .upgrade-modal.minimized .upgrade-timer-bar {
-            width: 100px;
-            margin-top: 0;
-        }
-
-        .upgrade-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .upgrade-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
-            color: #00ff88;
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .upgrade-hide-btn {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.5);
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .upgrade-hide-btn:hover {
-            background: rgba(0, 255, 136, 0.1);
-            border-color: rgba(0, 255, 136, 0.3);
-            color: #00ff88;
-        }
-
-        .upgrade-subtitle {
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            color: rgba(0, 255, 136, 0.5);
-            margin-bottom: 14px;
-            letter-spacing: 1.5px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .upgrade-timer {
-            font-family: 'DM Mono', monospace;
-            font-size: 12px;
-            color: rgba(0, 255, 136, 0.8);
-            text-align: center;
-            margin-bottom: 16px;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 6px;
-            border: 1px solid rgba(0, 255, 136, 0.15);
-        }
-
-        .upgrade-timer-bar {
-            height: 3px;
-            background: rgba(0, 255, 136, 0.15);
-            border-radius: 3px;
-            margin-top: 6px;
-            overflow: hidden;
-        }
-
-        .upgrade-timer-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff88, #22d3ee);
-            transition: width 0.1s linear;
-            box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
-        }
-
-        .upgrade-expand-btn {
-            display: none;
-            background: transparent;
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: #00ff88;
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            margin-left: auto;
-        }
-
-        .upgrade-expand-btn:hover {
-            background: rgba(0, 255, 136, 0.15);
-            border-color: rgba(0, 255, 136, 0.5);
-        }
-
-        .upgrade-modal.minimized .upgrade-expand-btn {
-            display: flex;
-        }
-
-        /* Horizontal Card Layout */
-        .upgrade-options {
-            display: flex;
-            flex-direction: row;
-            gap: 12px;
-            justify-content: center;
-            padding: 4px 0;
-        }
-
-        /* RPG-Style Upgrade Card (matches Ant Card aesthetic) */
-        .upgrade-card {
-            background: linear-gradient(180deg, rgba(20, 24, 28, 0.95) 0%, rgba(12, 15, 18, 0.98) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            padding: 16px 14px 14px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 170px;
-            max-width: 200px;
-            min-height: 180px;
-        }
-
-        .upgrade-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.6), transparent);
-            opacity: 0;
-            transition: opacity 0.25s;
-        }
-
-        .upgrade-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at center top, rgba(0, 255, 136, 0.06) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.25s;
-            pointer-events: none;
-        }
-
-        .upgrade-card:hover {
-            border-color: rgba(0, 255, 136, 0.4);
-            transform: translateY(-4px) scale(1.02);
-            box-shadow:
-                0 8px 24px rgba(0, 0, 0, 0.5),
-                0 0 20px rgba(0, 255, 136, 0.15);
-        }
-
-        .upgrade-card:hover::before {
-            opacity: 1;
-        }
-
-        .upgrade-card:hover::after {
-            opacity: 1;
-        }
-
-        .upgrade-card:active {
-            transform: translateY(-4px) scale(1.01);
-        }
-
-        /* Card Emoji/Icon */
-        .upgrade-emoji {
-            font-size: 36px;
-            filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.3));
-            flex-shrink: 0;
-            transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-            margin-top: 4px;
-        }
-
-        .upgrade-card:hover .upgrade-emoji {
-            transform: scale(1.1);
-        }
-
-        /* Card Info Container */
-        .upgrade-info {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        /* Card Name */
-        .upgrade-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
-            color: #00ff88;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
-            line-height: 1.3;
-        }
-
-        /* Card Description */
-        .upgrade-desc {
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.4;
-        }
-
-        /* Stack Count Badge */
-        .upgrade-stacks {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(0, 255, 136, 0.2);
-            color: #00ff88;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9px;
-            font-weight: bold;
-            padding: 3px 6px;
-            border-radius: 4px;
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        /* Upgrade count display in UI */
-        .upgrade-count {
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            color: var(--accent);
-            text-align: center;
-            padding: 10px 16px;
-            margin-top: 16px;
-            background: linear-gradient(180deg, rgba(184, 212, 104, 0.1) 0%, rgba(184, 212, 104, 0.05) 100%);
-            border-radius: 8px;
-            border: 1px solid rgba(184, 212, 104, 0.2);
-        }
-
-        /* Upgrade card wrapper for premium layout */
-        .upgrade-card-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            flex: 1;
-            min-width: 180px;
-            max-width: 220px;
-        }
-
-        /* Category label above upgrade card */
-        .upgrade-category {
-            font-family: 'DM Mono', monospace;
-            font-size: 8px;
-            letter-spacing: 1.5px;
-            text-align: center;
-            padding: 3px 10px;
-            margin-bottom: 4px;
-            border: 1px solid;
-            border-radius: 3px;
-            background: rgba(0, 0, 0, 0.4);
-            text-transform: uppercase;
-        }
-
-        /* When wrapper has premium, adjust card border radius */
-        .upgrade-card-wrapper:has(.upgrade-premium) .upgrade-card {
-            border-radius: 16px 16px 0 0;
-            border-bottom: none;
-        }
-
-        /* Premium upgrade option - connected to card */
-        .upgrade-premium {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: linear-gradient(165deg, rgba(255, 180, 100, 0.08) 0%, rgba(255, 140, 60, 0.04) 100%);
-            border: 1px solid rgba(255, 180, 100, 0.25);
-            border-top: 1px dashed rgba(255, 180, 100, 0.3);
-            border-radius: 0 0 8px 8px;
-            padding: 8px 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 0;
-            position: relative;
-        }
-
-        /* Subtle connector line between card and premium */
-        .upgrade-premium::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 180, 100, 0.4), transparent);
-        }
-
-        .upgrade-premium:hover:not(.disabled) {
-            background: linear-gradient(165deg, rgba(244, 208, 63, 0.2) 0%, rgba(244, 180, 63, 0.15) 100%);
-            border-color: var(--gold);
-            border-top-color: rgba(244, 208, 63, 0.6);
-            box-shadow: 0 4px 15px rgba(244, 208, 63, 0.2);
-        }
-
-        /* Hover on wrapper lifts both elements together */
-        .upgrade-card-wrapper:hover .upgrade-premium:not(.disabled) {
-            border-top-color: rgba(244, 208, 63, 0.5);
-        }
-
-        .upgrade-premium.disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            filter: grayscale(0.6);
-        }
-
-        .premium-cost {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
-            color: var(--gold);
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(244, 208, 63, 0.5);
-            flex-shrink: 0;
-        }
-
-        .premium-desc {
-            font-family: 'DM Mono', monospace;
-            font-size: 9px;
-            color: var(--gold);
-            opacity: 0.9;
-            text-align: center;
-        }
-
         /* Food Level Display */
         .food-level {
             font-family: 'DM Mono', monospace;
@@ -2367,10 +2238,65 @@
         .skill-ant-stat .stat-value.legendary { color: #ff8000; }
 
         .skill-ant-passive {
-            margin-top: 8px;
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .skill-ant-passive-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .skill-badge {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, rgba(60, 50, 80, 0.9) 0%, rgba(30, 25, 45, 0.95) 100%);
+            border: 2px solid rgba(255, 180, 100, 0.4);
+            border-radius: 8px;
+            font-size: 18px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            cursor: help;
+            transition: all 0.2s ease;
+        }
+
+        .skill-badge:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 180, 100, 0.8);
+            box-shadow: 0 4px 16px rgba(255, 180, 100, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .skill-badge::after {
+            content: attr(data-skill-name);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 15, 30, 0.95);
+            border: 1px solid rgba(255, 180, 100, 0.4);
+            border-radius: 6px;
+            padding: 4px 8px;
             font-family: 'DM Mono', monospace;
             font-size: 10px;
-            color: #ffd700;
+            color: #fff;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            margin-bottom: 6px;
+            z-index: 10;
+        }
+
+        .skill-badge:hover::after {
+            opacity: 1;
         }
 
         .skill-options {
@@ -2619,10 +2545,6 @@
                     <span id="survival-timer">0:00</span>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">Coins</span>
-                    <span class="stat-value coins" id="coins">10</span>
-                </div>
-                <div class="stat-row">
                     <span class="stat-label">Population</span>
                     <span class="stat-value" id="ant-count">0</span>
                 </div>
@@ -2632,6 +2554,17 @@
                 <div class="stat-row">
                     <span class="stat-label">Food stored</span>
                     <span class="stat-value" id="food-collected">0</span>
+                </div>
+                <!-- Hive Level Display -->
+                <div class="hive-level-panel">
+                    <div class="hive-level-header">
+                        <span class="hive-icon">🏠</span>
+                        <span class="hive-level-text">Hive Lv.<span id="hive-level">1</span></span>
+                    </div>
+                    <div class="hive-xp-bar">
+                        <div class="hive-xp-fill" id="hive-xp-fill"></div>
+                        <span class="hive-xp-text" id="hive-xp-text">0 / 75 XP</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2745,8 +2678,8 @@
                     <div class="game-stat-label">Food Collected</div>
                 </div>
                 <div class="game-stat">
-                    <div class="game-stat-value" id="final-coins">0</div>
-                    <div class="game-stat-label">Coins Earned</div>
+                    <div class="game-stat-value" id="final-hive-level">1</div>
+                    <div class="game-stat-label">Hive Level</div>
                 </div>
                 <div class="game-stat">
                     <div class="game-stat-value" id="final-ants">0</div>
@@ -2779,6 +2712,19 @@
             <!-- Skill cards inserted by JS -->
         </div>
         <button class="skill-confirm-btn" id="skill-confirm-btn" disabled>SELECT A SKILL</button>
+    </div>
+
+    <!-- Tech Tree Modal -->
+    <div id="tech-tree-modal" class="tech-tree-modal">
+        <div class="tech-tree-header">
+            <span class="tech-tree-title">🔬 RESEARCH LAB</span>
+            <span class="tech-tree-sp">Skill Points: <span id="tech-tree-sp">0</span></span>
+            <button class="tech-tree-close" onclick="toggleTechTree()">×</button>
+        </div>
+        <div class="tech-tree-content" id="tech-tree-content">
+            <!-- Tech tree branches inserted by JS -->
+        </div>
+        <div class="tech-tree-hint">Click on the hive anytime to open this menu</div>
     </div>
 
     <!-- Skilled Ants Panel (Bottom Right) -->
@@ -2826,25 +2772,6 @@
         <button class="harvest-continue-btn" id="harvest-continue-btn">SPAWN ANT</button>
     </div>
 
-    <!-- Upgrade Selection Panel -->
-    <div id="upgrade-modal" class="upgrade-modal">
-        <div class="upgrade-header">
-            <div class="upgrade-title">EVOLVE</div>
-            <button class="upgrade-hide-btn" id="upgrade-hide-btn" title="Hide (still counting down)">◀</button>
-        </div>
-        <div class="upgrade-subtitle">Pick an upgrade</div>
-        <div class="upgrade-timer" id="upgrade-timer">
-            <span class="upgrade-timer-text">Auto-select in: <span id="upgrade-countdown">60</span>s</span>
-            <button class="upgrade-expand-btn" id="upgrade-expand-btn" title="Show upgrade choices">▼</button>
-            <div class="upgrade-timer-bar">
-                <div class="upgrade-timer-fill" id="upgrade-timer-fill" style="width: 100%"></div>
-            </div>
-        </div>
-        <div class="upgrade-options" id="upgrade-options">
-            <!-- Upgrade cards will be inserted here by JavaScript -->
-        </div>
-    </div>
-
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -2853,6 +2780,139 @@
         let width = window.innerWidth;
         let height = window.innerHeight;
         let time = 0;
+
+        // ===========================================
+        // PERFORMANCE MONITORING (Press P to toggle)
+        // ===========================================
+        let showPerformanceStats = false;
+        let fpsHistory = [];
+        let lastFrameTime = performance.now();
+        let frameCount = 0;
+        let currentFps = 60;
+        let lastFpsUpdate = 0;
+
+        // Low performance mode - automatically enables when FPS drops
+        let lowPerformanceMode = false;
+        let lowPerfModeAuto = true;  // Auto-enable when FPS < 30
+        const LOW_FPS_THRESHOLD = 30;
+        let lowFpsCounter = 0;  // Count consecutive low FPS readings
+
+        // Check if we should use reduced effects
+        function shouldReduceEffects() {
+            return lowPerformanceMode || (lowPerfModeAuto && currentFps < LOW_FPS_THRESHOLD);
+        }
+
+        function updatePerformanceStats() {
+            const now = performance.now();
+            frameCount++;
+
+            if (now - lastFpsUpdate >= 500) {  // Update FPS twice per second
+                currentFps = Math.round(frameCount * 1000 / (now - lastFpsUpdate));
+                frameCount = 0;
+                lastFpsUpdate = now;
+
+                fpsHistory.push(currentFps);
+                if (fpsHistory.length > 60) fpsHistory.shift();
+
+                // Auto low-perf mode: enable after 3 consecutive low FPS readings
+                if (lowPerfModeAuto && !lowPerformanceMode) {
+                    if (currentFps < LOW_FPS_THRESHOLD) {
+                        lowFpsCounter++;
+                        if (lowFpsCounter >= 3) {
+                            lowPerformanceMode = true;
+                            console.log('[PERF] Auto-enabled low performance mode (FPS < 30)');
+                        }
+                    } else {
+                        lowFpsCounter = 0;
+                    }
+                }
+                // Auto-disable if FPS recovers above 50 for a while
+                if (lowPerformanceMode && currentFps >= 50) {
+                    lowFpsCounter--;
+                    if (lowFpsCounter <= -5) {
+                        lowPerformanceMode = false;
+                        lowFpsCounter = 0;
+                        console.log('[PERF] Disabled low performance mode (FPS recovered)');
+                    }
+                }
+            }
+            lastFrameTime = now;
+        }
+
+        function drawPerformanceStats() {
+            if (!showPerformanceStats) return;
+
+            ctx.save();
+            // Reset transform and apply DPR scaling fresh for consistent positioning
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+
+            // Position in top-right corner to avoid overlapping with header UI
+            const panelWidth = 260;
+            const panelHeight = 200;
+            const panelX = width - panelWidth - 15;
+            const panelY = 60;
+
+            // Draw background with padding
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+
+            // FPS display
+            ctx.fillStyle = currentFps >= 50 ? '#00ff00' : currentFps >= 30 ? '#ffff00' : '#ff0000';
+            ctx.font = 'bold 24px monospace';
+            ctx.fillText(`FPS: ${currentFps}`, panelX + 15, panelY + 28);
+
+            // Low perf mode indicator
+            if (lowPerformanceMode) {
+                ctx.fillStyle = '#ff8800';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText('LOW PERF MODE', panelX + 100, panelY + 28);
+            }
+
+            // Stats list
+            ctx.fillStyle = '#ccc';
+            ctx.font = '12px monospace';
+            ctx.fillText(`Ants: ${ants.length}`, panelX + 15, panelY + 50);
+            ctx.fillText(`Spiders: ${spiderPredators.length}`, panelX + 15, panelY + 65);
+            ctx.fillText(`Beetles: ${beetlePredators.length}`, panelX + 15, panelY + 80);
+            ctx.fillText(`Bosses: ${bossPredators.length}`, panelX + 15, panelY + 95);
+            ctx.fillText(`Floating texts: ${floatingTexts.length}`, panelX + 15, panelY + 110);
+            ctx.fillText(`Combat effects: ${combatEffects.length}`, panelX + 15, panelY + 125);
+            ctx.fillText(`Death effects: ${deathEffects.length}`, panelX + 15, panelY + 140);
+            ctx.fillText(`Food items: ${foodItems.length}`, panelX + 15, panelY + 155);
+
+            // Mini FPS graph (positioned to fit within panel)
+            ctx.strokeStyle = '#00ff00';
+            ctx.beginPath();
+            const graphX = panelX + 145;
+            for (let i = 0; i < Math.min(fpsHistory.length, 100); i++) {
+                const x = graphX + i;
+                const y = panelY + 65 - (fpsHistory[i] / 60) * 30;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Controls hint
+            ctx.fillStyle = '#888';
+            ctx.fillText('P=hide  L=low-perf', panelX + 15, panelY + 175);
+            ctx.fillText(`Low-perf: ${lowPerformanceMode ? 'ON' : 'OFF'}`, panelX + 15, panelY + 190);
+            ctx.restore();
+        }
+
+        // Toggle performance stats with P key, low-perf with L
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'p' || e.key === 'P') {
+                showPerformanceStats = !showPerformanceStats;
+            }
+            if (e.key === 'l' || e.key === 'L') {
+                lowPerformanceMode = !lowPerformanceMode;
+                console.log(`[PERF] Low performance mode: ${lowPerformanceMode ? 'ON' : 'OFF'}`);
+            }
+        });
 
         // ===========================================
         // FLOATING TEXT & COMBAT EFFECTS SYSTEM
@@ -2864,9 +2924,18 @@
 
         // Spawn a death effect (particle explosion + skull)
         function spawnDeathEffect(x, y, type = 'ant', color = null) {
+            // Cap death effects to prevent memory growth
+            const MAX_DEATH_EFFECTS = 20;
+            if (deathEffects.length >= MAX_DEATH_EFFECTS) {
+                deathEffects.splice(0, 5);
+            }
+
             const isAnt = type === 'ant';
             const baseColor = color || (isAnt ? { r: 80, g: 50, b: 30 } : { r: 100, g: 100, b: 100 });
-            const particleCount = isAnt ? 12 : 20;
+
+            // Reduce particles in low-perf mode
+            const reducedEffects = shouldReduceEffects();
+            const particleCount = reducedEffects ? (isAnt ? 4 : 6) : (isAnt ? 12 : 20);
             const particles = [];
 
             // Create particles that explode outward
@@ -2956,6 +3025,18 @@
         }
 
         function spawnFloatingText(x, y, text, color = '#ffd700', size = 14, duration = 120, followTarget = null) {
+            // Cap floating texts to prevent memory growth
+            const MAX_FLOATING_TEXTS = 100;
+            if (floatingTexts.length >= MAX_FLOATING_TEXTS) {
+                // Remove oldest texts
+                floatingTexts.splice(0, 10);
+            }
+
+            // In low-perf mode, skip small/minor floating texts
+            if (shouldReduceEffects() && size <= 10) {
+                return;  // Skip minor damage numbers etc.
+            }
+
             floatingTexts.push({
                 x: x,
                 y: y,
@@ -2972,6 +3053,15 @@
         }
 
         function spawnCombatEffect(x, y, antHp, antMaxHp, predatorHp, predatorMaxHp) {
+            // Skip combat effects in low-perf mode
+            if (shouldReduceEffects()) return;
+
+            // Cap combat effects
+            const MAX_COMBAT_EFFECTS = 30;
+            if (combatEffects.length >= MAX_COMBAT_EFFECTS) {
+                combatEffects.splice(0, 5);
+            }
+
             combatEffects.push({
                 x: x,
                 y: y,
@@ -3064,7 +3154,7 @@
                 pendingSkillChoices.push({ ant: ant, slot: skillSlot });
             }
             // If no modal open, show next skill choice
-            if (!skillChoiceModalOpen && !harvestModalOpen && !upgradesPaused) {
+            if (!skillChoiceModalOpen && !harvestModalOpen) {
                 showNextSkillChoice();
             }
         }
@@ -3119,6 +3209,7 @@
             const detVal = ant.foodDetectRadius * upgradeMultipliers.detectionRadius;
             const capVal = ant.carryCapacity + upgradeMultipliers.carryCapacity;
             const pherVal = ant.pheromoneStrength;
+            const hp5Val = ant.hp5Stacks || 0;
 
             // Get rarity classes for each stat
             const hpRarity = getStatRarity('HP', ant.maxHp);
@@ -3128,6 +3219,7 @@
             const detRarity = getStatRarity('DET', detVal);
             const capRarity = getStatRarity('CAP', capVal);
             const pherRarity = getStatRarity('PHER', pherVal);
+            const hp5Rarity = getStatRarity('HP5', hp5Val);
 
             statsEl.innerHTML = `
                 <span class="skill-ant-stat"><span class="stat-label">HP</span><span class="stat-value ${hpRarity}">${Math.floor(ant.maxHp)}</span></span>
@@ -3137,12 +3229,21 @@
                 <span class="skill-ant-stat"><span class="stat-label">DET</span><span class="stat-value ${detRarity}">${Math.round(detVal)}</span></span>
                 <span class="skill-ant-stat"><span class="stat-label">CAP</span><span class="stat-value ${capRarity}">${Math.round(capVal)}</span></span>
                 <span class="skill-ant-stat"><span class="stat-label">PHER</span><span class="stat-value ${pherRarity}">${pherVal.toFixed(1)}</span></span>
+                <span class="skill-ant-stat"><span class="stat-label">HP5</span><span class="stat-value ${hp5Rarity}">${hp5Val}</span></span>
             `;
 
-            // Show current skill if choosing second skill
-            if (currentSkillSlot === 2 && ant.chosenSkill) {
-                passiveEl.style.display = 'block';
-                passiveEl.innerHTML = `<span style="color: ${ant.chosenSkill.color}">Current: ${ant.chosenSkill.icon} ${ant.chosenSkill.name}</span>`;
+            // Show current skills as badges
+            const hasSkills = ant.chosenSkill || ant.chosenSkill2;
+            if (hasSkills) {
+                passiveEl.style.display = 'flex';
+                let badgesHtml = '<span class="skill-ant-passive-label">Skills:</span>';
+                if (ant.chosenSkill) {
+                    badgesHtml += `<div class="skill-badge" data-skill-name="${ant.chosenSkill.name}" style="border-color: ${ant.chosenSkill.color}40; box-shadow: 0 2px 8px ${ant.chosenSkill.color}30, inset 0 0 12px ${ant.chosenSkill.color}20;">${ant.chosenSkill.icon}</div>`;
+                }
+                if (ant.chosenSkill2) {
+                    badgesHtml += `<div class="skill-badge" data-skill-name="${ant.chosenSkill2.name}" style="border-color: ${ant.chosenSkill2.color}40; box-shadow: 0 2px 8px ${ant.chosenSkill2.color}30, inset 0 0 12px ${ant.chosenSkill2.color}20;">${ant.chosenSkill2.icon}</div>`;
+                }
+                passiveEl.innerHTML = badgesHtml;
             } else {
                 passiveEl.style.display = 'none';
             }
@@ -3256,7 +3357,7 @@
             skillChoiceAnt = null;
 
             // Resume game if no other modals
-            if (!harvestModalOpen && !upgradesPaused && pendingSkillChoices.length === 0) {
+            if (!harvestModalOpen && pendingSkillChoices.length === 0) {
                 if (pauseStartTime !== null) {
                     pausedTime += Date.now() - pauseStartTime;
                     pauseStartTime = null;
@@ -4487,12 +4588,36 @@
         }
 
         function spawnDecoyAnt(x, y, angle) {
-            decoyAnts.push({
+            const decoy = {
                 x, y, angle,
                 life: 300,  // 5 seconds at 60fps
                 shimmerPhase: 0,
-                wobble: 0
-            });
+                wobble: 0,
+                tauntRadius: 150  // Force predators within this radius to target decoy
+            };
+            decoyAnts.push(decoy);
+
+            // TAUNT: Force all nearby predators to target this decoy immediately
+            for (const spider of spiderPredators) {
+                if (spider.currentHp <= 0) continue;
+                const dist = Math.hypot(spider.x - x, spider.y - y);
+                if (dist < decoy.tauntRadius) {
+                    spider.targetX = x;
+                    spider.targetY = y;
+                    spider.targetAnt = null;  // Clear real ant target
+                    spawnFloatingText(spider.x, spider.y - 20, 'TAUNTED!', '#ac92ec', 10, 60);
+                }
+            }
+            for (const beetle of beetlePredators) {
+                if (beetle.currentHp <= 0) continue;
+                const dist = Math.hypot(beetle.x - x, beetle.y - y);
+                if (dist < decoy.tauntRadius) {
+                    beetle.targetX = x;
+                    beetle.targetY = y;
+                    beetle.targetAnt = null;
+                    spawnFloatingText(beetle.x, beetle.y - 20, 'TAUNTED!', '#ac92ec', 10, 60);
+                }
+            }
         }
 
         function updateDecoyEffects() {
@@ -6360,12 +6485,17 @@
                 // Dim occupied zones
                 const alphaMultiplier = isOccupied ? 0.3 : 1.0;
 
-                // Glowing circle for food spot
-                const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
-                gradient.addColorStop(0, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.15 * alphaMultiplier})`);
-                gradient.addColorStop(0.7, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.08 * alphaMultiplier})`);
-                gradient.addColorStop(1, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0)`);
-                ctx.fillStyle = gradient;
+                // Glowing circle for food spot - simplified in low-perf mode
+                if (shouldReduceEffects()) {
+                    // Simple fill instead of gradient
+                    ctx.fillStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.1 * alphaMultiplier})`;
+                } else {
+                    const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
+                    gradient.addColorStop(0, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.15 * alphaMultiplier})`);
+                    gradient.addColorStop(0.7, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.08 * alphaMultiplier})`);
+                    gradient.addColorStop(1, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0)`);
+                    ctx.fillStyle = gradient;
+                }
                 ctx.beginPath();
                 ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
                 ctx.fill();
@@ -6424,11 +6554,15 @@
                     const progress = remaining / ZONE_COOLDOWN_DURATION;  // 1 = full cooldown, 0 = ready
                     const seconds = Math.ceil(remaining / 1000);
 
-                    // Darken the zone with radial gradient
-                    const darkGrad = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
-                    darkGrad.addColorStop(0, 'rgba(0, 0, 0, 0.6)');
-                    darkGrad.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
-                    ctx.fillStyle = darkGrad;
+                    // Darken the zone - simplified in low-perf mode
+                    if (shouldReduceEffects()) {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+                    } else {
+                        const darkGrad = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
+                        darkGrad.addColorStop(0, 'rgba(0, 0, 0, 0.6)');
+                        darkGrad.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+                        ctx.fillStyle = darkGrad;
+                    }
                     ctx.beginPath();
                     ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
                     ctx.fill();
@@ -6462,12 +6596,16 @@
                     ? { r: 120, g: 40, b: 40 }
                     : { r: 80, g: 100, b: 50 };
 
-                // Danger glow
-                const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
-                gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0.25)`);
-                gradient.addColorStop(0.7, `rgba(${color.r}, ${color.g}, ${color.b}, 0.1)`);
-                gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
-                ctx.fillStyle = gradient;
+                // Danger glow - simplified in low-perf mode
+                if (shouldReduceEffects()) {
+                    ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.12)`;
+                } else {
+                    const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.radius);
+                    gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0.25)`);
+                    gradient.addColorStop(0.7, `rgba(${color.r}, ${color.g}, ${color.b}, 0.1)`);
+                    gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
+                    ctx.fillStyle = gradient;
+                }
                 ctx.beginPath();
                 ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
                 ctx.fill();
@@ -6628,6 +6766,21 @@
                     hp: 40,                  // Tanky but not too much
                     atk: 1,                  // Very low attack
                     def: 2                   // Moderate defense
+                },
+                boss: {
+                    baseHp: 150,             // High HP pool
+                    hpPerWave: 50,           // +50 HP per boss wave
+                    baseAtk: 8,              // High attack damage
+                    atkPerWave: 2,           // +2 ATK per boss wave
+                    baseDef: 5,              // Tanky defense
+                    defPerWave: 1,           // +1 DEF per boss wave
+                    speed: 0.5,              // Slow but menacing
+                    huntRadius: 600,         // Hunt from very far
+                    killRadius: 30,          // Large kill zone
+                    size: 40,                // Large size
+                    spawnInterval: 300,      // 5 minutes (300 seconds)
+                    goldReward: 50,          // Base gold reward
+                    goldPerWave: 25          // +25 gold per boss wave
                 }
             }
         };
@@ -6644,8 +6797,8 @@
                 color: { r: 255, g: 100, b: 100 },  // Red tint
                 apply: (ant) => { ant.birthAtkBonus = 2; }
             },
-            lucky: {
-                name: 'Lucky',
+            prospector: {
+                name: 'Prospector',
                 description: '20% chance +1 gold on delivery',
                 icon: '🍀',
                 color: { r: 255, g: 215, b: 0 },  // Gold sparkle
@@ -6698,14 +6851,6 @@
                 type: 'active',
                 cooldown: 15000,  // 15 seconds
                 color: '#00d4ff'
-            },
-            berserker: {
-                name: 'Berserker',
-                description: '+100% ATK when below 40% HP',
-                icon: '🔥',
-                type: 'passive',
-                cooldown: 0,
-                color: '#ff4757'
             },
             rallyCry: {
                 name: 'Rally Cry',
@@ -6789,7 +6934,7 @@
             },
             decoy: {
                 name: 'Decoy',
-                description: 'Create a fake ant that distracts predators for 5s',
+                description: 'Create a fake ant that taunts nearby predators for 5s',
                 icon: '👻',
                 type: 'active',
                 cooldown: 20000,
@@ -6907,17 +7052,9 @@
                 cooldown: 24000,
                 color: '#9b59b6'
             },
-            blink: {
-                name: 'Blink',
-                description: 'Instantly teleport to a random nearby enemy and stun it for 1.5s',
-                icon: '✨',
-                type: 'active',
-                cooldown: 10000,
-                color: '#f39c12'
-            },
             spiritLink: {
                 name: 'Spirit Link',
-                description: 'Link with allies within DET×2 range - damage split evenly for 6s. Triggers when any ally is in combat.',
+                description: 'For 6s, heal nearby allies for 25% of damage dealt. Triggers in combat.',
                 icon: '🔗',
                 type: 'active',
                 cooldown: 20000,
@@ -6937,7 +7074,7 @@
         // CURRENCY SYSTEM
         // ===========================================
 
-        let coins = 10;  // Starting gold for first upgrade (gold mainly comes from enemy kills now)
+        let skillPoints = 0;  // Earned on hive level-up, spent in tech tree
 
         // ===========================================
         // SURVIVAL MODE STATE
@@ -6949,12 +7086,99 @@
         let pausedTime = 0;  // Track total paused time for accurate timer
         let pauseStartTime = null;  // When the current pause started
         let totalAntsSpawned = 0;
-        let totalCoinsEarned = 0;
         let lastUpdateTime = Date.now();
+
+        // ===========================================
+        // HIVE LEVELING SYSTEM
+        // ===========================================
+        let hiveLevel = 1;
+        let hiveXP = 0;
+        let hiveXPToNextLevel = 75;  // Level 1 -> 2 requires 75 XP
+
+        function getHiveXPForLevel(level) {
+            // Soft exponential: Level N requires ~75 * N^1.5 total XP
+            // Level 2: 75, Level 5: 420, Level 10: 1185, Level 15: 2175
+            return Math.floor(75 * Math.pow(level, 1.5));
+        }
+
+        function getHiveXPForNextLevel(currentLevel) {
+            // XP needed to go from currentLevel to currentLevel+1
+            return getHiveXPForLevel(currentLevel + 1) - getHiveXPForLevel(currentLevel);
+        }
+
+        function addHiveXP(amount) {
+            if (gameOver) return;
+
+            // Apply XP amplifier from shop if purchased
+            const xpMultiplier = upgradeMultipliers.hiveXPBonus || 1;
+            const finalAmount = Math.floor(amount * xpMultiplier);
+
+            hiveXP += finalAmount;
+
+            // Check for level up(s)
+            while (hiveXP >= hiveXPToNextLevel) {
+                hiveXP -= hiveXPToNextLevel;
+                hiveLevel++;
+                hiveXPToNextLevel = getHiveXPForNextLevel(hiveLevel);
+                onHiveLevelUp();
+            }
+            updateHiveUI();
+        }
+
+        function onHiveLevelUp() {
+            // Award skill point for tech tree
+            skillPoints++;
+            updateSkillPointsUI();
+
+            // Play level-up celebration effect
+            spawnHiveLevelUpEffect();
+        }
+
+        function updateSkillPointsUI() {
+            const el = document.getElementById('skill-points');
+            if (el) el.textContent = skillPoints;
+        }
+
+        function spawnHiveLevelUpEffect() {
+            const cx = CONFIG.nestX;
+            const cy = CONFIG.nestY;
+            const radius = getColonySize();
+
+            // Floating text announcement
+            spawnFloatingText(cx, cy - radius - 40, `HIVE LEVEL ${hiveLevel}!`, '#ffd700', 24, 180);
+
+            // Spawn celebratory floating emojis around the hive
+            const emojis = ['✨', '⭐', '🌟', '💫'];
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const dist = radius + 20 + Math.random() * 30;
+                const x = cx + Math.cos(angle) * dist;
+                const y = cy + Math.sin(angle) * dist;
+                setTimeout(() => {
+                    spawnFloatingText(x, y, emojis[i % emojis.length], '#ffd700', 16, 120);
+                }, i * 50);
+            }
+        }
+
+        function updateHiveUI() {
+            const levelEl = document.getElementById('hive-level');
+            const xpFillEl = document.getElementById('hive-xp-fill');
+            const xpTextEl = document.getElementById('hive-xp-text');
+
+            if (levelEl) levelEl.textContent = hiveLevel;
+            if (xpFillEl) {
+                const percent = (hiveXP / hiveXPToNextLevel) * 100;
+                xpFillEl.style.width = percent + '%';
+            }
+            if (xpTextEl) xpTextEl.textContent = `${hiveXP} / ${hiveXPToNextLevel} XP`;
+        }
 
         // Arrays to hold multiple predators of each type
         let spiderPredators = [];
         let beetlePredators = [];
+        let bossPredators = [];
+        let bossWaveCount = 0;  // Track how many bosses have spawned
+        let lastBossSpawnTime = 0;  // Track when last boss spawned
 
         function getElapsedSeconds() {
             if (!gameStartTime) return 0;
@@ -6987,7 +7211,7 @@
             // Update final stats
             document.getElementById('final-time').textContent = formatTime(getElapsedSeconds());
             document.getElementById('final-food').textContent = foodCollected;
-            document.getElementById('final-coins').textContent = totalCoinsEarned;
+            document.getElementById('final-hive-level').textContent = hiveLevel;
             document.getElementById('final-ants').textContent = totalAntsSpawned;
 
             // Show modal
@@ -7029,6 +7253,115 @@
                 lastPredatorSpawnTime = elapsed;
                 predatorWave++;
                 spawnAdditionalPredators();
+            }
+
+            // Check for boss spawn (every 5 minutes)
+            checkBossSpawn();
+        }
+
+        function checkBossSpawn() {
+            if (gameOver) return;
+
+            const elapsed = getElapsedSeconds();
+            const bossInterval = CONFIG.predators.boss.spawnInterval;  // 300 seconds (5 minutes)
+
+            // Don't spawn boss if one is already alive
+            if (bossPredators.length > 0) return;
+
+            // Check if it's time for a boss spawn
+            if (elapsed >= bossInterval && elapsed - lastBossSpawnTime >= bossInterval) {
+                lastBossSpawnTime = elapsed;
+                bossWaveCount++;
+                spawnBoss();
+            }
+        }
+
+        function spawnBoss() {
+            const boss = new Boss(bossWaveCount);
+            bossPredators.push(boss);
+
+            // Epic boss announcement
+            spawnBossAnnouncement(boss);
+        }
+
+        // Boss announcement effects
+        let bossAnnouncementEffects = [];
+
+        function spawnBossAnnouncement(boss) {
+            bossAnnouncementEffects.push({
+                boss: boss,
+                life: 300,  // 5 seconds
+                maxLife: 300,
+                phase: 0,
+                shakeOffset: 0
+            });
+
+            // Screen flash
+            screenFlashColor = 'rgba(150, 0, 0, 0.3)';
+            screenFlashTimer = 30;
+        }
+
+        let screenFlashColor = null;
+        let screenFlashTimer = 0;
+
+        function updateBossAnnouncementEffects() {
+            bossAnnouncementEffects = bossAnnouncementEffects.filter(e => {
+                e.life--;
+                e.phase += 0.1;
+                e.shakeOffset = Math.sin(e.phase * 3) * (e.life > 200 ? 3 : 0);
+                return e.life > 0;
+            });
+
+            if (screenFlashTimer > 0) screenFlashTimer--;
+        }
+
+        function drawBossAnnouncementEffects() {
+            // Screen flash
+            if (screenFlashTimer > 0) {
+                ctx.fillStyle = screenFlashColor;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            for (const e of bossAnnouncementEffects) {
+                const alpha = Math.min(1, e.life / 60);  // Fade in first second, fade out last second
+                const fadeIn = Math.min(1, (e.maxLife - e.life) / 60);
+                const finalAlpha = alpha * fadeIn;
+
+                if (e.life > 200) {  // First 1.7 seconds - dramatic announcement
+                    ctx.save();
+                    ctx.translate(width / 2 + e.shakeOffset, height / 2);
+
+                    // Dark overlay
+                    ctx.fillStyle = `rgba(0, 0, 0, ${finalAlpha * 0.6})`;
+                    ctx.fillRect(-width, -height, width * 2, height * 2);
+
+                    // Boss name with glow
+                    ctx.shadowColor = '#ff3300';
+                    ctx.shadowBlur = 30 * finalAlpha;
+                    ctx.fillStyle = `rgba(255, 68, 0, ${finalAlpha})`;
+                    ctx.font = 'bold 48px "Courier New", monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`⚔ ${e.boss.name.toUpperCase()} ⚔`, 0, -20);
+
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = `rgba(255, 200, 150, ${finalAlpha * 0.9})`;
+                    ctx.font = '24px "Courier New", monospace';
+                    ctx.fillText('BOSS INCOMING!', 0, 25);
+
+                    ctx.fillStyle = `rgba(255, 150, 100, ${finalAlpha * 0.7})`;
+                    ctx.font = '16px "Courier New", monospace';
+                    ctx.fillText(`Wave ${e.boss.wave} • HP: ${e.boss.maxHp} • ATK: ${e.boss.atk}`, 0, 55);
+
+                    // Display boss skills
+                    if (e.boss.skills && e.boss.skills.length > 0) {
+                        const skillText = e.boss.skills.map(s => `${BOSS_SKILLS[s].icon} ${BOSS_SKILLS[s].name}`).join('  ');
+                        ctx.fillStyle = `rgba(255, 100, 50, ${finalAlpha * 0.9})`;
+                        ctx.font = 'bold 18px "Courier New", monospace';
+                        ctx.fillText(skillText, 0, 85);
+                    }
+
+                    ctx.restore();
+                }
             }
         }
 
@@ -7176,20 +7509,10 @@
             }
         }
 
-        // ===========================================
-        // UPGRADE SYSTEM (Vampire Survivors style)
-        // ===========================================
-
-        let upgradesPaused = false;
-        let lastUpgradeTime = 0;
-        const UPGRADE_INTERVAL = 300;  // Seconds between upgrade offers (5 minutes)
-
-        // Auto-spawn system (separate from upgrades)
+        // Auto-spawn system
         const AUTO_SPAWN_INTERVAL = 20;  // Seconds between auto-spawning worker ants
         let lastAutoSpawnTime = 0;
-        const UPGRADE_CHOICE_TIMEOUT = 60;  // Seconds before auto-choosing
-        let upgradeChoiceStartTime = 0;  // When the current upgrade choice was shown
-        let activeUpgrades = [];  // Track which upgrades player has chosen
+        let activeUpgrades = [];  // Track upgrades from tech tree
         let upgradeMultipliers = {
             antSpeed: 1,
             carryCapacity: 0,          // Changed to flat bonus (was misleading multiplier)
@@ -7207,529 +7530,314 @@
             predatorHpMultiplier: 1,   // Multiplier for predator max HP (lower = weaker predators)
             goldRushActive: false,     // Temporary gold bonus flag
             goldRushEndTime: 0,        // When gold rush expires
-            goldRushMultiplier: 1      // Gold multiplier during rush
+            goldRushMultiplier: 1,     // Gold multiplier during rush
+            // Shop upgrade multipliers
+            hiveXPBonus: 1,            // Multiplier for hive XP gains
+            killGoldBonus: 1,          // Multiplier for gold from kills
+            nestHealAmount: 0,         // HP healed when entering nest
+            newAntBonusHP: 0,          // Flat HP bonus for newly spawned ants
+            newAntBonusATK: 0,         // Flat ATK bonus for newly spawned ants
+            newAntBonusDEF: 0,         // Flat DEF bonus for newly spawned ants
+            passiveRegen: 0,           // HP regeneration per 10 seconds for all ants
+            xpSharing: 0,              // Percentage of XP shared with nearby ants
+            rallyDuration: 1,          // Multiplier for Rally Cry skill duration
+            soldierStartLevel: 1       // Starting level for soldiers
         };
 
-        const UPGRADE_POOL = [
-            // ============================================
-            // LEFT COLUMN: ANT TYPES - Spawning & Colony
-            // ============================================
-            {
-                id: 'free_worker',
-                name: 'Worker Swarm',
-                description: 'Instantly spawn 5 free workers',
-                emoji: '🐜',
-                category: 'ants',
-                apply: () => {
-                    for (let i = 0; i < 5; i++) {
-                        if (ants.length < CONFIG.maxAnts) {
-                            const angle = Math.random() * Math.PI * 2;
-                            const dist = 30 + Math.random() * 20;
-                            const ant = new Ant(
-                                CONFIG.nestX + Math.cos(angle) * dist,
-                                CONFIG.nestY + Math.sin(angle) * dist,
-                                'worker'
-                            );
-                            ants.push(ant);
-                            totalAntsSpawned++;
-                        }
-                    }
-                },
-                maxStacks: 99,
-                premium: {
-                    cost: 25,
-                    description: 'Instantly spawn 12 free workers',
-                    apply: () => {
-                        for (let i = 0; i < 12; i++) {
-                            if (ants.length < CONFIG.maxAnts) {
-                                const angle = Math.random() * Math.PI * 2;
-                                const dist = 30 + Math.random() * 20;
-                                const ant = new Ant(
-                                    CONFIG.nestX + Math.cos(angle) * dist,
-                                    CONFIG.nestY + Math.sin(angle) * dist,
-                                    'worker'
-                                );
-                                ants.push(ant);
-                                totalAntsSpawned++;
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                id: 'max_ants',
-                name: 'Colony Expansion',
-                description: 'Max colony size +30 ants',
-                emoji: '🏠',
-                category: 'ants',
-                apply: () => {
-                    upgradeMultipliers.maxAnts += 30;
-                    CONFIG.maxAnts += 30;
-                },
-                maxStacks: 5,
-                premium: {
-                    cost: 65,
-                    description: 'Max colony size +100 ants',
-                    apply: () => {
-                        upgradeMultipliers.maxAnts += 100;
-                        CONFIG.maxAnts += 100;
-                    }
-                }
-            },
-            // ============================================
-            // MIDDLE COLUMN: ECONOMY - Gold & Resources
-            // ============================================
-            {
-                id: 'food_value',
-                name: 'Nutrient Rich',
-                description: 'Food deliveries give +30% gold',
-                emoji: '🍯',
-                category: 'economy',
-                apply: () => { upgradeMultipliers.foodValue *= 1.30; },
-                maxStacks: 4,
-                premium: {
-                    cost: 45,
-                    description: 'Food deliveries give +75% gold',
-                    apply: () => { upgradeMultipliers.foodValue *= 1.75; }
-                }
-            },
-            {
-                id: 'coin_bonus',
-                name: 'Golden Harvest',
-                description: '+3 bonus gold per delivery',
-                emoji: '💰',
-                category: 'economy',
-                apply: () => { upgradeMultipliers.coinBonus += 3; },
-                maxStacks: 5,
-                premium: {
-                    cost: 35,
-                    description: '+8 bonus gold per delivery',
-                    apply: () => { upgradeMultipliers.coinBonus += 8; }
-                }
-            },
-            {
-                id: 'cheap_spawns',
-                name: 'Efficient Breeding',
-                description: 'Ant spawn costs reduced by 20%',
-                emoji: '🥚',
-                category: 'economy',
-                apply: () => { upgradeMultipliers.spawnCostReduction *= 0.80; },
-                maxStacks: 4,
-                premium: {
-                    cost: 50,
-                    description: 'Ant spawn costs reduced by 45%',
-                    apply: () => { upgradeMultipliers.spawnCostReduction *= 0.55; }
-                }
-            },
-            {
-                id: 'gold_rush',
-                name: 'Gold Rush',
-                description: 'Double gold income for 90 seconds',
-                emoji: '🌟',
-                category: 'economy',
-                apply: () => {
-                    upgradeMultipliers.goldRushActive = true;
-                    upgradeMultipliers.goldRushMultiplier = 2;
-                    upgradeMultipliers.goldRushEndTime = Date.now() + 90000;
-                },
-                maxStacks: 99,
-                premium: {
-                    cost: 60,
-                    description: 'Triple gold income for 120 seconds',
-                    apply: () => {
-                        upgradeMultipliers.goldRushActive = true;
-                        upgradeMultipliers.goldRushMultiplier = 3;
-                        upgradeMultipliers.goldRushEndTime = Date.now() + 120000;
-                    }
-                }
-            },
-            {
-                id: 'coin_burst',
-                name: 'Treasure Found',
-                description: 'Instantly gain 75 gold',
-                emoji: '💎',
-                category: 'economy',
-                apply: () => {
-                    coins += 75;
-                    totalCoinsEarned += 75;
-                },
-                maxStacks: 99,
-                premium: {
-                    cost: 40,
-                    description: 'Instantly gain 200 gold',
-                    apply: () => {
-                        coins += 200;
-                        totalCoinsEarned += 200;
-                    }
-                }
-            },
-            // ============================================
-            // RIGHT COLUMN: OTHER - Combat & Foraging
-            // ============================================
-            {
-                id: 'atk_boost',
-                name: 'Combat Training',
-                description: 'All ants gain +3 ATK',
-                emoji: '🗡️',
-                category: 'other',
-                apply: () => { upgradeMultipliers.atkBonus += 3; },
-                maxStacks: 5,
-                premium: {
-                    cost: 55,
-                    description: 'All ants gain +8 ATK',
-                    apply: () => { upgradeMultipliers.atkBonus += 8; }
-                }
-            },
-            {
-                id: 'def_boost',
-                name: 'Hardened Carapace',
-                description: 'All ants gain +3 DEF',
-                emoji: '🛡️',
-                category: 'other',
-                apply: () => { upgradeMultipliers.defBonus += 3; },
-                maxStacks: 5,
-                premium: {
-                    cost: 55,
-                    description: 'All ants gain +8 DEF',
-                    apply: () => { upgradeMultipliers.defBonus += 8; }
-                }
-            },
-            {
-                id: 'hp_boost',
-                name: 'Vitality',
-                description: 'All ants gain +8 max HP',
-                emoji: '❤️',
-                category: 'other',
-                apply: () => { upgradeMultipliers.hpBonus += 8; },
-                maxStacks: 5,
-                premium: {
-                    cost: 50,
-                    description: 'All ants gain +20 max HP',
-                    apply: () => { upgradeMultipliers.hpBonus += 20; }
-                }
-            },
-            {
-                id: 'nest_defense',
-                name: 'Fortified Nest',
-                description: 'Ants near nest gain +5 DEF',
-                emoji: '🏰',
-                category: 'other',
-                apply: () => { upgradeMultipliers.nestDefenseBonus += 5; },
-                maxStacks: 3,
-                premium: {
-                    cost: 70,
-                    description: 'Ants near nest gain +12 DEF',
-                    apply: () => { upgradeMultipliers.nestDefenseBonus += 12; }
-                }
-            },
-            {
-                id: 'predator_weakness',
-                name: 'Predator Bane',
-                description: 'Predators have -15% max HP',
-                emoji: '☠️',
-                category: 'other',
-                apply: () => {
-                    upgradeMultipliers.predatorHpMultiplier *= 0.85;
-                    // Apply to existing predators
-                    if (typeof spider !== 'undefined' && spider) {
-                        spider.hp = Math.max(1, Math.floor(spider.hp * 0.85));
-                        spider.maxHp = Math.max(1, Math.floor(spider.maxHp * 0.85));
-                    }
-                    for (const beetle of beetlePredators) {
-                        beetle.hp = Math.max(1, Math.floor(beetle.hp * 0.85));
-                        beetle.maxHp = Math.max(1, Math.floor(beetle.maxHp * 0.85));
-                    }
-                },
-                maxStacks: 3,
-                premium: {
-                    cost: 100,
-                    description: 'Predators have -35% max HP',
-                    apply: () => {
-                        upgradeMultipliers.predatorHpMultiplier *= 0.65;
-                        // Apply to existing predators
-                        if (typeof spider !== 'undefined' && spider) {
-                            spider.hp = Math.max(1, Math.floor(spider.hp * 0.65));
-                            spider.maxHp = Math.max(1, Math.floor(spider.maxHp * 0.65));
-                        }
-                        for (const beetle of beetlePredators) {
-                            beetle.hp = Math.max(1, Math.floor(beetle.hp * 0.65));
-                            beetle.maxHp = Math.max(1, Math.floor(beetle.maxHp * 0.65));
-                        }
-                    }
-                }
-            },
-            {
-                id: 'detection',
-                name: 'Keen Senses',
-                description: 'Food detection radius +40%',
-                emoji: '👁️',
-                category: 'other',
-                apply: () => { upgradeMultipliers.detectionRadius *= 1.4; },
-                maxStacks: 3,
-                premium: {
-                    cost: 40,
-                    description: 'Food detection radius +100%',
-                    apply: () => { upgradeMultipliers.detectionRadius *= 2.0; }
-                }
-            },
-            {
-                id: 'carry_boost',
-                name: 'Strong Mandibles',
-                description: 'Carry capacity +1 for all ants',
-                emoji: '💪',
-                category: 'other',
-                apply: () => { upgradeMultipliers.carryCapacity += 1; },
-                maxStacks: 4,
-                premium: {
-                    cost: 45,
-                    description: 'Carry capacity +3 for all ants',
-                    apply: () => { upgradeMultipliers.carryCapacity += 3; }
-                }
-            },
-            {
-                id: 'pheromone_boost',
-                name: 'Scent Markers',
-                description: 'Pheromone trails are 50% stronger',
-                emoji: '👃',
-                category: 'other',
-                apply: () => { upgradeMultipliers.pheromoneStrength *= 1.5; },
-                maxStacks: 3,
-                premium: {
-                    cost: 50,
-                    description: 'Pheromone trails are 2x stronger',
-                    apply: () => { upgradeMultipliers.pheromoneStrength *= 2.0; }
-                }
-            },
-            {
-                id: 'speed_boost',
-                name: 'Swift Legs',
-                description: 'All ants move 25% faster',
-                emoji: '⚡',
-                category: 'other',
-                apply: () => { upgradeMultipliers.antSpeed *= 1.25; },
-                maxStacks: 4,
-                premium: {
-                    cost: 60,
-                    description: 'All ants move 50% faster',
-                    apply: () => { upgradeMultipliers.antSpeed *= 1.50; }
-                }
-            }
+        // ===========================================
+        // TECH TREE SYSTEM
+        // ===========================================
+
+        let techTreeOpen = false;
+        let techTreeResearched = {};  // { nodeId: true } for researched nodes
+
+        // Tech tree as a single branching tree - nodes can require multiple parents
+        // Visual grid layout with connecting lines
+        const TECH_TREE = [
+            // ===== ROW 0: ROOT =====
+            { id: 'hive_core', name: 'Hive Core', emoji: '🏠', cost: 0, row: 0, col: 4,
+              description: 'The heart of your colony', prereq: [], isRoot: true,
+              apply: () => { techTreeResearched['hive_core'] = true; } },
+
+            // ===== ROW 1: Three main branches =====
+            { id: 'defense_1', name: 'Carapace', emoji: '🛡️', cost: 1, row: 1, col: 1,
+              description: '+3 DEF', prereq: ['hive_core'],
+              apply: () => { upgradeMultipliers.defBonus += 3; } },
+            { id: 'harvest_1', name: 'Foraging', emoji: '🍎', cost: 1, row: 1, col: 4,
+              description: '+30% detection', prereq: ['hive_core'],
+              apply: () => { upgradeMultipliers.detectionRadius *= 1.3; } },
+            { id: 'offense_1', name: 'Fangs', emoji: '⚔️', cost: 1, row: 1, col: 7,
+              description: '+3 ATK', prereq: ['hive_core'],
+              apply: () => { upgradeMultipliers.atkBonus += 3; } },
+
+            // ===== ROW 2: Branches split (6 nodes across cols 0,2,3,5,6,8) =====
+            { id: 'def_hp', name: 'Vitality', emoji: '❤️', cost: 1, row: 2, col: 0,
+              description: '+12 HP', prereq: ['defense_1'],
+              apply: () => { upgradeMultipliers.hpBonus += 12; } },
+            { id: 'def_armor', name: 'Plating', emoji: '🔩', cost: 1, row: 2, col: 2,
+              description: '+4 DEF', prereq: ['defense_1'],
+              apply: () => { upgradeMultipliers.defBonus += 4; } },
+
+            { id: 'harv_xp', name: 'Wisdom', emoji: '📚', cost: 1, row: 2, col: 3,
+              description: '+20% XP', prereq: ['harvest_1'],
+              apply: () => { upgradeMultipliers.hiveXPBonus = (upgradeMultipliers.hiveXPBonus || 1) * 1.2; } },
+            { id: 'harv_carry', name: 'Mandibles', emoji: '🦷', cost: 1, row: 2, col: 5,
+              description: '+1 carry', prereq: ['harvest_1'],
+              apply: () => { upgradeMultipliers.carryCapacity += 1; } },
+
+            { id: 'off_dmg', name: 'Razor', emoji: '🗡️', cost: 1, row: 2, col: 6,
+              description: '+4 ATK', prereq: ['offense_1'],
+              apply: () => { upgradeMultipliers.atkBonus += 4; } },
+            { id: 'off_crit', name: 'Ambush', emoji: '🎯', cost: 1, row: 2, col: 8,
+              description: '+25% first hit', prereq: ['offense_1'],
+              apply: () => { upgradeMultipliers.ambushBonus = 1.25; } },
+
+            // ===== ROW 3: More branching (9 nodes across cols 0-8) =====
+            { id: 'regen', name: 'Regen', emoji: '💚', cost: 2, row: 3, col: 0,
+              description: 'Heal 1HP/15s', prereq: ['def_hp'],
+              apply: () => { upgradeMultipliers.passiveRegen += 1; } },
+            { id: 'fortress', name: 'Fortress', emoji: '🏰', cost: 2, row: 3, col: 1,
+              description: '+8 DEF near nest', prereq: ['def_hp', 'def_armor'],
+              apply: () => { upgradeMultipliers.nestDefenseBonus += 8; } },
+            { id: 'shell', name: 'Iron Shell', emoji: '🐚', cost: 2, row: 3, col: 2,
+              description: '+6 DEF', prereq: ['def_armor'],
+              apply: () => { upgradeMultipliers.defBonus += 6; } },
+
+            { id: 'scholar', name: 'Scholar', emoji: '🎓', cost: 2, row: 3, col: 3,
+              description: '+30% XP', prereq: ['harv_xp'],
+              apply: () => { upgradeMultipliers.hiveXPBonus = (upgradeMultipliers.hiveXPBonus || 1) * 1.3; } },
+            { id: 'swift', name: 'Swift', emoji: '💨', cost: 2, row: 3, col: 4,
+              description: '+15% speed', prereq: ['harv_xp', 'harv_carry'],
+              apply: () => { upgradeMultipliers.antSpeed *= 1.15; } },
+            { id: 'hauler', name: 'Hauler', emoji: '📦', cost: 2, row: 3, col: 5,
+              description: '+2 carry', prereq: ['harv_carry'],
+              apply: () => { upgradeMultipliers.carryCapacity += 2; } },
+
+            { id: 'venom', name: 'Venom', emoji: '☠️', cost: 2, row: 3, col: 6,
+              description: 'Poison 2/3s', prereq: ['off_dmg'],
+              apply: () => { upgradeMultipliers.poisonDamage = 2; } },
+            { id: 'pack', name: 'Pack', emoji: '🐺', cost: 2, row: 3, col: 7,
+              description: '+2 ATK/ally', prereq: ['off_dmg', 'off_crit'],
+              apply: () => { upgradeMultipliers.packHunterBonus = 2; } },
+            { id: 'hunter', name: 'Hunter', emoji: '🏹', cost: 2, row: 3, col: 8,
+              description: '+35% first hit', prereq: ['off_crit'],
+              apply: () => { upgradeMultipliers.ambushBonus = 1.35; } },
+
+            // ===== ROW 4: Powerful upgrades (6 nodes) =====
+            { id: 'immortal', name: 'Undying', emoji: '⭐', cost: 3, row: 4, col: 0,
+              description: '+50% stats <25% HP', prereq: ['regen'],
+              apply: () => { upgradeMultipliers.lastStand = true; } },
+            { id: 'bastion', name: 'Bastion', emoji: '🏯', cost: 3, row: 4, col: 2,
+              description: '15% dmg reduction', prereq: ['fortress', 'shell'],
+              apply: () => { upgradeMultipliers.swarmShield = true; } },
+
+            { id: 'pheromone', name: 'Scent', emoji: '🌀', cost: 3, row: 4, col: 3,
+              description: '2x trail duration', prereq: ['scholar'],
+              apply: () => { CONFIG.pheromoneDecay *= 0.5; } },
+            { id: 'colony', name: 'Colony+', emoji: '🏠', cost: 3, row: 4, col: 5,
+              description: '+60 max pop', prereq: ['swift', 'hauler'],
+              apply: () => { upgradeMultipliers.maxAnts += 60; CONFIG.maxAnts += 60; } },
+
+            { id: 'bane', name: 'Bane', emoji: '💀', cost: 3, row: 4, col: 6,
+              description: '-20% predator HP', prereq: ['venom', 'pack'],
+              apply: () => { upgradeMultipliers.predatorHpMultiplier *= 0.8; } },
+            { id: 'berserker', name: 'Berserk', emoji: '🔥', cost: 3, row: 4, col: 8,
+              description: 'Rally +40% ATK', prereq: ['pack', 'hunter'],
+              apply: () => { upgradeMultipliers.rallyAtkBonus = 1.4; } },
+
+            // ===== ROW 5: Ultimate abilities (3 nodes) =====
+            { id: 'eternal', name: 'Eternal', emoji: '👑', cost: 4, row: 5, col: 1,
+              description: 'Regen +2HP/10s', prereq: ['immortal', 'bastion'],
+              apply: () => { upgradeMultipliers.passiveRegen += 2; } },
+            { id: 'empire', name: 'Empire', emoji: '🌟', cost: 4, row: 5, col: 4,
+              description: '+100 pop, +25% XP', prereq: ['pheromone', 'colony'],
+              apply: () => { upgradeMultipliers.maxAnts += 100; CONFIG.maxAnts += 100; upgradeMultipliers.hiveXPBonus *= 1.25; } },
+            { id: 'warlord', name: 'Warlord', emoji: '⚡', cost: 4, row: 5, col: 7,
+              description: '+10 ATK, -30% pred HP', prereq: ['bane', 'berserker'],
+              apply: () => { upgradeMultipliers.atkBonus += 10; upgradeMultipliers.predatorHpMultiplier *= 0.7; } }
         ];
 
-        function getUpgradeStacks(upgradeId) {
-            return activeUpgrades.filter(u => u === upgradeId).length;
-        }
+        function toggleTechTree() {
+            const modal = document.getElementById('tech-tree-modal');
+            techTreeOpen = !techTreeOpen;
 
-        function getRandomUpgrades(count = 3) {
-            // Filter out maxed upgrades
-            const available = UPGRADE_POOL.filter(u => getUpgradeStacks(u.id) < u.maxStacks);
-
-            // Organize by category: ants (left), economy (middle), other (right)
-            const categories = {
-                ants: available.filter(u => u.category === 'ants'),
-                economy: available.filter(u => u.category === 'economy'),
-                other: available.filter(u => u.category === 'other')
-            };
-
-            // Pick one random upgrade from each category
-            const result = [];
-            const order = ['ants', 'economy', 'other'];
-            for (const cat of order) {
-                if (categories[cat].length > 0) {
-                    const shuffled = categories[cat].sort(() => Math.random() - 0.5);
-                    result.push(shuffled[0]);
-                }
-            }
-
-            // If we don't have 3, fill from any available
-            if (result.length < 3) {
-                const remaining = available.filter(u => !result.includes(u));
-                const shuffled = remaining.sort(() => Math.random() - 0.5);
-                while (result.length < 3 && shuffled.length > 0) {
-                    result.push(shuffled.shift());
-                }
-            }
-
-            return result;
-        }
-
-        let currentUpgradeChoices = [];  // Track current upgrade options for auto-select
-
-        function showUpgradeSelection() {
-            upgradesPaused = true;
-            // Start pausing the survival timer
-            if (pauseStartTime === null) {
-                pauseStartTime = Date.now();
-            }
-            const upgrades = getRandomUpgrades(3);
-            currentUpgradeChoices = upgrades;  // Store for auto-select
-            upgradeChoiceStartTime = Date.now();  // Start countdown
-
-            const container = document.getElementById('upgrade-options');
-            container.innerHTML = '';
-
-            // Category labels and colors
-            const categoryInfo = {
-                ants: { label: 'COLONY', color: '#7bed9f' },
-                economy: { label: 'ECONOMY', color: '#ffd700' },
-                other: { label: 'POWER', color: '#ff6b6b' }
-            };
-
-            upgrades.forEach(upgrade => {
-                const stacks = getUpgradeStacks(upgrade.id);
-                const hasPremium = upgrade.premium && upgrade.premium.cost;
-                const canAffordPremium = hasPremium && coins >= upgrade.premium.cost;
-                const catInfo = categoryInfo[upgrade.category] || { label: 'OTHER', color: '#888' };
-
-                const card = document.createElement('div');
-                card.className = 'upgrade-card-wrapper';
-                card.innerHTML = `
-                    <div class="upgrade-category" style="color: ${catInfo.color}; border-color: ${catInfo.color}">${catInfo.label}</div>
-                    <div class="upgrade-card" data-upgrade-id="${upgrade.id}">
-                        <div class="upgrade-emoji">${upgrade.emoji}</div>
-                        <div class="upgrade-info">
-                            <div class="upgrade-name">${upgrade.name}</div>
-                            <div class="upgrade-desc">${upgrade.description}</div>
-                        </div>
-                        ${stacks > 0 ? `<div class="upgrade-stacks">x${stacks + 1}</div>` : ''}
-                    </div>
-                    ${hasPremium ? `
-                        <div class="upgrade-premium ${canAffordPremium ? '' : 'disabled'}" data-upgrade-id="${upgrade.id}">
-                            <span class="premium-cost">${upgrade.premium.cost}G</span>
-                            <span class="premium-desc">${upgrade.premium.description}</span>
-                        </div>
-                    ` : ''}
-                `;
-
-                // Add click handlers
-                const normalCard = card.querySelector('.upgrade-card');
-                normalCard.onclick = () => selectUpgrade(upgrade);
-
-                if (hasPremium) {
-                    const premiumCard = card.querySelector('.upgrade-premium');
-                    premiumCard.onclick = () => selectPremiumUpgrade(upgrade);
-                }
-
-                container.appendChild(card);
-            });
-
-            // Reset countdown display
-            document.getElementById('upgrade-countdown').textContent = UPGRADE_CHOICE_TIMEOUT;
-            document.getElementById('upgrade-timer-fill').style.width = '100%';
-
-            const modal = document.getElementById('upgrade-modal');
-            modal.classList.remove('minimized');
-            modal.classList.add('visible');
-        }
-
-        function selectUpgrade(upgrade) {
-            upgrade.apply();
-            activeUpgrades.push(upgrade.id);
-
-            // Recalculate stats for all existing ants so upgrade bonuses apply immediately
-            for (const ant of ants) {
-                ant.recalculateStats();
-            }
-
-            document.getElementById('upgrade-modal').classList.remove('visible');
-            document.getElementById('upgrade-modal').classList.remove('minimized');
-            upgradesPaused = false;
-            // End the survival timer pause
-            if (pauseStartTime !== null) {
-                pausedTime += Date.now() - pauseStartTime;
-                pauseStartTime = null;
-            }
-            lastUpgradeTime = getElapsedSeconds();
-            currentUpgradeChoices = [];  // Clear choices
-
-            // Check for pending skill choices
-            setTimeout(() => {
-                if (!skillChoiceModalOpen && pendingSkillChoices.length > 0) {
-                    showNextSkillChoice();
-                }
-            }, 300);
-        }
-
-        function selectPremiumUpgrade(upgrade) {
-            if (!upgrade.premium || coins < upgrade.premium.cost) {
-                return;  // Can't afford
-            }
-
-            // Deduct cost
-            coins -= upgrade.premium.cost;
-
-            // Apply premium effect
-            upgrade.premium.apply();
-            activeUpgrades.push(upgrade.id);
-
-            // Recalculate stats for all existing ants so upgrade bonuses apply immediately
-            for (const ant of ants) {
-                ant.recalculateStats();
-            }
-
-            document.getElementById('upgrade-modal').classList.remove('visible');
-            document.getElementById('upgrade-modal').classList.remove('minimized');
-            upgradesPaused = false;
-            // End the survival timer pause
-            if (pauseStartTime !== null) {
-                pausedTime += Date.now() - pauseStartTime;
-                pauseStartTime = null;
-            }
-            lastUpgradeTime = getElapsedSeconds();
-            currentUpgradeChoices = [];  // Clear choices
-
-            // Check for pending skill choices (premium upgrade path)
-            setTimeout(() => {
-                if (!skillChoiceModalOpen && pendingSkillChoices.length > 0) {
-                    showNextSkillChoice();
-                }
-            }, 300);
-        }
-
-        function updateUpgradeCountdown() {
-            if (!upgradesPaused || currentUpgradeChoices.length === 0) return;
-
-            const elapsed = (Date.now() - upgradeChoiceStartTime) / 1000;
-            const remaining = Math.max(0, UPGRADE_CHOICE_TIMEOUT - elapsed);
-
-            // Update countdown display
-            document.getElementById('upgrade-countdown').textContent = Math.ceil(remaining);
-            document.getElementById('upgrade-timer-fill').style.width = (remaining / UPGRADE_CHOICE_TIMEOUT * 100) + '%';
-
-            // Auto-select if time runs out
-            if (remaining <= 0 && currentUpgradeChoices.length > 0) {
-                const randomIndex = Math.floor(Math.random() * currentUpgradeChoices.length);
-                selectUpgrade(currentUpgradeChoices[randomIndex]);
-            }
-        }
-
-        function toggleUpgradePanel() {
-            const modal = document.getElementById('upgrade-modal');
-            const btn = document.getElementById('upgrade-hide-btn');
-            if (modal.classList.contains('minimized')) {
-                modal.classList.remove('minimized');
-                btn.textContent = '\u25C0';  // Left arrow
-                btn.title = 'Hide (still counting down)';
+            if (techTreeOpen) {
+                renderTechTree();
+                modal.classList.add('visible');
             } else {
-                modal.classList.add('minimized');
-                btn.textContent = '\u25B6';  // Right arrow
-                btn.title = 'Show upgrade choices';
+                modal.classList.remove('visible');
             }
         }
 
-        // Set up hide button event listener
-        document.getElementById('upgrade-hide-btn').addEventListener('click', toggleUpgradePanel);
-        document.getElementById('upgrade-expand-btn').addEventListener('click', toggleUpgradePanel);
+        function canResearchNode(node) {
+            if (node.isRoot) return !techTreeResearched[node.id];
+            if (techTreeResearched[node.id]) return false;
+            if (skillPoints < node.cost) return false;
+            // All prerequisites must be researched
+            for (const prereqId of node.prereq) {
+                if (!techTreeResearched[prereqId]) return false;
+            }
+            return true;
+        }
 
-        function checkUpgradeTime() {
-            if (gameOver || upgradesPaused || harvestModalOpen) return;
+        function isNodeLocked(node) {
+            if (node.isRoot) return false;
+            if (techTreeResearched[node.id]) return false;
+            // Locked if ANY prerequisite is not researched
+            for (const prereqId of node.prereq) {
+                if (!techTreeResearched[prereqId]) return true;
+            }
+            return false;
+        }
 
-            const elapsed = getElapsedSeconds();
-            const timeSinceLastUpgrade = elapsed - lastUpgradeTime;
+        function getPrereqNames(node) {
+            if (!node.prereq || node.prereq.length === 0) return null;
+            const names = node.prereq.map(id => {
+                const n = TECH_TREE.find(t => t.id === id);
+                return n ? n.name : id;
+            });
+            return names.join(' + ');
+        }
 
-            if (timeSinceLastUpgrade >= UPGRADE_INTERVAL) {
-                // Show upgrade selection directly (no harvest modal)
-                showUpgradeSelection();
+        function researchNode(nodeId) {
+            const node = TECH_TREE.find(n => n.id === nodeId);
+            if (!node || !canResearchNode(node)) return;
+
+            // Spend skill points
+            skillPoints -= node.cost;
+            techTreeResearched[nodeId] = true;
+
+            // Apply the effect
+            node.apply();
+
+            // Recalculate stats for all ants
+            for (const ant of ants) {
+                ant.recalculateStats();
+            }
+
+            // Visual feedback
+            spawnFloatingText(CONFIG.nestX, CONFIG.nestY - 50, `${node.name} Researched!`, '#00d4ff', 14, 120);
+
+            // Update UI
+            updateSkillPointsUI();
+            renderTechTree();
+        }
+
+        function renderTechTree() {
+            const container = document.getElementById('tech-tree-content');
+            document.getElementById('tech-tree-sp').textContent = skillPoints;
+
+            // Grid settings - 9 columns (0-8), 100x80px nodes
+            const nodeWidth = 100;
+            const nodeHeight = 80;
+            const colSpacing = 110;
+            const rowSpacing = 100;
+            const paddingLeft = 20;
+            const paddingTop = 15;
+
+            // Calculate node positions
+            function getNodePos(node) {
+                return {
+                    x: paddingLeft + node.col * colSpacing,
+                    y: paddingTop + node.row * rowSpacing
+                };
+            }
+
+            // Build SVG lines for connections
+            let svgLines = '';
+            for (const node of TECH_TREE) {
+                if (node.prereq && node.prereq.length > 0) {
+                    const nodePos = getNodePos(node);
+                    const nodeCenterX = nodePos.x + nodeWidth / 2;
+                    const nodeTopY = nodePos.y;
+
+                    for (const prereqId of node.prereq) {
+                        const prereqNode = TECH_TREE.find(n => n.id === prereqId);
+                        if (prereqNode) {
+                            const prereqPos = getNodePos(prereqNode);
+                            const prereqCenterX = prereqPos.x + nodeWidth / 2;
+                            const prereqBottomY = prereqPos.y + nodeHeight;
+
+                            // Determine line class based on research state
+                            let lineClass = '';
+                            if (techTreeResearched[node.id]) {
+                                lineClass = 'active';
+                            } else if (techTreeResearched[prereqId] && canResearchNode(node)) {
+                                lineClass = 'available';
+                            }
+
+                            svgLines += `<line class="${lineClass}" x1="${prereqCenterX}" y1="${prereqBottomY}" x2="${nodeCenterX}" y2="${nodeTopY}"/>`;
+                        }
+                    }
+                }
+            }
+
+            // Calculate grid dimensions
+            const maxCol = Math.max(...TECH_TREE.map(n => n.col));
+            const maxRow = Math.max(...TECH_TREE.map(n => n.row));
+            const gridWidth = paddingLeft * 2 + (maxCol + 1) * colSpacing;
+            const gridHeight = paddingTop * 2 + (maxRow + 1) * rowSpacing;
+
+            // Build HTML
+            let html = `<div class="tech-tree-grid" style="width:${gridWidth}px;height:${gridHeight}px;">`;
+            html += `<svg class="tech-tree-svg" width="${gridWidth}" height="${gridHeight}">${svgLines}</svg>`;
+
+            // Render each node
+            for (const node of TECH_TREE) {
+                html += renderNode(node, nodeWidth, nodeHeight, colSpacing, rowSpacing, paddingLeft, paddingTop);
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderNode(node, nodeWidth = 100, nodeHeight = 80, colSpacing = 110, rowSpacing = 100, paddingLeft = 20, paddingTop = 15) {
+            const isResearched = techTreeResearched[node.id];
+            const locked = isNodeLocked(node);
+            const canResearch = canResearchNode(node);
+            const notEnoughSP = !isResearched && !locked && skillPoints < node.cost;
+
+            // Grid positioning
+            const x = paddingLeft + node.col * colSpacing;
+            const y = paddingTop + node.row * rowSpacing;
+
+            // Determine branch type for coloring
+            let branchType = 'root';
+            if (node.id.includes('def') || node.id.includes('regen') || node.id.includes('fortress') || node.id.includes('shell') || node.id.includes('immortal') || node.id.includes('bastion') || node.id.includes('eternal')) {
+                branchType = 'defense';
+            } else if (node.id.includes('off') || node.id.includes('venom') || node.id.includes('pack') || node.id.includes('hunter') || node.id.includes('bane') || node.id.includes('berserker') || node.id.includes('warlord')) {
+                branchType = 'offense';
+            } else if (node.id.includes('harv') || node.id.includes('scholar') || node.id.includes('swift') || node.id.includes('hauler') || node.id.includes('pheromone') || node.id.includes('colony') || node.id.includes('empire')) {
+                branchType = 'harvest';
+            }
+
+            let nodeClass = 'tech-node';
+            if (isResearched) nodeClass += ' researched';
+            else if (locked) nodeClass += ' locked';
+            else if (canResearch) nodeClass += ' available';
+            else if (notEnoughSP) nodeClass += ' no-sp';
+
+            return `
+                <div class="${nodeClass}"
+                     style="left:${x}px;top:${y}px;"
+                     data-branch="${branchType}"
+                     data-node-id="${node.id}"
+                     onclick="researchNode('${node.id}')">
+                    <div class="tech-node-emoji">${node.emoji}</div>
+                    <div class="tech-node-name">${node.name}</div>
+                    <div class="tech-node-desc">${node.description}</div>
+                    <div class="tech-node-cost">
+                        ${isResearched ? '✓' : locked ? '🔒' : node.cost === 0 ? '✓' : `${node.cost} SP`}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateSkillPointsUI() {
+            const badge = document.getElementById('skill-points-badge');
+            if (badge) {
+                badge.textContent = skillPoints;
+                badge.style.display = skillPoints > 0 ? 'flex' : 'none';
             }
         }
 
@@ -7784,20 +7892,42 @@
                 predatorHpMultiplier: 1,
                 goldRushActive: false,
                 goldRushEndTime: 0,
-                goldRushMultiplier: 1
+                goldRushMultiplier: 1,
+                // Shop upgrade multipliers
+                hiveXPBonus: 1,
+                killGoldBonus: 1,
+                nestHealAmount: 0,
+                newAntBonusHP: 0,
+                newAntBonusATK: 0,
+                newAntBonusDEF: 0,
+                passiveRegen: 0,
+                xpSharing: 0,
+                rallyDuration: 1,
+                soldierStartLevel: 1
             };
-            lastUpgradeTime = 0;
             CONFIG.maxAnts = 300;  // Reset to default
+
+            // Reset hive leveling
+            hiveLevel = 1;
+            hiveXP = 0;
+            hiveXPToNextLevel = 75;
+
+            // Reset tech tree
+            techTreeResearched = {};
+            techTreeOpen = false;
         }
 
         function restartGame() {
             // Hide modals
             document.getElementById('game-over-modal').classList.remove('visible');
-            document.getElementById('upgrade-modal').classList.remove('visible');
+            document.getElementById('tech-tree-modal').classList.remove('visible');
+            techTreeOpen = false;
 
             // Reset upgrades
             resetUpgrades();
-            upgradesPaused = false;
+
+            // Update hive UI
+            updateHiveUI();
 
             // Reset game state - go back to hive placement mode
             gameOver = false;
@@ -7808,9 +7938,8 @@
             lastUpdateTime = Date.now();
             lastPredatorSpawnTime = 0;
             lastAutoSpawnTime = 0;
-            coins = 50;
+            skillPoints = 0;
             totalAntsSpawned = 0;
-            totalCoinsEarned = 0;
 
             // Clear entities - ants will spawn when hive is placed
             ants.length = 0;
@@ -7856,24 +7985,7 @@
             updateUI();
         }
 
-        function canAfford(cost) {
-            return coins >= cost;
-        }
-
-        function spendCoins(amount) {
-            if (coins >= amount) {
-                coins -= amount;
-                updateUI();
-                return true;
-            }
-            return false;
-        }
-
-        function earnCoins(amount) {
-            coins += amount;
-            totalCoinsEarned += amount;
-            updateUI();
-        }
+        // Coins removed - ants are now free to spawn (limited by max population)
 
         function isInDangerZone(x, y) {
             // Check if position is near a predator spawn spot
@@ -7980,6 +8092,9 @@
         }
 
         function drawAmbientParticles() {
+            // Skip entirely in low-performance mode - ambient particles are purely decorative
+            if (shouldReduceEffects()) return;
+
             for (const dust of dustMotes) {
                 const gradient = ctx.createRadialGradient(dust.x, dust.y, 0, dust.x, dust.y, dust.size * 2);
                 gradient.addColorStop(0, `rgba(255, 250, 220, ${dust.alpha})`);
@@ -8034,6 +8149,9 @@
         }
 
         function drawGrass() {
+            // Skip grass entirely in low-perf mode - purely decorative
+            if (shouldReduceEffects()) return;
+
             for (const cluster of grassClusters) {
                 for (const blade of cluster.blades) {
                     const x = cluster.x + blade.offsetX;
@@ -8225,7 +8343,7 @@
 
         // Helper to get all predators as a flat array
         function getAllPredators() {
-            return [...spiderPredators, ...beetlePredators];
+            return [...spiderPredators, ...beetlePredators, ...bossPredators];
         }
 
         // Helper to get predators with their type key (for card display)
@@ -8233,6 +8351,7 @@
             const result = [];
             for (const p of spiderPredators) result.push({ predator: p, key: 'spider' });
             for (const p of beetlePredators) result.push({ predator: p, key: 'beetle' });
+            for (const p of bossPredators) result.push({ predator: p, key: 'boss' });
             return result;
         }
 
@@ -8298,14 +8417,11 @@
             const FIGHTING_DURATION = 60;  // 1 second - refreshes on each hit so they stay still while fighting
 
             // Combine all predators into one array
-            const allPredators = [...spiderPredators, ...beetlePredators];
+            const allPredators = [...spiderPredators, ...beetlePredators, ...bossPredators];
 
             for (const ant of ants) {
                 // Skip ants that are in the hive resting
                 if (ant.hiveRestTimer > 0) continue;
-
-                // Skip ants that are busy or panicking
-                if (ant.panicTimer > 0) continue;
 
                 // Check attack cooldown (1 attack per second)
                 if (time - ant.lastAttackTime < ATTACK_COOLDOWN) continue;
@@ -8391,6 +8507,7 @@
             // GOLD FROM ENEMY KILLS - determine gold drop based on predator type
             let goldDrop = 0;
             let xpReward = 1;  // Base XP for kill
+            let isBoss = false;
             const spiderIdx = spiderPredators.indexOf(predator);
             if (spiderIdx !== -1) {
                 // Spider drops 3-5 gold, XP scales with wave
@@ -8404,6 +8521,18 @@
                     goldDrop = 5 + Math.floor(Math.random() * 4);
                     xpReward = 2 + Math.floor((predator.wave || 0) * 0.5);  // Higher base + wave bonus
                     beetlePredators.splice(beetleIdx, 1);
+                } else {
+                    const bossIdx = bossPredators.indexOf(predator);
+                    if (bossIdx !== -1) {
+                        // BOSS KILL! Huge rewards
+                        isBoss = true;
+                        const cfg = CONFIG.predators.boss;
+                        goldDrop = cfg.goldReward + cfg.goldPerWave * (predator.wave - 1);
+                        xpReward = 10 + predator.wave * 5;  // Massive XP reward
+                        bossPredators.splice(bossIdx, 1);
+                        // Epic boss death announcement
+                        spawnBossDeathCelebration(predator);
+                    }
                 }
             }
 
@@ -8428,27 +8557,105 @@
                 }
             }
 
-            // Award gold and show floating text
-            if (goldDrop > 0) {
-                // Check for Gold Hunter ability on any ant
-                const hasGoldHunter = ants.some(ant => ant.harvestAbilities && ant.harvestAbilities.includes('goldHunter'));
-                if (hasGoldHunter) {
-                    goldDrop += 2;  // Gold Hunter bonus
+            // Gold rewards removed - kills only give XP to the killer ant now
+        }
+
+        // Boss death celebration effect
+        let bossDeathCelebrations = [];
+
+        function spawnBossDeathCelebration(boss) {
+            bossDeathCelebrations.push({
+                x: boss.x,
+                y: boss.y,
+                name: boss.name,
+                wave: boss.wave,
+                gold: CONFIG.predators.boss.goldReward + CONFIG.predators.boss.goldPerWave * (boss.wave - 1),
+                life: 240,  // 4 seconds
+                maxLife: 240,
+                particles: [],
+                phase: 0
+            });
+
+            // Screen flash green for victory
+            screenFlashColor = 'rgba(0, 255, 100, 0.3)';
+            screenFlashTimer = 20;
+
+            // Spawn lots of gold particles
+            for (let i = 0; i < 30; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2 + Math.random() * 4;
+                bossDeathCelebrations[bossDeathCelebrations.length - 1].particles.push({
+                    x: 0,
+                    y: 0,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 90 + Math.random() * 60,
+                    maxLife: 150,
+                    color: Math.random() < 0.5 ? '#ffd700' : '#ff6600'
+                });
+            }
+        }
+
+        function updateBossDeathCelebrations() {
+            bossDeathCelebrations = bossDeathCelebrations.filter(e => {
+                e.life--;
+                e.phase += 0.1;
+
+                // Update particles
+                e.particles = e.particles.filter(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.1;  // Gravity
+                    p.life--;
+                    return p.life > 0;
+                });
+
+                return e.life > 0;
+            });
+        }
+
+        function drawBossDeathCelebrations() {
+            for (const e of bossDeathCelebrations) {
+                const alpha = Math.min(1, e.life / 60);
+
+                ctx.save();
+                ctx.translate(e.x, e.y);
+
+                // Draw particles
+                for (const p of e.particles) {
+                    const pAlpha = p.life / p.maxLife;
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = pAlpha * alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4 * pAlpha, 0, Math.PI * 2);
+                    ctx.fill();
                 }
 
-                // LUCKY SKILL: 50% chance for double gold (per lucky ant)
-                const luckyAnts = ants.filter(ant => ant.hasSkill('lucky'));
-                for (const luckyAnt of luckyAnts) {
-                    if (Math.random() < 0.50) {
-                        goldDrop *= 2;
-                        spawnLuckyEffect(predator.x, predator.y);
-                        spawnFloatingText(predator.x, predator.y - 55, `🍀 LUCKY! 2x GOLD!`, '#8cc152', 14);
-                        break;  // Only double once per kill
-                    }
+                ctx.globalAlpha = alpha;
+
+                // Victory text
+                if (e.life > 120) {
+                    const scale = 1 + Math.sin(e.phase * 2) * 0.1;
+                    ctx.scale(scale, scale);
+
+                    ctx.shadowColor = '#00ff00';
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#00ff88';
+                    ctx.font = 'bold 32px "Courier New", monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`💀 ${e.name.toUpperCase()} SLAIN! 💀`, 0, -40);
+
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 24px "Courier New", monospace';
+                    ctx.fillText(`+${e.gold} GOLD!`, 0, 0);
+
+                    ctx.fillStyle = '#00d4ff';
+                    ctx.font = '16px "Courier New", monospace';
+                    ctx.fillText(`Boss Wave ${e.wave} Complete`, 0, 30);
                 }
 
-                earnCoins(goldDrop);
-                spawnFloatingText(predator.x, predator.y - 20, `+${goldDrop}g`, '#ffd700', 14);
+                ctx.restore();
             }
         }
 
@@ -8736,7 +8943,8 @@
                 ctx.translate(this.x, this.y);
 
                 // Draw skill aura before rotating (so it stays centered)
-                if (this.skill) {
+                // Skip in low-perf mode - decorative only
+                if (this.skill && !shouldReduceEffects()) {
                     const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
                     let auraColor;
                     switch (this.skill) {
@@ -9112,7 +9320,8 @@
                 ctx.translate(this.x, this.y);
 
                 // Draw skill aura before rotating (so it stays centered)
-                if (this.skill) {
+                // Skip in low-perf mode - decorative only
+                if (this.skill && !shouldReduceEffects()) {
                     const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
                     let auraColor;
                     switch (this.skill) {
@@ -9285,6 +9494,657 @@
         }
 
         // ===========================================
+        // BOSS PREDATOR CLASS
+        // ===========================================
+
+        class Boss {
+            constructor(waveNumber = 1) {
+                const cfg = CONFIG.predators.boss;
+                this.wave = waveNumber;
+
+                // Spawn at random edge of map
+                const edge = Math.floor(Math.random() * 4);
+                const margin = 50;
+                switch (edge) {
+                    case 0: // Top
+                        this.x = margin + Math.random() * (width - margin * 2);
+                        this.y = margin;
+                        break;
+                    case 1: // Right
+                        this.x = width - margin;
+                        this.y = margin + Math.random() * (height - margin * 2);
+                        break;
+                    case 2: // Bottom
+                        this.x = margin + Math.random() * (width - margin * 2);
+                        this.y = height - margin;
+                        break;
+                    case 3: // Left
+                        this.x = margin;
+                        this.y = margin + Math.random() * (height - margin * 2);
+                        break;
+                }
+
+                this.angle = Math.random() * Math.PI * 2;
+                this.targetX = width / 2;
+                this.targetY = height / 2;
+                this.size = cfg.size;
+                this.legPhase = 0;
+                this.state = 'hunting';
+                this.stunTimer = 0;
+                this.wanderTimer = 0;
+                this.lastAttackTime = 0;
+                this.fightingTimer = 0;
+
+                // Status effects
+                this.slowTimer = 0;
+                this.burnTimer = 0;
+                this.burnSource = null;
+                this.frozenTimer = 0;
+                this.fearTimer = 0;
+                this.fearSourceX = 0;
+                this.fearSourceY = 0;
+
+                // Scaled stats based on wave
+                this.maxHp = cfg.baseHp + cfg.hpPerWave * (waveNumber - 1);
+                this.currentHp = this.maxHp;
+                this.atk = cfg.baseAtk + cfg.atkPerWave * (waveNumber - 1);
+                this.def = cfg.baseDef + cfg.defPerWave * (waveNumber - 1);
+                this.speed = cfg.speed;
+
+                // Visual effects
+                this.pulsePhase = 0;
+                this.auraParticles = [];
+                this.spawnTime = Date.now();
+
+                // Boss name based on wave
+                this.name = this.getBossName(waveNumber);
+
+                // Boss skills (1 per wave, random each run)
+                this.skills = getRandomBossSkills(waveNumber);
+
+                // Skill-specific state
+                this.chargeCooldown = 0;
+                this.chargeActive = false;
+                this.chargeTargetX = 0;
+                this.chargeTargetY = 0;
+                this.terrifyCooldown = 0;
+                this.summonCooldown = 0;
+                this.poisonedAnts = new Set();  // Track poisoned ants
+
+                // Apply passive skill effects
+                if (this.skills.includes('ironSkin')) {
+                    this.def = Math.floor(this.def * 1.5);
+                }
+            }
+
+            getBossName(wave) {
+                const names = [
+                    'Goliath', 'Colossus', 'Titan', 'Behemoth', 'Leviathan',
+                    'Juggernaut', 'Destroyer', 'Overlord', 'Nightmare', 'Apocalypse'
+                ];
+                return names[Math.min(wave - 1, names.length - 1)];
+            }
+
+            stun(duration) {
+                // Bosses have 70% stun resistance
+                duration = Math.floor(duration * 0.3);
+                if (duration > 0) {
+                    this.stunTimer = duration;
+                    this.state = 'stunned';
+                }
+            }
+
+            update() {
+                const cfg = CONFIG.predators.boss;
+
+                // Update visual effects
+                this.pulsePhase += 0.05;
+                this.legPhase += 0.08;
+
+                // Update aura particles (skip in low-perf mode)
+                if (!shouldReduceEffects() && Math.random() < 0.3) {
+                    this.auraParticles.push({
+                        x: this.x + (Math.random() - 0.5) * this.size * 2,
+                        y: this.y + (Math.random() - 0.5) * this.size * 2,
+                        life: 60,
+                        maxLife: 60,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: -Math.random() * 1.5
+                    });
+                }
+                // Still update existing particles even in low-perf mode
+                this.auraParticles = this.auraParticles.filter(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                    return p.life > 0;
+                });
+
+                // If fighting, decrement timer and skip movement
+                if (this.fightingTimer > 0) {
+                    this.fightingTimer--;
+                    return;
+                }
+
+                if (this.state === 'stunned') {
+                    this.stunTimer--;
+                    if (this.frozenTimer > 0) this.frozenTimer--;
+                    if (this.stunTimer <= 0) this.state = 'hunting';
+                    return;
+                }
+
+                // Process burn damage
+                if (this.burnTimer > 0) {
+                    this.burnTimer--;
+                    if (this.burnTimer % 60 === 0) {
+                        this.currentHp -= 3;  // Bosses take more burn damage
+                        spawnFloatingText(this.x, this.y - 15, '🔥 3', '#ff4500', 10, 60);
+                        if (this.currentHp <= 0) {
+                            removePredator(this, this.burnSource);
+                            return;
+                        }
+                    }
+                }
+
+                // Process slow
+                let slowMultiplier = 1;
+                if (this.slowTimer > 0) {
+                    this.slowTimer--;
+                    slowMultiplier = 0.6;  // Bosses less affected by slow
+                }
+
+                // Process fear (bosses only flee briefly)
+                if (this.fearTimer > 0) {
+                    this.fearTimer--;
+                    const fleeAngle = Math.atan2(this.y - this.fearSourceY, this.x - this.fearSourceX);
+                    this.x += Math.cos(fleeAngle) * this.speed * 0.5;
+                    this.y += Math.sin(fleeAngle) * this.speed * 0.5;
+                    this.angle = fleeAngle;
+                    return;
+                }
+
+                // Find nearest ant to chase (prioritize ants carrying food)
+                let nearestAnt = null;
+                let nearestDist = cfg.huntRadius;
+                let priorityTarget = null;
+                let priorityDist = cfg.huntRadius;
+
+                // Check decoys first
+                for (const decoy of decoyAnts) {
+                    const dist = Math.hypot(decoy.x - this.x, decoy.y - this.y);
+                    if (dist < nearestDist) {
+                        nearestDist = dist;
+                        this.targetX = decoy.x;
+                        this.targetY = decoy.y;
+                    }
+                }
+
+                // Find real ants
+                for (const ant of ants) {
+                    const dist = Math.hypot(ant.x - this.x, ant.y - this.y);
+                    if (dist < nearestDist) {
+                        nearestDist = dist;
+                        nearestAnt = ant;
+                    }
+                    // Priority: ants carrying food
+                    if (ant.state === 'carrying' && dist < priorityDist) {
+                        priorityDist = dist;
+                        priorityTarget = ant;
+                    }
+                }
+
+                // Prefer ants carrying food
+                const targetAnt = priorityTarget || nearestAnt;
+
+                if (targetAnt) {
+                    this.targetX = targetAnt.x;
+                    this.targetY = targetAnt.y;
+                } else {
+                    // Wander toward nest
+                    this.wanderTimer--;
+                    if (this.wanderTimer <= 0) {
+                        this.targetX = CONFIG.nestX + (Math.random() - 0.5) * 200;
+                        this.targetY = CONFIG.nestY + (Math.random() - 0.5) * 200;
+                        this.wanderTimer = 120;
+                    }
+                }
+
+                // SKILL: Charge - periodic high-speed charge at ants
+                if (this.skills.includes('charge')) {
+                    if (this.chargeCooldown > 0) this.chargeCooldown--;
+
+                    if (this.chargeActive) {
+                        // Charging! Move fast toward charge target
+                        const chargeAngle = Math.atan2(this.chargeTargetY - this.y, this.chargeTargetX - this.x);
+                        this.angle = chargeAngle;
+                        this.x += Math.cos(this.angle) * 4;  // Fast charge
+                        this.y += Math.sin(this.angle) * 4;
+
+                        // End charge when close to target or at bounds
+                        const distToTarget = Math.hypot(this.chargeTargetX - this.x, this.chargeTargetY - this.y);
+                        if (distToTarget < 30 || this.x < 50 || this.x > width - 50 || this.y < 50 || this.y > height - 50) {
+                            this.chargeActive = false;
+                            this.chargeCooldown = 300;  // 5 second cooldown
+                            spawnBossGroundSlam(this.x, this.y);
+                        }
+                    } else if (this.chargeCooldown <= 0 && targetAnt) {
+                        // Start charge!
+                        this.chargeActive = true;
+                        this.chargeTargetX = targetAnt.x;
+                        this.chargeTargetY = targetAnt.y;
+                        spawnFloatingText(this.x, this.y - 50, '🐂 CHARGE!', '#ff8800', 14, 60);
+                    }
+                }
+
+                // SKILL: Terrify - periodically scare nearby ants
+                if (this.skills.includes('terrify')) {
+                    if (this.terrifyCooldown > 0) this.terrifyCooldown--;
+
+                    if (this.terrifyCooldown <= 0) {
+                        let terrified = 0;
+                        for (const ant of ants) {
+                            const dist = Math.hypot(ant.x - this.x, ant.y - this.y);
+                            if (dist < 100) {
+                                ant.panicTimer = 120;  // 2 seconds of panic
+                                ant.targetPredator = null;
+                                ant.state = 'exploring';
+                                terrified++;
+                            }
+                        }
+                        if (terrified > 0) {
+                            spawnFloatingText(this.x, this.y - 50, '👁️ TERRIFY!', '#6600aa', 14, 60);
+                            this.terrifyCooldown = 360;  // 6 second cooldown
+                        }
+                    }
+                }
+
+                // SKILL: Summon - spawn mini spiders periodically
+                if (this.skills.includes('summon')) {
+                    if (this.summonCooldown > 0) this.summonCooldown--;
+
+                    if (this.summonCooldown <= 0) {
+                        // Spawn 2 mini spiders
+                        for (let i = 0; i < 2; i++) {
+                            const newSpider = new Spider();
+                            newSpider.x = this.x + (Math.random() - 0.5) * 60;
+                            newSpider.y = this.y + (Math.random() - 0.5) * 60;
+                            newSpider.maxHp = Math.floor(newSpider.maxHp * 0.5);  // Half HP
+                            newSpider.currentHp = newSpider.maxHp;
+                            newSpider.atk = Math.floor(newSpider.atk * 0.5);  // Half ATK
+                            newSpider.wave = this.wave;
+                            spiderPredators.push(newSpider);
+                        }
+                        spawnFloatingText(this.x, this.y - 50, '🕷️ SUMMON!', '#444444', 14, 60);
+                        this.summonCooldown = 480;  // 8 second cooldown
+                    }
+                }
+
+                // SKILL: Enrage - +50% ATK when below 50% HP
+                if (this.skills.includes('enrage')) {
+                    const hpPercent = this.currentHp / this.maxHp;
+                    if (hpPercent < 0.5 && !this.enraged) {
+                        this.enraged = true;
+                        this.atk = Math.floor(this.atk * 1.5);
+                        spawnFloatingText(this.x, this.y - 50, '😤 ENRAGED!', '#ff0000', 16, 90);
+                    }
+                }
+
+                // Move toward target (unless charging)
+                if (!this.chargeActive) {
+                    const angleToTarget = Math.atan2(this.targetY - this.y, this.targetX - this.x);
+                    this.angle = angleToTarget;
+
+                    const actualSpeed = this.speed * slowMultiplier;
+                    this.x += Math.cos(this.angle) * actualSpeed;
+                    this.y += Math.sin(this.angle) * actualSpeed;
+                }
+
+                // Keep within screen bounds
+                const margin = 30;
+                this.x = Math.max(margin, Math.min(width - margin, this.x));
+                this.y = Math.max(margin, Math.min(height - margin, this.y));
+
+                // Attack ants in radius (1 attack per 1.5 seconds for boss)
+                if (time - this.lastAttackTime >= 90) {
+                    const antsInRange = [];
+                    for (const ant of ants) {
+                        if (Math.hypot(ant.x - this.x, ant.y - this.y) < cfg.killRadius) {
+                            antsInRange.push(ant);
+                        }
+                    }
+
+                    if (antsInRange.length > 0) {
+                        this.lastAttackTime = time;
+
+                        // SKILL: Cleave - hit ALL ants in range
+                        const targetsToHit = this.skills.includes('cleave') ? antsInRange : [antsInRange[0]];
+
+                        for (const ant of targetsToHit) {
+                            // Calculate damage
+                            const predatorAtk = this.atk;
+                            const antDef = ant.getEffectiveDef();
+                            const damage = Math.max(1, predatorAtk - antDef);
+
+                            ant.currentHp -= damage;
+                            spawnFloatingText(ant.x, ant.y - 15, `${damage}`, '#ff4444', 12, 60);
+
+                            // SKILL: Poison - apply poison effect
+                            if (this.skills.includes('poison') && !this.poisonedAnts.has(ant)) {
+                                this.poisonedAnts.add(ant);
+                                ant.poisonTimer = 180;  // 3 seconds
+                                ant.poisonSource = this;
+                                spawnFloatingText(ant.x, ant.y - 25, '☠️', '#88ff00', 10, 60);
+                            }
+
+                            // SKILL: Life Steal - heal 25% of damage dealt
+                            if (this.skills.includes('lifeSteal')) {
+                                const healAmount = Math.floor(damage * 0.25);
+                                if (healAmount > 0) {
+                                    this.currentHp = Math.min(this.maxHp, this.currentHp + healAmount);
+                                    spawnFloatingText(this.x, this.y - 30, `+${healAmount}`, '#ff6666', 10, 60);
+                                }
+                            }
+
+                            // Check if ant died
+                            if (ant.currentHp <= 0) {
+                                spawnDeathEffect(ant.x, ant.y, 'ant', ant.color);
+                                dropCarriedFood(ant);
+                                const idx = ants.indexOf(ant);
+                                if (idx !== -1) ants.splice(idx, 1);
+                            }
+                        }
+
+                        // Boss ground slam effect
+                        spawnBossGroundSlam(this.x, this.y);
+                    }
+                }
+            }
+
+            // Check if boss has a specific skill
+            hasSkill(skillName) {
+                return this.skills && this.skills.includes(skillName);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                const reducedEffects = shouldReduceEffects();
+
+                // Draw menacing aura - simplified in low-perf mode
+                const auraPulse = Math.sin(this.pulsePhase) * 0.3 + 0.7;
+                if (reducedEffects) {
+                    // Simple circle instead of gradient
+                    ctx.fillStyle = `rgba(100, 0, 0, ${auraPulse * 0.2})`;
+                } else {
+                    const gradient = ctx.createRadialGradient(0, 0, this.size * 0.5, 0, 0, this.size * 2);
+                    gradient.addColorStop(0, `rgba(150, 0, 0, ${auraPulse * 0.4})`);
+                    gradient.addColorStop(0.5, `rgba(80, 0, 0, ${auraPulse * 0.2})`);
+                    gradient.addColorStop(1, 'rgba(50, 0, 0, 0)');
+                    ctx.fillStyle = gradient;
+                }
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw aura particles - skip in low-perf mode
+                if (!reducedEffects) {
+                    for (const p of this.auraParticles) {
+                        const alpha = p.life / p.maxLife;
+                        ctx.fillStyle = `rgba(255, 50, 0, ${alpha * 0.8})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x - this.x, p.y - this.y, 3 * alpha, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                ctx.rotate(this.angle + Math.PI / 2);
+
+                const s = this.size;
+                const legWave = Math.sin(this.legPhase) * 0.15;
+
+                if (this.state === 'stunned') {
+                    ctx.globalAlpha = 0.5 + Math.sin(this.stunTimer * 0.3) * 0.3;
+                    if (this.frozenTimer > 0) {
+                        ctx.fillStyle = 'rgba(135, 206, 235, 0.6)';
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.size * 1.3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Burn visual
+                if (this.burnTimer > 0) {
+                    const burnPulse = Math.sin(Date.now() / 100) * 0.3 + 0.7;
+                    ctx.fillStyle = `rgba(255, 100, 0, ${burnPulse * 0.5})`;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.beginPath();
+                ctx.ellipse(5, 5, s * 0.8, s * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 8 legs for boss (spider-like but bigger)
+                ctx.strokeStyle = '#1a0505';
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+
+                for (let side = -1; side <= 1; side += 2) {
+                    for (let i = 0; i < 4; i++) {
+                        const attachY = -s * 0.4 + i * s * 0.3;
+                        const phase = (i % 2 === 0) ? legWave : -legWave;
+                        const baseAngle = (30 + i * 20) * side * Math.PI / 180;
+
+                        ctx.beginPath();
+                        ctx.moveTo(side * s * 0.3, attachY);
+                        const midX = side * (s * 0.6 + Math.cos(baseAngle) * s * 0.2);
+                        const midY = attachY - s * 0.3 + phase * s * 0.15;
+                        ctx.lineTo(midX, midY);
+                        const endX = side * (s * 0.9 + Math.cos(baseAngle) * s * 0.3);
+                        const endY = attachY + s * 0.2 + phase * s * 0.2;
+                        ctx.lineTo(endX, endY);
+                        ctx.stroke();
+                    }
+                }
+
+                // Main body - dark crimson (simplified in low-perf mode)
+                if (reducedEffects) {
+                    ctx.fillStyle = '#3a0a0a';
+                } else {
+                    const bodyGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 0.8);
+                    bodyGradient.addColorStop(0, '#5a1515');
+                    bodyGradient.addColorStop(0.5, '#3a0a0a');
+                    bodyGradient.addColorStop(1, '#1a0505');
+                    ctx.fillStyle = bodyGradient;
+                }
+                ctx.beginPath();
+                ctx.ellipse(0, 0, s * 0.7, s * 0.85, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Skull pattern on back
+                ctx.fillStyle = '#2a0808';
+                ctx.beginPath();
+                ctx.ellipse(0, -s * 0.1, s * 0.35, s * 0.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Glowing eyes - skip shadowBlur in low-perf mode
+                const eyeGlow = Math.sin(this.pulsePhase * 2) * 0.3 + 0.7;
+                ctx.fillStyle = `rgba(255, 50, 0, ${eyeGlow})`;
+                if (!reducedEffects) {
+                    ctx.shadowColor = '#ff3300';
+                    ctx.shadowBlur = 15;
+                }
+                ctx.beginPath();
+                ctx.arc(-s * 0.2, -s * 0.5, s * 0.12, 0, Math.PI * 2);
+                ctx.arc(s * 0.2, -s * 0.5, s * 0.12, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Mandibles
+                ctx.strokeStyle = '#4a1010';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(-s * 0.15, -s * 0.7);
+                ctx.quadraticCurveTo(-s * 0.3, -s * 1, -s * 0.1, -s * 1.1);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(s * 0.15, -s * 0.7);
+                ctx.quadraticCurveTo(s * 0.3, -s * 1, s * 0.1, -s * 1.1);
+                ctx.stroke();
+
+                // Unrotate for HP bar and text (so they stay horizontal)
+                ctx.rotate(-(this.angle + Math.PI / 2));
+
+                // HP bar above boss (same style as other predators)
+                const barWidth = s * 2;
+                const barHeight = 6;
+                const barY = -s * 1.5;
+                const hpPercent = this.currentHp / this.maxHp;
+
+                // Background bar
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(-barWidth / 2, barY, barWidth, barHeight);
+
+                // HP fill - red like other predators
+                let hpColor = '#ff4444';
+                if (hpPercent <= 0.2) hpColor = '#aa0000';
+
+                ctx.fillStyle = hpColor;
+                ctx.fillRect(-barWidth / 2, barY, barWidth * hpPercent, barHeight);
+
+                // Border
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(-barWidth / 2, barY, barWidth, barHeight);
+
+                // Boss name label
+                ctx.fillStyle = '#ff4400';
+                ctx.font = 'bold 11px "Courier New", monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(`⚔ ${this.name} ⚔`, 0, -s * 1.8);
+
+                // Show skills
+                if (this.skills && this.skills.length > 0) {
+                    const skillIcons = this.skills.map(sk => BOSS_SKILLS[sk]?.icon || '?').join(' ');
+                    ctx.fillStyle = 'rgba(255, 150, 100, 0.9)';
+                    ctx.font = '10px "Courier New", monospace';
+                    ctx.fillText(skillIcons, 0, -s * 2.05);
+                }
+
+                ctx.restore();
+            }
+        }
+
+        // ===========================================
+        // BOSS SKILLS SYSTEM
+        // ===========================================
+
+        const BOSS_SKILLS = {
+            // Offensive skills
+            cleave: {
+                name: 'Cleave',
+                icon: '⚔️',
+                description: 'Attacks hit all ants in range',
+                color: '#ff4444'
+            },
+            charge: {
+                name: 'Charge',
+                icon: '🐂',
+                description: 'Periodically charges at high speed',
+                color: '#ff8800'
+            },
+            poison: {
+                name: 'Poison',
+                icon: '☠️',
+                description: 'Attacks apply poison (3 damage over 3s)',
+                color: '#88ff00'
+            },
+            // Defensive skills
+            ironSkin: {
+                name: 'Iron Skin',
+                icon: '🛡️',
+                description: '+50% DEF',
+                color: '#888888'
+            },
+            lifeSteal: {
+                name: 'Life Steal',
+                icon: '🩸',
+                description: 'Heals 25% of damage dealt',
+                color: '#aa0000'
+            },
+            enrage: {
+                name: 'Enrage',
+                icon: '😤',
+                description: '+50% ATK when below 50% HP',
+                color: '#ff0000'
+            },
+            // Utility skills
+            terrify: {
+                name: 'Terrify',
+                icon: '👁️',
+                description: 'Nearby ants flee periodically',
+                color: '#6600aa'
+            },
+            summon: {
+                name: 'Summon',
+                icon: '🕷️',
+                description: 'Spawns mini spiders periodically',
+                color: '#444444'
+            }
+        };
+
+        // Skill pools for randomization
+        const BOSS_SKILL_POOL = Object.keys(BOSS_SKILLS);
+
+        // Get random skills for a boss (different each run)
+        function getRandomBossSkills(count) {
+            const shuffled = [...BOSS_SKILL_POOL].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, count);
+        }
+
+        // Boss ground slam effect
+        let bossGroundSlamEffects = [];
+
+        function spawnBossGroundSlam(x, y) {
+            bossGroundSlamEffects.push({
+                x, y,
+                radius: 10,
+                maxRadius: 80,
+                life: 30,
+                maxLife: 30
+            });
+        }
+
+        function updateBossGroundSlamEffects() {
+            bossGroundSlamEffects = bossGroundSlamEffects.filter(e => {
+                e.radius += (e.maxRadius - e.radius) * 0.2;
+                e.life--;
+                return e.life > 0;
+            });
+        }
+
+        function drawBossGroundSlamEffects() {
+            for (const e of bossGroundSlamEffects) {
+                const alpha = e.life / e.maxLife;
+                ctx.strokeStyle = `rgba(150, 0, 0, ${alpha})`;
+                ctx.lineWidth = 4 * alpha;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Inner ring
+                ctx.strokeStyle = `rgba(255, 100, 0, ${alpha * 0.5})`;
+                ctx.lineWidth = 2 * alpha;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius * 0.5, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // ===========================================
         // FOOD ITEMS
         // ===========================================
 
@@ -9339,6 +10199,10 @@
         const zoneCooldowns = new Map();  // Map<spotIndex, endTimestamp>
         const ZONE_COOLDOWN_DURATION = 10000;  // 10 seconds cooldown after level up
 
+        // Fallback: Track when zones became empty to detect "stuck" zones
+        const zoneEmptySince = new Map();  // Map<spotIndex, timestamp>
+        const ZONE_STALE_THRESHOLD = 30000;  // 30 seconds - force respawn if empty this long
+
         // Track ant spawn counts for scaling costs
         let antSpawnCounts = { worker: 0 };
 
@@ -9350,12 +10214,10 @@
         }
 
         function spawnAnt(antType) {
-            const cost = getAntSpawnCost(antType);
-            if (!canAfford(cost)) return false;
+            // Coins removed - ants are free but still limited by max population
             if (ants.length >= CONFIG.maxAnts) return false;
             if (gameOver) return false;
 
-            spendCoins(cost);
             antSpawnCounts[antType]++;
             totalAntsSpawned++;
 
@@ -9450,30 +10312,23 @@
                 return (this.unitsDelivered + this.unitsDropped) >= this.maxSize;
             }
 
-            // Called when units are dropped (ant died) - may trigger respawn
+            // Called when units are dropped (ant died) - just track for stats
             onUnitsDropped(units) {
                 this.unitsDropped += units;
-                if (this.isDepleted && this.allUnitsAccountedFor()) {
-                    this.triggerRespawn();
-                }
             }
 
-            // Called when units are delivered - may trigger respawn
+            // Called when units are delivered - just track for stats
             onUnitsDelivered(units) {
                 this.unitsDelivered += units;
-                if (this.isDepleted && this.allUnitsAccountedFor()) {
-                    this.triggerRespawn();
-                }
             }
 
-            // Trigger respawn for this food
+            // Trigger respawn for this food - called immediately when last piece picked up
             triggerRespawn() {
-                // Level up only if all units were delivered (not just dropped)
-                const levelGain = this.unitsDelivered >= this.maxSize ? 1 : 0;
+                console.log(`[FOOD ${this.type}] triggerRespawn called! zoneSpot=${this.zoneSpot}`);
+
+                // Level up every time food is fully harvested
                 const oldLevel = foodLevels[this.type];
-                if (levelGain > 0) {
-                    foodLevels[this.type] = Math.min(10, foodLevels[this.type] + 1);
-                }
+                foodLevels[this.type] = Math.min(10, foodLevels[this.type] + 1);
                 const newLevel = foodLevels[this.type];
 
                 if (newLevel > oldLevel) {
@@ -9488,22 +10343,14 @@
                     }
                 }
 
-                // Schedule respawn
+                // Schedule respawn with cooldown
                 const respawnX = this.x;
                 const respawnY = this.y;
                 const respawnType = this.type;
                 const respawnSpot = this.zoneSpot;
 
-                // Clear zone occupation
+                // Set zone cooldown
                 if (respawnSpot !== null) {
-                    zoneOccupied.delete(respawnSpot);
-                }
-
-                // Respawn after cooldown if leveled up, else quick respawn
-                const needsCooldown = levelGain > 0 || newLevel >= 10;
-                const respawnDelay = needsCooldown ? ZONE_COOLDOWN_DURATION : 1000;
-
-                if (needsCooldown && respawnSpot !== null) {
                     zoneCooldowns.set(respawnSpot, Date.now() + ZONE_COOLDOWN_DURATION);
                 }
 
@@ -9512,7 +10359,7 @@
                         zoneCooldowns.delete(respawnSpot);
                     }
                     respawnFoodAtZone(respawnSpot, respawnType, respawnX, respawnY);
-                }, respawnDelay);
+                }, ZONE_COOLDOWN_DURATION);
             }
 
             addCarrier(ant) {
@@ -9541,32 +10388,46 @@
                 ctx.fill();
 
                 // Zone-based glow behind emoji (or special glow for rare food)
-                const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.2);
-                if (isRare) {
-                    // Golden sparkle glow for rare food
-                    const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
-                    const gc = foodConfig.glowColor;
-                    glowGrad.addColorStop(0, `rgba(${gc.r}, ${gc.g}, ${gc.b}, ${0.8 * pulse})`);
-                    glowGrad.addColorStop(0.5, `rgba(${gc.r}, ${gc.g}, ${gc.b}, ${0.4 * pulse})`);
-                    glowGrad.addColorStop(1, 'transparent');
-                } else if (this.inDangerZone) {
-                    // Golden/amber glow for danger zone food
-                    glowGrad.addColorStop(0, 'rgba(255, 200, 80, 0.5)');
-                    glowGrad.addColorStop(0.5, 'rgba(255, 180, 50, 0.2)');
-                    glowGrad.addColorStop(1, 'transparent');
+                // Skip gradient and sparkles in low-perf mode
+                const reducedFoodEffects = shouldReduceEffects();
+                if (reducedFoodEffects) {
+                    // Simple fill instead of gradient
+                    if (isRare) {
+                        const gc = foodConfig.glowColor;
+                        ctx.fillStyle = `rgba(${gc.r}, ${gc.g}, ${gc.b}, 0.3)`;
+                    } else if (this.inDangerZone) {
+                        ctx.fillStyle = 'rgba(255, 200, 80, 0.2)';
+                    } else {
+                        ctx.fillStyle = 'rgba(120, 255, 150, 0.15)';
+                    }
                 } else {
-                    // Green glow for safe zone food
-                    glowGrad.addColorStop(0, 'rgba(120, 255, 150, 0.4)');
-                    glowGrad.addColorStop(0.5, 'rgba(100, 230, 130, 0.15)');
-                    glowGrad.addColorStop(1, 'transparent');
+                    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.2);
+                    if (isRare) {
+                        // Golden sparkle glow for rare food
+                        const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
+                        const gc = foodConfig.glowColor;
+                        glowGrad.addColorStop(0, `rgba(${gc.r}, ${gc.g}, ${gc.b}, ${0.8 * pulse})`);
+                        glowGrad.addColorStop(0.5, `rgba(${gc.r}, ${gc.g}, ${gc.b}, ${0.4 * pulse})`);
+                        glowGrad.addColorStop(1, 'transparent');
+                    } else if (this.inDangerZone) {
+                        // Golden/amber glow for danger zone food
+                        glowGrad.addColorStop(0, 'rgba(255, 200, 80, 0.5)');
+                        glowGrad.addColorStop(0.5, 'rgba(255, 180, 50, 0.2)');
+                        glowGrad.addColorStop(1, 'transparent');
+                    } else {
+                        // Green glow for safe zone food
+                        glowGrad.addColorStop(0, 'rgba(120, 255, 150, 0.4)');
+                        glowGrad.addColorStop(0.5, 'rgba(100, 230, 130, 0.15)');
+                        glowGrad.addColorStop(1, 'transparent');
+                    }
+                    ctx.fillStyle = glowGrad;
                 }
-                ctx.fillStyle = glowGrad;
                 ctx.beginPath();
                 ctx.arc(0, 0, r * 1.2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Sparkle effect for rare food
-                if (isRare) {
+                // Sparkle effect for rare food - skip in low-perf mode
+                if (isRare && !reducedFoodEffects) {
                     const sparkleCount = 4;
                     for (let i = 0; i < sparkleCount; i++) {
                         const angle = (Date.now() / 500 + i * Math.PI * 2 / sparkleCount) % (Math.PI * 2);
@@ -9664,11 +10525,16 @@
 
         // Respawn food at a specific zone
         function respawnFoodAtZone(zoneIndex, foodType, x, y) {
-            if (zoneOccupied.has(zoneIndex)) return;  // Already occupied
+            console.log(`[RESPAWN] respawnFoodAtZone called: zone=${zoneIndex}, type=${foodType}, occupied=${zoneOccupied.has(zoneIndex)}`);
+            if (zoneOccupied.has(zoneIndex)) {
+                console.log(`[RESPAWN] BLOCKED - zone ${zoneIndex} is already occupied!`);
+                return;  // Already occupied
+            }
 
             const food = new FoodItem(x, y, foodType, zoneIndex);
             foodItems.push(food);
             zoneOccupied.set(zoneIndex, food);
+            console.log(`[RESPAWN] SUCCESS - ${foodType} spawned at zone ${zoneIndex}`);
         }
 
         // Drop carried food when an ant dies - restores units to source or marks as dropped
@@ -9707,6 +10573,41 @@
                 const food = new FoodItem(spot.x, spot.y, foodType, i);
                 foodItems.push(food);
                 zoneOccupied.set(i, food);
+            }
+        }
+
+        // Fallback: Check for zones that have been empty too long and force respawn
+        function checkStaleZones() {
+            const now = Date.now();
+
+            for (let i = 0; i < foodSpots.length; i++) {
+                const spot = foodSpots[i];
+                const isOccupied = zoneOccupied.has(i);
+                const cooldownEnd = zoneCooldowns.get(i);
+                const isOnCooldown = cooldownEnd && now < cooldownEnd;
+
+                if (isOccupied) {
+                    // Zone has food, clear the empty timestamp
+                    zoneEmptySince.delete(i);
+                } else if (!isOnCooldown) {
+                    // Zone is empty and NOT on cooldown - track when it became empty
+                    if (!zoneEmptySince.has(i)) {
+                        zoneEmptySince.set(i, now);
+                    } else {
+                        // Check if it's been empty too long
+                        const emptySince = zoneEmptySince.get(i);
+                        if (now - emptySince > ZONE_STALE_THRESHOLD) {
+                            console.log(`[FALLBACK] Zone ${i} has been empty for ${Math.floor((now - emptySince) / 1000)}s - forcing respawn!`);
+                            // Force respawn
+                            const foodType = spot.assignedFoodType;
+                            respawnFoodAtZone(i, foodType, spot.x, spot.y);
+                            zoneEmptySince.delete(i);
+                        }
+                    }
+                } else {
+                    // Zone is on cooldown, reset the empty timer
+                    zoneEmptySince.delete(i);
+                }
             }
         }
 
@@ -10340,6 +11241,20 @@
                             }
                         }
 
+                        // SPIRIT LINK skill: Heal nearby allies for 25% of damage dealt
+                        if (this.spiritLinkActive) {
+                            const healAmount = Math.ceil(retaliateDamage * 0.25);
+                            const linkRadius = this.spiritLinkRadius || (this.foodDetectRadius * 2);
+                            for (const ally of ants) {
+                                if (ally === this || ally.currentHp <= 0) continue;
+                                const dist = Math.hypot(ally.x - this.x, ally.y - this.y);
+                                if (dist < linkRadius && ally.currentHp < ally.maxHp) {
+                                    ally.currentHp = Math.min(ally.maxHp, ally.currentHp + healAmount);
+                                    spawnFloatingText(ally.x, ally.y - 25, `🔗 +${healAmount}`, '#1abc9c', 10);
+                                }
+                            }
+                        }
+
                         // Spawn combat effect with health indicators
                         const midX = (this.x + predator.x) / 2;
                         const midY = (this.y + predator.y) / 2;
@@ -10377,14 +11292,6 @@
                 // BLOODLUST SKILL: Add permanent ATK from kills
                 if (this.hasSkill('bloodlust')) {
                     atk += this.bloodlustStacks;
-                }
-
-                // Berserker skill (level 3 choice): +100% ATK when below 40% HP
-                if (this.hasSkill('berserker')) {
-                    if (this.currentHp / this.maxHp < 0.4) {
-                        atk *= 2;
-                        // Visual indicator handled in draw function
-                    }
                 }
 
                 // LAST STAND SKILL: 3x damage when below 50% HP
@@ -10535,7 +11442,7 @@
 
                 // HP5 STAT: Heal based on hp5Stacks from nectar deliveries (1 HP per 5 sec per stack)
                 // Uses real time (Date.now) and respects pause states
-                if (this.hp5Stacks > 0 && !upgradesPaused && !skillChoiceModalOpen && !harvestModalOpen) {
+                if (this.hp5Stacks > 0 && !skillChoiceModalOpen && !harvestModalOpen) {
                     const now = Date.now();
                     if (!this.hp5LastTick) this.hp5LastTick = now;
 
@@ -10545,6 +11452,22 @@
                         this.hp5LastTick = now;
                         if (healAmount > 0) {
                             spawnFloatingText(this.x, this.y - 15, `+${healAmount}`, '#ff9ff3', 9);
+                        }
+                    }
+                }
+
+                // BOSS POISON: Take damage over time from boss poison skill
+                if (this.poisonTimer > 0) {
+                    this.poisonTimer--;
+                    if (this.poisonTimer % 60 === 0) {  // 1 damage per second
+                        this.currentHp -= 1;
+                        spawnFloatingText(this.x, this.y - 15, '☠️1', '#88ff00', 9, 60);
+                        if (this.currentHp <= 0) {
+                            spawnDeathEffect(this.x, this.y, 'ant', this.color);
+                            dropCarriedFood(this);
+                            const idx = ants.indexOf(this);
+                            if (idx !== -1) ants.splice(idx, 1);
+                            return;  // Stop update, ant is dead
                         }
                     }
                 }
@@ -10606,13 +11529,6 @@
                 // SPIRIT LINK: Track duration and cleanup
                 if (this.spiritLinkActive && now >= this.spiritLinkEndTime) {
                     this.spiritLinkActive = false;
-                    for (const ant of this.spiritLinkedAnts) {
-                        if (ant.spiritLinkedTo === this) ant.spiritLinkedTo = null;
-                    }
-                    this.spiritLinkedAnts = [];
-                }
-                if (this.spiritLinkedTo && now >= this.spiritLinkEndTime) {
-                    this.spiritLinkedTo = null;
                 }
 
                 // =====================
@@ -11229,81 +12145,23 @@
                     }
                 }
 
-                // BLINK SKILL: Teleport to enemy and stun
-                if (this.hasSkill('blink')) {
-                    const skill = this.getSkill('blink');
-                    const now = Date.now();
-                    const cooldownDone = (now - this.getLastSkillUse('blink')) >= skill.cooldown;
-
-                    if (cooldownDone) {
-                        // Find a nearby enemy to blink to
-                        let blinkTarget = null;
-                        let blinkDist = 150;
-                        for (const p of getAllPredators()) {
-                            if (p.currentHp <= 0 || p.state === 'stunned') continue;
-                            const dist = Math.hypot(p.x - this.x, p.y - this.y);
-                            if (dist < blinkDist && dist > 40) {
-                                blinkDist = dist;
-                                blinkTarget = p;
-                            }
-                        }
-
-                        if (blinkTarget) {
-                            this.setLastSkillUse('blink', now);
-                            const startX = this.x;
-                            const startY = this.y;
-                            // Teleport next to target
-                            const angle = Math.atan2(this.y - blinkTarget.y, this.x - blinkTarget.x);
-                            this.x = blinkTarget.x + Math.cos(angle) * 20;
-                            this.y = blinkTarget.y + Math.sin(angle) * 20;
-                            this.angle = angle + Math.PI;  // Face the target
-
-                            spawnBlinkEffect(startX, startY, this.x, this.y);
-                            spawnFloatingText(this.x, this.y - 35, '✨ BLINK!', '#f39c12', 14, 90, this);
-
-                            // Stun the target
-                            blinkTarget.stunTimer = 90;  // 1.5 seconds
-                            blinkTarget.state = 'stunned';
-                            spawnFloatingText(blinkTarget.x, blinkTarget.y - 20, 'STUNNED!', '#f39c12', 12);
-                        }
-                    }
-                }
-
-                // SPIRIT LINK SKILL: Link with allies to share damage (DET×2 range, triggers when any ally is in combat)
+                // SPIRIT LINK SKILL: When in combat, heal nearby allies for 25% of damage dealt
                 if (this.hasSkill('spiritLink')) {
                     const skill = this.getSkill('spiritLink');
                     const now = Date.now();
                     const cooldownDone = (now - this.getLastSkillUse('spiritLink')) >= skill.cooldown;
 
                     if (cooldownDone && !this.spiritLinkActive) {
-                        const radius = this.foodDetectRadius * 2;  // Use DET×2 range
-                        let nearbyAllies = [];
-                        let anyInCombat = false;
+                        // Trigger when THIS ant is in combat
+                        const inCombat = this.fightingTimer > 0 || this.state === 'hunting';
 
-                        for (const ant of ants) {
-                            if (ant === this) continue;
-                            const dist = Math.hypot(ant.x - this.x, ant.y - this.y);
-                            if (dist < radius) {
-                                nearbyAllies.push(ant);
-                            }
-                            // Check if ANY ant is in combat (not just nearby ones)
-                            if (ant.fightingTimer > 0 || ant.state === 'hunting') anyInCombat = true;
-                        }
-
-                        // Trigger when any ally on the map is in combat and we have nearby allies to link with
-                        if (nearbyAllies.length >= 1 && anyInCombat) {
+                        if (inCombat) {
                             this.setLastSkillUse('spiritLink', now);
                             this.spiritLinkActive = true;
                             this.spiritLinkEndTime = now + 6000;
-                            this.spiritLinkedAnts = nearbyAllies;
+                            this.spiritLinkRadius = this.foodDetectRadius * 2;  // DET×2 range
 
-                            // Mark linked ants
-                            for (const ant of nearbyAllies) {
-                                ant.spiritLinkedTo = this;
-                                ant.spiritLinkEndTime = now + 6000;
-                            }
-
-                            spawnSpiritLinkEffect(this, nearbyAllies);
+                            spawnSpiritLinkEffect(this, []);  // Visual only on caster
                             spawnFloatingText(this.x, this.y - 35, '🔗 SPIRIT LINK!', '#1abc9c', 14, 120, this);
                         }
                     }
@@ -11361,10 +12219,6 @@
                     }
                 }
 
-                // Determine if this ant will fight or flee based on ATK stat
-                // Ants with 3+ ATK will stand and fight, weaker ants flee
-                const willFight = this.getEffectiveAtk() >= 3;
-
                 // Priority 1: Help a friendly in danger (rush to assist)
                 if (friendlyInDanger && friendlyInDanger.targetPredator && this.state !== 'hunting') {
                     const predator = friendlyInDanger.targetPredator;
@@ -11376,35 +12230,22 @@
                     }
                 }
 
-                // Priority 2: Engage predator if close and willing to fight
-                if (nearestPredator && nearestPredatorDist < 50 && willFight && this.state !== 'hunting' && this.state !== 'carrying') {
+                // Priority 2: Engage predator if close - ALL ANTS ALWAYS FIGHT
+                // Even ants carrying food will drop food and fight
+                if (nearestPredator && nearestPredatorDist < 60 && this.state !== 'hunting') {
+                    // Drop food if carrying to join the fight
+                    if (this.state === 'carrying' && this.carriedFood > 0) {
+                        // Drop food on the ground (spawns a small food item)
+                        const droppedFood = new Food(this.x, this.y, 'dropped', Math.min(this.carriedFood, 3));
+                        droppedFood.units = this.carriedFood;
+                        droppedFood.maxUnits = this.carriedFood;
+                        foodItems.push(droppedFood);
+                        this.carriedFood = 0;
+                    }
                     this.targetPredator = nearestPredator;
                     this.state = 'hunting';
                     return;
                 }
-
-                // Priority 3: Flee if predator is close and ant is weak (or carrying food)
-                // But limit flee time to 3 seconds (180 frames) so ants don't run forever
-                if (nearestPredator && nearestPredatorDist < 60 && (!willFight || this.state === 'carrying')) {
-                    this.fleeTimer = (this.fleeTimer || 0) + 1;
-
-                    // Only flee if we haven't been fleeing too long (max 3 seconds)
-                    if (this.fleeTimer < 180) {
-                        this.panicTimer = 30;
-                        const fleeAngle = Math.atan2(this.y - nearestPredator.y, this.x - nearestPredator.x);
-                        this.angle = fleeAngle + (Math.random() - 0.5) * 0.5;
-                        this.x += Math.cos(this.angle) * this.speed * 2.5;
-                        this.y += Math.sin(this.angle) * this.speed * 2.5;
-                        this.bounceOffWalls();
-                        return;
-                    }
-                    // After max flee time, continue normal behavior (will explore/return to nest)
-                } else {
-                    // Reset flee timer when not actively fleeing
-                    this.fleeTimer = 0;
-                }
-
-                if (this.panicTimer > 0) this.panicTimer--;
 
                 switch (this.state) {
                     case 'exploring': this.explore(); break;
@@ -11439,18 +12280,7 @@
                         this.state = 'exploring';
                         return;
                     }
-
-                    // Disengage if HP gets low (below 40%)
-                    if (this.currentHp < this.maxHp * 0.4) {
-                        this.targetPredator = null;
-                        this.state = 'exploring';
-                        this.panicTimer = 60;  // Flee for a bit
-                        const fleeAngle = Math.atan2(this.y - predator.y, this.x - predator.x);
-                        this.angle = fleeAngle;
-                        return;
-                    }
-
-                    // Otherwise keep fighting (attack cooldown will handle timing)
+                    // Keep fighting until death or victory - no fleeing!
                     return;
                 }
 
@@ -11622,15 +12452,18 @@
                     this.state = 'carrying';
                     this.angle = Math.atan2(CONFIG.nestY - this.y, CONFIG.nestX - this.x);
 
-                    // Mark food as depleted when empty (will respawn when all units accounted for)
+                    // Mark food as depleted when empty - trigger respawn immediately on last pickup
                     if (food.isEmpty()) {
+                        console.log(`[FOOD ${food.type}] DEPLETED! zoneSpot=${food.zoneSpot}, maxSize=${food.maxSize}`);
                         food.isDepleted = true;
                         const idx = foodItems.indexOf(food);
                         if (idx !== -1) foodItems.splice(idx, 1);
-                        // Clear zone occupation so respawn can happen when all units are delivered/dropped
+                        // Clear zone occupation
                         if (food.zoneSpot !== null && food.zoneSpot !== undefined) {
                             zoneOccupied.delete(food.zoneSpot);
                         }
+                        // Trigger respawn cooldown immediately when last piece is picked up
+                        food.triggerRespawn();
                     }
                 }
             }
@@ -11724,10 +12557,18 @@
 
                     foodCollected += unitsDelivered;
 
-                    // LUCKY BIRTH PASSIVE: 20% chance for +1 gold on delivery
+                    // Award hive XP for food delivery
+                    const baseXP = 5;
+                    const foodXPMultiplier = deliveredFoodType === 'goldenApple' ? 3 :
+                                              deliveredFoodType === 'nectar' ? 1.4 : 1;
+                    const zoneXPBonus = 1 + (zoneMultiplier - 1) * 0.5;  // x2 zone = 1.5x, x3 = 2x
+                    const xpGained = Math.floor(baseXP * unitsDelivered * foodXPMultiplier * zoneXPBonus);
+                    addHiveXP(xpGained);
+
+                    // LUCKY BIRTH PASSIVE: 20% chance for bonus XP on delivery
                     if (this.luckyDelivery && Math.random() < 0.2) {
-                        earnCoins(1);
-                        spawnFloatingText(this.x, this.y - 25, '🍀 +1g', '#ffd700', 10);
+                        addHiveXP(3);
+                        spawnFloatingText(this.x, this.y - 25, '🍀 +3 XP', '#00d4ff', 10);
                     }
 
                     // Show bonus gained floating text on the delivering ant
@@ -11805,9 +12646,10 @@
 
             draw() {
                 const antLevel = this.getLevel();
+                const reducedEffects = shouldReduceEffects();
 
-                // Draw sci-fi energy trail for level 2+ only
-                if (antLevel >= 2 && this.positionHistory.length > 3) {
+                // Draw sci-fi energy trail for level 2+ only (skip in low-perf mode)
+                if (!reducedEffects && antLevel >= 2 && this.positionHistory.length > 3) {
                     // Bright neon color palette - cycles for high levels
                     const trailThemes = {
                         2: { core: [0, 255, 200], glow: [0, 255, 255] },    // Cyan
@@ -11883,19 +12725,21 @@
                 // SHADOW STEP: Ant becomes semi-transparent while stealthed
                 if (this.shadowStepActive) {
                     ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 200) * 0.1;
-                    // Dark shadow aura
-                    const shadowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 25);
-                    shadowGrad.addColorStop(0, 'rgba(44, 62, 80, 0.5)');
-                    shadowGrad.addColorStop(0.7, 'rgba(44, 62, 80, 0.2)');
-                    shadowGrad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = shadowGrad;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 25, 0, Math.PI * 2);
-                    ctx.fill();
+                    // Dark shadow aura (skip gradient in low-perf mode)
+                    if (!reducedEffects) {
+                        const shadowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 25);
+                        shadowGrad.addColorStop(0, 'rgba(44, 62, 80, 0.5)');
+                        shadowGrad.addColorStop(0.7, 'rgba(44, 62, 80, 0.2)');
+                        shadowGrad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = shadowGrad;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, 25, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 }
 
-                // Rally Cry buff glow (golden aura before rotation)
-                if (this.rallyBoostTimer > 0) {
+                // Rally Cry buff glow (golden aura before rotation) - skip in low-perf mode
+                if (!reducedEffects && this.rallyBoostTimer > 0) {
                     const pulse = Math.sin(Date.now() / 150) * 0.3 + 0.7;
                     const rallyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 20);
                     rallyGrad.addColorStop(0, `rgba(255, 215, 0, ${0.4 * pulse})`);
@@ -12332,6 +13176,7 @@
 
         function drawPheromones() {
             const cellSize = CONFIG.pheromoneGridSize;
+            const reducedEffects = shouldReduceEffects();
 
             // Use soft blending for smooth trails
             ctx.globalCompositeOperation = 'lighter';
@@ -12341,7 +13186,9 @@
                     const idx = row * pheromoneGrid.cols + col;
                     const foodPh = pheromoneGrid.food[idx];
 
-                    if (foodPh > 0.5) {
+                    // In low-perf mode, use higher threshold to draw fewer cells
+                    const threshold = reducedEffects ? 2 : 0.5;
+                    if (foodPh > threshold) {
                         const x = col * cellSize + cellSize / 2;
                         const y = row * cellSize + cellSize / 2;
 
@@ -12359,13 +13206,18 @@
                         const g = Math.round(150 + strength * 105);
                         const b = Math.round(80 + strength * 120);
 
-                        // Soft radial gradient for each point - creates smooth blending
-                        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
-                        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
-                        gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${alpha * 0.5})`);
-                        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+                        // In low-perf mode, use simple fill instead of gradient
+                        if (reducedEffects) {
+                            ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.7})`;
+                        } else {
+                            // Soft radial gradient for each point - creates smooth blending
+                            const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
+                            gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${alpha * 0.5})`);
+                            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+                            ctx.fillStyle = gradient;
+                        }
 
-                        ctx.fillStyle = gradient;
                         ctx.beginPath();
                         ctx.arc(x, y, size, 0, Math.PI * 2);
                         ctx.fill();
@@ -12387,22 +13239,25 @@
             const cx = CONFIG.nestX;
             const cy = CONFIG.nestY;
             const antCount = ants.length;
+            const reducedEffects = shouldReduceEffects();
 
             // Draw defense radius if Fortified Nest is active
             if (upgradeMultipliers.nestDefenseBonus > 0) {
                 const defRadius = upgradeMultipliers.nestDefenseRadius;
                 const pulse = Math.sin(Date.now() / 600) * 0.15 + 0.85;
 
-                // Outer glow
-                const glowGrad = ctx.createRadialGradient(cx, cy, defRadius * 0.7, cx, cy, defRadius * 1.1);
-                glowGrad.addColorStop(0, 'transparent');
-                glowGrad.addColorStop(0.5, `rgba(100, 180, 255, ${0.08 * pulse})`);
-                glowGrad.addColorStop(0.8, `rgba(100, 180, 255, ${0.15 * pulse})`);
-                glowGrad.addColorStop(1, 'transparent');
-                ctx.fillStyle = glowGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy, defRadius * 1.1, 0, Math.PI * 2);
-                ctx.fill();
+                // Outer glow - skip gradient in low-perf mode
+                if (!reducedEffects) {
+                    const glowGrad = ctx.createRadialGradient(cx, cy, defRadius * 0.7, cx, cy, defRadius * 1.1);
+                    glowGrad.addColorStop(0, 'transparent');
+                    glowGrad.addColorStop(0.5, `rgba(100, 180, 255, ${0.08 * pulse})`);
+                    glowGrad.addColorStop(0.8, `rgba(100, 180, 255, ${0.15 * pulse})`);
+                    glowGrad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = glowGrad;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, defRadius * 1.1, 0, Math.PI * 2);
+                    ctx.fill();
+                }
 
                 // Defense circle border
                 ctx.strokeStyle = `rgba(100, 180, 255, ${0.4 * pulse})`;
@@ -12438,24 +13293,31 @@
                 ctx.fill();
             }
 
-            // Shadow
-            const shadowGrad = ctx.createRadialGradient(cx + currentRadius * 0.1, cy + currentRadius * 0.15, 0, cx, cy, currentRadius * 1.3);
-            shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
-            shadowGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.12)');
-            shadowGrad.addColorStop(1, 'transparent');
-            ctx.fillStyle = shadowGrad;
+            // Shadow - simplified in low-perf mode
+            if (reducedEffects) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            } else {
+                const shadowGrad = ctx.createRadialGradient(cx + currentRadius * 0.1, cy + currentRadius * 0.15, 0, cx, cy, currentRadius * 1.3);
+                shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+                shadowGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.12)');
+                shadowGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = shadowGrad;
+            }
             ctx.beginPath();
             ctx.ellipse(cx + currentRadius * 0.1, cy + currentRadius * 0.12, currentRadius * 1.2, currentRadius * 0.7, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Main mound
-            const baseGrad = ctx.createRadialGradient(cx - currentRadius * 0.2, cy - currentRadius * 0.25, 0, cx, cy, currentRadius * 1.2);
-            baseGrad.addColorStop(0, '#6a5a45');
-            baseGrad.addColorStop(0.3, '#5a4a38');
-            baseGrad.addColorStop(0.6, '#4a3a2a');
-            baseGrad.addColorStop(1, '#3a2a1f');
-
-            ctx.fillStyle = baseGrad;
+            // Main mound - simplified in low-perf mode
+            if (reducedEffects) {
+                ctx.fillStyle = '#4a3a2a';
+            } else {
+                const baseGrad = ctx.createRadialGradient(cx - currentRadius * 0.2, cy - currentRadius * 0.25, 0, cx, cy, currentRadius * 1.2);
+                baseGrad.addColorStop(0, '#6a5a45');
+                baseGrad.addColorStop(0.3, '#5a4a38');
+                baseGrad.addColorStop(0.6, '#4a3a2a');
+                baseGrad.addColorStop(1, '#3a2a1f');
+                ctx.fillStyle = baseGrad;
+            }
             ctx.beginPath();
             ctx.ellipse(cx, cy, currentRadius, currentRadius * 0.6, 0, 0, Math.PI * 2);
             ctx.fill();
@@ -12528,6 +13390,43 @@
                     ctx.fillText('🐜', cx, cy - currentRadius * 0.4);
                 }
             }
+
+            // Skill points indicator - glow and icon when player has unspent points
+            if (skillPoints > 0 && !techTreeOpen) {
+                const pulse = Math.sin(Date.now() / 400) * 0.3 + 0.7;
+
+                // Pulsing glow around hive
+                const glowGrad = ctx.createRadialGradient(cx, cy, currentRadius * 0.8, cx, cy, currentRadius * 1.5);
+                glowGrad.addColorStop(0, 'transparent');
+                glowGrad.addColorStop(0.5, `rgba(0, 212, 255, ${0.1 * pulse})`);
+                glowGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = glowGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, currentRadius * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Research icon above hive
+                ctx.save();
+                ctx.translate(cx, cy - currentRadius - 20);
+
+                // Badge background
+                ctx.fillStyle = `rgba(0, 40, 60, ${0.8 * pulse})`;
+                ctx.strokeStyle = `rgba(0, 212, 255, ${0.8 * pulse})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(-30, -12, 60, 24, 12);
+                ctx.fill();
+                ctx.stroke();
+
+                // Icon and text
+                ctx.font = '12px serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = `rgba(0, 212, 255, ${pulse})`;
+                ctx.fillText(`🔬 ${skillPoints} SP`, 0, 0);
+
+                ctx.restore();
+            }
         }
 
         function drawFood() {
@@ -12539,7 +13438,6 @@
         }
 
         function updateUI() {
-            document.getElementById('coins').textContent = coins;
             document.getElementById('ant-count').textContent = ants.length;
             document.getElementById('food-collected').textContent = foodCollected;
             document.getElementById('survival-timer').textContent = formatTime(getElapsedSeconds());
@@ -12550,15 +13448,10 @@
             // Food buttons are always available (food is free in new system)
             // Disabled state is only set by cooldown system
 
-            // Update ant button states and costs
+            // Update ant button states (ants are free now, only limited by max population)
             document.querySelectorAll('.ant-btn').forEach(btn => {
-                const antType = btn.dataset.ant;
-                const cost = getAntSpawnCost(antType);
-                btn.classList.toggle('disabled', coins < cost || ants.length >= CONFIG.maxAnts);
+                btn.classList.toggle('disabled', ants.length >= CONFIG.maxAnts);
             });
-
-            // Update displayed costs
-            updateAntCosts();
         }
 
         // ===========================================
@@ -12728,6 +13621,23 @@
                     { text: 'Armored', class: 'negative' },
                     { text: 'Weak Attack', class: 'positive' },
                     { text: 'Slow Patrol', class: 'positive' }
+                ]
+            },
+            boss: {
+                icon: '💀',
+                title: 'Boss',
+                subtitle: 'Apex Predator',
+                description: 'A terrifying boss that spawns every 5 minutes. Massive HP, devastating attacks, and huge gold rewards!',
+                stats: [
+                    { name: 'HP', value: '150+', class: 'bad' },
+                    { name: 'ATK', value: '8+', class: 'bad' },
+                    { name: 'DEF', value: '5+', class: 'bad' },
+                    { name: 'SPD', value: '0.5', class: 'good' }
+                ],
+                traits: [
+                    { text: '⚔ BOSS', class: 'bad' },
+                    { text: 'Stun Resist', class: 'negative' },
+                    { text: 'High Rewards', class: 'positive' }
                 ]
             }
         };
@@ -13146,9 +14056,12 @@
                 traits.unshift({ text: 'Hunting', class: 'negative' });
             }
 
+            // For bosses, use their custom name
+            const title = (key === 'boss' && predator.name) ? predator.name : baseData.title;
+
             return {
                 icon: baseData.icon,
-                title: baseData.title,
+                title: title,
                 subtitle: baseData.subtitle,
                 description: baseData.description,
                 stats: stats,
@@ -13201,7 +14114,7 @@
             'Balanced': 'Average stats across the board',
             'Efficient Carrier': 'Good at transporting food',
             'Common': 'Standard worker type',
-            'Brave': 'Will fight instead of flee',
+            'Brave': 'Fearless warrior - fights to the death',
             // Predator traits
             'Territorial': 'Guards a specific area',
             'Can Be Stunned': 'Can be temporarily disabled',
@@ -13954,6 +14867,9 @@
             pausedTime = 0;
             pauseStartTime = null;
 
+            // Auto-research the hive core (root of tech tree)
+            techTreeResearched['hive_core'] = true;
+
             // Initialize cycle timer for food rework
             initCycleTimer();
 
@@ -14074,6 +14990,18 @@
 
             // Only process click if we weren't dragging
             if (!wasDragging && !foodPlacementActive) {
+                // Check if clicking on the hive to open tech tree
+                const rect = canvas.getBoundingClientRect();
+                const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                const distToHive = Math.hypot(clickX - CONFIG.nestX, clickY - CONFIG.nestY);
+                const hiveRadius = getColonySize() * 1.2;  // Slightly larger click area
+
+                if (distToHive < hiveRadius && gameStarted && !gameOver) {
+                    toggleTechTree();
+                    return;
+                }
+
                 const entity = findClickedEntity(e.clientX, e.clientY);
                 if (entity) {
                     if (entity.type === 'ant') {
@@ -14107,6 +15035,18 @@
             // If card is open, close it on any touch
             if (characterCardOpen) {
                 closeCharacterCard();
+                return;
+            }
+
+            // Check if touching the hive to open tech tree
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = (touchX - rect.left) * (canvas.width / rect.width);
+            const canvasY = (touchY - rect.top) * (canvas.height / rect.height);
+            const distToHive = Math.hypot(canvasX - CONFIG.nestX, canvasY - CONFIG.nestY);
+            const hiveRadius = getColonySize() * 1.2;
+
+            if (distToHive < hiveRadius && !gameOver) {
+                toggleTechTree();
                 return;
             }
 
@@ -14331,12 +15271,9 @@
         function update() {
             // Don't update if game hasn't started (waiting for hive placement)
             // Also pause during skill selection modal
-            if (!gameStarted || gameOver || upgradesPaused || skillChoiceModalOpen) return;
+            if (!gameStarted || gameOver || skillChoiceModalOpen) return;
 
             time++;
-
-            // Check if it's time for upgrades
-            checkUpgradeTime();
 
             // Check if it's time to auto-spawn a worker ant
             checkAutoSpawn();
@@ -14347,6 +15284,11 @@
             // Check for rare food spawns (golden apples)
             checkRareFoodSpawn();
 
+            // Check for stale food zones (fallback respawn) every second
+            if (time % 60 === 0) {
+                checkStaleZones();
+            }
+
             for (const ant of ants) {
                 ant.update();
                 ant.updateBuffs();  // Clean up expired food buffs
@@ -14355,6 +15297,7 @@
             // Update all predators from arrays
             for (const spider of spiderPredators) spider.update();
             for (const beetle of beetlePredators) beetle.update();
+            for (const boss of bossPredators) boss.update();
 
             decayPheromones();
             updateAmbientParticles();
@@ -14402,6 +15345,9 @@
             updateBlinkEffects(); // Blink teleport
             updateSpiritLinkEffects(); // Spirit link chains
             updateSkilledAntsPanel(); // Update skill cooldowns in UI
+            updateBossGroundSlamEffects(); // Boss ground slam
+            updateBossAnnouncementEffects(); // Boss announcement
+            updateBossDeathCelebrations(); // Boss death celebration
 
             // Check for game over
             checkGameOver();
@@ -14445,6 +15391,8 @@
             // Draw predators FIRST so ants appear on top during combat
             for (const spider of spiderPredators) spider.draw();
             for (const beetle of beetlePredators) beetle.draw();
+            for (const boss of bossPredators) boss.draw();
+            drawBossGroundSlamEffects(); // Boss ground slam effect
             drawAnts();
             drawAmbientParticles();
             drawSpawnNotifications();
@@ -14485,16 +15433,19 @@
             drawBlinkEffects(); // Blink teleport
             drawSpiritLinkEffects(); // Spirit link chains
             drawFloatingTexts();  // Reward and damage floating text
+            drawBossAnnouncementEffects(); // Boss announcement (on top)
+            drawBossDeathCelebrations(); // Boss death celebration
             drawHint();
             drawSelectionRect(); // Draw selection rectangle on top
+            drawPerformanceStats(); // FPS counter (Press P to toggle)
         }
 
         function gameLoop() {
+            updatePerformanceStats();
             update();
             render();
             updateUI();
-            updateUpgradeCountdown();
-            updateCycleTimerUI();  // Update cycle timer display based on upgrade time
+            updateCycleTimerUI();  // Update cycle timer display
             requestAnimationFrame(gameLoop);
         }
 
@@ -14506,6 +15457,8 @@
             canvas.height = height * dpr;
             canvas.style.width = width + 'px';
             canvas.style.height = height + 'px';
+            // Reset transform before scaling to prevent compound scaling
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(dpr, dpr);
 
             initPheromoneGrid();
@@ -14554,27 +15507,11 @@
 
         window.addEventListener('resize', resize);
 
-        // Check if running on localhost - if so, hide WIP overlay and show game
-        // On public site, show WIP overlay and hide game
-        (function checkAccess() {
-            const hostname = window.location.hostname;
-            const isLocal = hostname === 'localhost' ||
-                           hostname === '127.0.0.1' ||
-                           hostname === '' ||  // file:// protocol
-                           hostname.endsWith('.local');
-
+        // Hide WIP overlay - game is now available publicly
+        (function() {
             const wipOverlay = document.getElementById('wip-overlay');
-            const canvas = document.getElementById('canvas');
-            const uiElements = document.querySelectorAll('.ui-overlay, .upgrade-modal, .game-over-modal, .harvest-modal, .hive-placement-overlay');
-
-            if (isLocal) {
-                // On localhost - hide WIP, show game
+            if (wipOverlay) {
                 wipOverlay.classList.add('hidden');
-            } else {
-                // On public site - show WIP, hide game
-                wipOverlay.classList.remove('hidden');
-                canvas.style.display = 'none';
-                uiElements.forEach(el => el.style.display = 'none');
             }
         })();
     </script>
